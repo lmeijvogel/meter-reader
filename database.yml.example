@@ -1,0 +1,11 @@
+development:
+  host: localhost
+  database: meterstanden_development
+  username: root
+  password:
+
+test:
+  host: localhost
+  database: meterstanden_test
+  username: root
+  password:

@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem "serialport"
+gem "mysql2"
 
 group :development do
   gem "guard"

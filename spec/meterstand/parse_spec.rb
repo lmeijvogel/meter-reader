@@ -29,11 +29,11 @@ describe "full integration" do
 INPUT
     end
 
-    around do |example|
+    before do
       Timecop.freeze
+    end
 
-      example.run
-
+    after do
       Timecop.return
     end
 

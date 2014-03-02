@@ -26,6 +26,7 @@ GEM
       rb-inotify (>= 0.9)
     lumberjack (1.0.4)
     method_source (0.8.2)
+    mysql2 (0.3.15)
     nio4r (1.0.0)
     pry (0.9.12.6)
       coderay (~> 1.0)
@@ -54,6 +55,7 @@ PLATFORMS
 DEPENDENCIES
   guard
   guard-rspec
+  mysql2
   rspec
   serialport
   timecop

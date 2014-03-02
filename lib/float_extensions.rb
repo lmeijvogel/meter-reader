@@ -17,6 +17,10 @@ class Kwh
     "#{value}kWh"
   end
 
+  def to_f
+    value
+  end
+
   protected
   attr_accessor :value
 end
