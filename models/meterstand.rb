@@ -1,3 +1,5 @@
+require 'date'
+
 require_relative "../lib/data_parsing/gas_chain.rb"
 require_relative "../lib/data_parsing/stroom_dal_chain.rb"
 require_relative "../lib/data_parsing/stroom_current_chain.rb"
