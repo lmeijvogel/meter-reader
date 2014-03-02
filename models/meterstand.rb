@@ -1,5 +1,6 @@
 require_relative "../lib/data_parsing/gas_chain.rb"
 require_relative "../lib/data_parsing/stroom_dal_chain.rb"
+require_relative "../lib/data_parsing/stroom_current_chain.rb"
 require_relative "../lib/data_parsing/stroom_piek_chain.rb"
 require_relative "../lib/data_parsing/skip_line_chain.rb"
 
@@ -7,7 +8,11 @@ class Meterstand < OpenStruct
   def initialize
     super
 
-    @chain = StroomDalChain.new(StroomPiekChain.new(GasChain.new(SkipLineChain.new)))
+    @chain = StroomDalChain.new(
+      StroomPiekChain.new(
+        StroomCurrentChain.new(
+          GasChain.new(
+            SkipLineChain.new))))
   end
 
   def parse(input)

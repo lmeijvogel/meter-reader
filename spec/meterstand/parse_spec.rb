@@ -42,6 +42,7 @@ INPUT
     its(:time_stamp)  { should == DateTime.now }
     its(:stroom_dal)  { should == 557.379.kWh }
     its(:stroom_piek) { should == 610.251.kWh }
+    its(:stroom_current) { should == 0.69 }
     its(:gas)         { should == 742.914 }
   end
 end
