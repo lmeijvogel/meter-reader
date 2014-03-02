@@ -6,6 +6,8 @@ require_relative "../lib/data_parsing/stroom_current_chain.rb"
 require_relative "../lib/data_parsing/stroom_piek_chain.rb"
 require_relative "../lib/data_parsing/skip_line_chain.rb"
 
+require_relative "measurement.rb"
+
 class Meterstand < OpenStruct
   def initialize
     super
@@ -18,7 +20,7 @@ class Meterstand < OpenStruct
   end
 
   def parse(input)
-    output = OpenStruct.new
+    output = Measurement.new
 
     input = input.lines.to_enum
 
