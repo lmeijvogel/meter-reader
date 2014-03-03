@@ -1,3 +1,5 @@
+DROP TABLE measurements;
+
 CREATE TABLE measurements (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   time_stamp DATETIME,
