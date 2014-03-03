@@ -1,7 +1,10 @@
+require 'yaml'
 require 'ostruct'
 require 'serialport'
+require 'mysql2'
 require_relative "models/meterstand.rb"
 require_relative "lib/data_parsing/stream_splitter.rb"
+require_relative "lib/output/database_writer.rb"
 
 
 serial_port = SerialPort.new("/dev/ttyUSB0", 9600)
@@ -18,10 +21,12 @@ database_connection = Mysql2::Client.new(host: config["host"],
                                                username: config["username"],
                                                password: config["password"])
 
+database_writer = DatabaseWriter.new(database_connection)
+
 loop do
   message = stream_splitter.read
 
   measurement = meterstand_parser.parse(message)
-  database_connection.write(measurement)
+  database_writer.save(measurement)
   puts measurement
 end
