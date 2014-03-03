@@ -8,8 +8,8 @@ require ROOT_PATH.join("models/measurement.rb")
 describe DatabaseWriter do
   describe :write do
     let(:time_stamp) { DateTime.now }
-    let(:stroom_dal) { 12.23 }
-    let(:stroom_piek) { 12.23 }
+    let(:stroom_dal) { 12.23.kWh }
+    let(:stroom_piek) { 12.23.kWh }
     let(:stroom_current) { 12.23 }
     let(:gas) { 12.23 }
     
