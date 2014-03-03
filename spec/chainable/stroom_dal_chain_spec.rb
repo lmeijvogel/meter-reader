@@ -30,6 +30,20 @@ describe StroomDalChain do
       output.stroom_dal.should == 557.379.kWh
     end
 
+    it "notes the previous value" do
+      subject.handle(lines, output)
+
+      subject.last_value.should == 557.370.kWh
+    end
+
+    it "stores the difference from the last value" do
+      subject.last_value = 557.370.kWh
+
+      subject.handle(lines, output)
+
+      output.diff_stroom_dal.should == 0.009.kWh
+    end
+
     it "advances the enumerator" do
       subject.handle(lines, output)
 

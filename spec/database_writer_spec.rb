@@ -2,6 +2,7 @@ require 'yaml'
 require 'mysql2'
 require 'spec_helper'
 
+require ROOT_PATH.join("lib/float_extensions.rb")
 require ROOT_PATH.join("lib/output/database_writer.rb")
 require ROOT_PATH.join("models/measurement.rb")
 
@@ -9,8 +10,10 @@ describe DatabaseWriter do
   describe :write do
     let(:time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23.kWh }
-    let(:stroom_piek) { 12.23.kWh }
-    let(:stroom_current) { 12.23 }
+    let(:stroom_piek) { 23.34.kWh }
+    let(:stroom_current) { 0.23 }
+    let(:diff_stroom_dal) { 14.23.kWh }
+    let(:diff_stroom_piek) { 15.23.kWh }
     let(:gas) { 12.23 }
     
     let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
@@ -28,6 +31,8 @@ describe DatabaseWriter do
       @measurement.stroom_dal = stroom_dal
       @measurement.stroom_piek = stroom_piek
       @measurement.stroom_current = stroom_current
+      @measurement.diff_stroom_dal = diff_stroom_dal
+      @measurement.diff_stroom_piek = diff_stroom_piek
       @measurement.gas = gas
 
       database_connection.query("DELETE FROM measurements")
@@ -52,6 +57,14 @@ describe DatabaseWriter do
 
       it "should have the correct stroom_piek" do
         subject["stroom_piek"].should == stroom_piek.to_f
+      end
+
+      it "should have the correct diff_stroom_dal" do
+        subject["diff_stroom_dal"].should == diff_stroom_dal.to_f
+      end
+
+      it "should have the correct diff_stroom_piek" do
+        subject["diff_stroom_piek"].should == diff_stroom_piek.to_f
       end
 
       it "should have the correct stroom_current" do

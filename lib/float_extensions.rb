@@ -10,7 +10,17 @@ class Kwh
   end
 
   def ==(other)
-    other.value == value
+    if other.is_a? Kwh
+      (other.value - value) < 0.001
+    elsif other.is_a? Float
+      (other - value) < 0.001
+    else
+      false
+    end
+  end
+
+  def -(other)
+    (self.value - other.value).kWh
   end
 
   def inspect
