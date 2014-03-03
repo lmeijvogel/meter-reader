@@ -8,7 +8,7 @@ require_relative "../lib/data_parsing/skip_line_chain.rb"
 
 require_relative "measurement.rb"
 
-class Meterstand < OpenStruct
+class Meterstand
   def initialize
     super
 

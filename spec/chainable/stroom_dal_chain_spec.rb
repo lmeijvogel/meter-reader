@@ -1,4 +1,5 @@
 require 'spec_helper'
+require ROOT_PATH.join("models/measurement.rb")
 require ROOT_PATH.join("lib/data_parsing/stroom_dal_chain.rb")
 
 describe StroomDalChain do
@@ -19,7 +20,7 @@ describe StroomDalChain do
   end
 
   describe :handle do
-    let(:output) { OpenStruct.new }
+    let(:output) { Measurement.new }
     let(:next_line) { "next line" }
     let(:lines) { ["1-0:1.8.1(00557.379*kWh)", next_line].to_enum }
 

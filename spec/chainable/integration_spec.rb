@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'ostruct'
+
 require ROOT_PATH.join("lib/data_parsing/chainable.rb")
 
 class TestChainable < Chainable

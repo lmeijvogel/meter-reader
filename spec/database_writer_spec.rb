@@ -1,3 +1,4 @@
+require 'yaml'
 require 'mysql2'
 require 'spec_helper'
 

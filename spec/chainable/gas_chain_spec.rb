@@ -1,6 +1,6 @@
 require 'spec_helper'
-
 require ROOT_PATH.join('lib/data_parsing/gas_chain.rb')
+require ROOT_PATH.join("models/measurement.rb")
 
 describe GasChain do
   describe :can_handle? do
@@ -22,7 +22,7 @@ describe GasChain do
     let(:next_line) { "The next line" }
     let(:lines) { ['0-1:24.3.0(140228200000)(24)(60)(1)(0-1:24.2.0)(m3)', '(00742.914)', next_line].to_enum }
 
-    let(:output) { OpenStruct.new }
+    let(:output) { Measurement.new }
 
     it "sets :gas to the correct value" do
       subject.handle(lines, output)
