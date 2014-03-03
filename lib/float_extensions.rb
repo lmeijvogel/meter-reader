@@ -17,6 +17,10 @@ class Kwh
     "#{value}kWh"
   end
 
+  def to_s
+    inspect
+  end
+
   def to_f
     value
   end
