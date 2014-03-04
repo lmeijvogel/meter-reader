@@ -12,3 +12,5 @@ CREATE TABLE measurements (
   diff_stroom_piek FLOAT,
   diff_gas FLOAT
 );
+
+CREATE INDEX measurement_time_index ON measurements(time_stamp);
