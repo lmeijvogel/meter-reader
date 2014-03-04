@@ -1,4 +1,3 @@
-require 'yaml'
 require 'ostruct'
 require 'serialport'
 require 'mysql2'
@@ -7,6 +6,7 @@ require 'trollop'
 require_relative "models/meterstand.rb"
 require_relative "lib/data_parsing/stream_splitter.rb"
 require_relative "lib/output/database_writer.rb"
+require_relative "lib/database_config.rb"
 
 opts = Trollop::options do
   opt :stdin, "Read from stdin"
@@ -27,12 +27,7 @@ end
 meterstand_parser = Meterstand.new
 stream_splitter = StreamSplitter.new(input, "/XMX5XMXABCE100129872")
 
-config = YAML.load(File.read("database.yml"))[opts[:env]]
-
-database_connection = Mysql2::Client.new(host: config["host"],
-                                               database: config["database"],
-                                               username: config["username"],
-                                               password: config["password"])
+database_connection = Mysql2::Client.new(DatabaseConfig.for(opts[:env]))
 
 database_writer = DatabaseWriter.new(database_connection)
 
