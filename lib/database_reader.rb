@@ -40,19 +40,21 @@ class DatabaseReader
   def week=(date)
     date = date.to_datetime
     self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date + 7}'"
-    self.granularity = :hour
+    self.granularity = :three_hour
   end
 
   def month=(date)
     date = date.to_datetime
     self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date.next_month}'"
-    self.granularity = :day
+    self.granularity = :three_hour
   end
 
   def granularity
     case @granularity
     when :hour
       "DAYOFYEAR(time_stamp), HOUR(time_stamp)"
+    when :three_hour
+      "DAYOFYEAR(time_stamp), HOUR(time_stamp) DIV 3"
     when :day
       "DAYOFYEAR(time_stamp)"
     else
