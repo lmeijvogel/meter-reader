@@ -50,6 +50,7 @@ $(function() {
       }
 
       var options = {
+        animation: false,
         scaleOverride: true,
         scaleStepWidth: 0.25,
         scaleSteps: determineMaxGridSteps(measurements, 0.25),
