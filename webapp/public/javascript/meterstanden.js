@@ -62,17 +62,80 @@ $(function() {
     });
   };
 
-  $('.today').on('click', function() {
-    var now = new Date();
+  var datasetSize;
+  var date;
 
-    var url = "/day/today"
-    render(url);
+  $('.yesterday').on('click', function() {
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate()-1);
+
+    renderDay(yesterday);
+  });
+
+  $('.today').on('click', function() {
+    var today = new Date();
+
+    renderDay(today);
   });
 
   $('.this_month').on('click', function() {
+    var this_month = new Date();
+    // make sure that adding months on e.g. the 31st doesn't
+    // skip months if the next month only has 30 days.
+    this_month.setDate(1);
+
+    renderMonth(this_month);
+  });
+
+  $('.previous').on('click', function() {
+    switch(datasetSize) {
+      case 'day':
+        date.setDate(date.getDate() - 1);
+
+        renderDay(date);
+        break;
+      case 'month':
+        date.setMonth(date.getMonth() - 1);
+
+        renderMonth(date);
+        break;
+    }
+  });
+
+  $('.next').on('click', function() {
+    switch(datasetSize) {
+      case 'day':
+        date.setDate(date.getDate() + 1);
+
+        renderDay(date);
+        break;
+      case 'month':
+        date.setMonth(date.getMonth() + 1);
+
+        renderMonth(date);
+        break;
+    }
+  });
+
+  renderDay  = function(day) {
+    date = day;
+    datasetSize = "day";
+
+    var url = "/day/"+date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
+    render(url);
+  };
+
+  renderMonth = function(month) {
+    date = month;
+    datasetSize = "month";
+
+    var url = "/month/"+date.getFullYear()+"/"+(date.getMonth()+1);
+    render(url);
+  };
+
+  (function() {
     var now = new Date();
 
-    var url = "/month/"+now.getFullYear()+"/"+(now.getMonth()+1);
-    render(url);
-  });
+    renderDay( now );
+  })();
 });
