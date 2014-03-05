@@ -1,8 +1,20 @@
 $(function() {
+  var makeLabels = function(measurements) {
+    return _.map(measurements, function(value, i) {
+      var time_stamp = new Date(value.time_stamp);
+
+      if (time_stamp.getHours() % 3 == 0) {
+        return moment(time_stamp).format("HH:mm");
+      } else {
+        return "";
+      }
+    });
+  }
+
   var render = function(url) {
     $.getJSON(url).then( function( measurements ) {
       var data = {
-        labels : _.map(measurements, function(value, i) { if (i % 5 == 0) { return value.time_stamp; } else { return ""; } }),
+        labels : makeLabels(measurements),
         datasets : [
         {
           fillColor : "rgba(220,220,220,0.5)",
