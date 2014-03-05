@@ -37,9 +37,10 @@ $(function() {
   $('.today').on('click', function() {
     var now = new Date();
 
-    var url = "/day/"+now.getFullYear()+"/"+(now.getMonth()+1)+"/"+now.getDate();
+    var url = "/day/today"
     render(url);
   });
+
   $('.this_month').on('click', function() {
     var now = new Date();
 

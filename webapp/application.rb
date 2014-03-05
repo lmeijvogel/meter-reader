@@ -9,6 +9,14 @@ set :bind, '0.0.0.0'
 
 database_connection = Mysql2::Client.new(DatabaseConfig.for(settings.environment))
 
+get "/day/today" do
+  database_reader = DatabaseReader.new(database_connection)
+
+  database_reader.day = :today
+
+  database_reader.read().to_json
+end
+
 get "/day/:year/:month/:day" do
   database_reader = DatabaseReader.new(database_connection)
 
