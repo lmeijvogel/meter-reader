@@ -11,6 +11,13 @@ $(function() {
     });
   }
 
+  var determineMaxGridSteps = function(measurements, stepSize) {
+    var allValues = [_.pluck(measurements, "stroom_piek"), _.pluck(measurements, "stroom_dal"), _.pluck(measurements, "gas")];
+    var maxValue = _.max(_.flatten(allValues));
+
+    return (maxValue / stepSize) + stepSize;
+  };
+
   var render = function(url) {
     $.getJSON(url).then( function( measurements ) {
       var data = {
@@ -41,8 +48,17 @@ $(function() {
         },
         ]
       }
+
+      var options = {
+        scaleOverride: true,
+        scaleStepWidth: 0.25,
+        scaleSteps: determineMaxGridSteps(measurements, 0.25),
+
+        scaleGridLineColor: "rgba(0, 0, 0, 0.2)"
+      }
+
       var ctx = document.getElementById("chart").getContext("2d");
-      new Chart(ctx).Line(data, {});
+      new Chart(ctx).Line(data, options);
     });
   };
 
