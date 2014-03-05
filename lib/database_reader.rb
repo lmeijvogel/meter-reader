@@ -28,12 +28,8 @@ class DatabaseReader
   end
 
   def day=(date)
-    if date == :today
-      self.where = "WHERE time_stamp > DATE_SUB(NOW(), INTERVAL 1 DAY)"
-    else
-      date = date.to_datetime
-      self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date.next_day}'"
-    end
+    date = date.to_datetime
+    self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date.next_day}'"
     self.granularity = :hour
   end
 
