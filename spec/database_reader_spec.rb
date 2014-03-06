@@ -7,7 +7,7 @@ require ROOT_PATH.join "lib/database_reader.rb"
 require ROOT_PATH.join "lib/float_extensions.rb"
 
 describe DatabaseReader do
-  let(:time_stamp_1) { DateTime.now - 1/(24*60) }
+  let(:time_stamp_1) { DateTime.now }
   let(:stroom_dal_1) { 12.23 }
   let(:stroom_piek_1) { 23.34 }
   let(:gas_1) { 12.23 }
@@ -31,9 +31,10 @@ describe DatabaseReader do
     database_connection.query("DELETE FROM measurements")
     database_connection.query("INSERT INTO measurements(
                               time_stamp, stroom_dal, stroom_piek, gas)
-                              VALUES ('#{time_stamp_1}', '#{stroom_dal_1}', '#{stroom_piek_1}', '#{gas_1}'),
-                                     ('#{time_stamp_2}', '#{stroom_dal_2}', '#{stroom_piek_2}', '#{gas_2}')")
+                              VALUES ('#{time_stamp_1.new_offset(0)}', '#{stroom_dal_1}', '#{stroom_piek_1}', '#{gas_1}'),
+                                     ('#{time_stamp_2.new_offset(0)}', '#{stroom_dal_2}', '#{stroom_piek_2}', '#{gas_2}')")
 
+    reader.send(:granularity=, :hour)
     @usage = reader.read().first
   end
 
