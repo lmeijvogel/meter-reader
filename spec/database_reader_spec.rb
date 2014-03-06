@@ -17,6 +17,9 @@ describe DatabaseReader do
   let(:stroom_piek_2) { 25.34 }
   let(:gas_2) { 12.23 }
 
+  let(:stroom_totaal_1) { stroom_dal_1 + stroom_piek_1 }
+  let(:stroom_totaal_2) { stroom_dal_2 + stroom_piek_2 }
+
   let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
   let(:database_connection) { Mysql2::Client.new(host: config["host"],
                                                  database: config["database"],
@@ -44,6 +47,10 @@ describe DatabaseReader do
 
   it "sets the correct stroom_piek" do
     @usage.stroom_piek.should == stroom_piek_2 - stroom_piek_1
+  end
+
+  it "sets the correct stroom_totaal" do
+    @usage.stroom_totaal.should == stroom_totaal_2 - stroom_totaal_1
   end
 
   it "sets the correct gas" do

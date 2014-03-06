@@ -12,7 +12,7 @@ $(function() {
   }
 
   var determineMaxGridSteps = function(measurements, stepSize) {
-    var allValues = [_.pluck(measurements, "stroom_piek"), _.pluck(measurements, "stroom_dal"), _.pluck(measurements, "gas")];
+    var allValues = [_.pluck(measurements, "stroom_totaal"), _.pluck(measurements, "gas")];
     var maxValue = _.max(_.flatten(allValues));
 
     return (maxValue / stepSize) + stepSize;
@@ -28,14 +28,7 @@ $(function() {
           strokeColor : "rgba(220,220,220,1)",
           pointColor : "rgba(220,220,220,1)",
           pointStrokeColor : "#fff",
-          data : _.pluck(measurements, "stroom_piek")
-        },
-        {
-          fillColor : "rgba(151,187,205,0.5)",
-          strokeColor : "rgba(151,187,205,1)",
-          pointColor : "rgba(151,187,205,1)",
-          pointStrokeColor : "#fff",
-          data : _.pluck(measurements, "stroom_dal")
+          data : _.pluck(measurements, "stroom_totaal")
         },
         {
           datasetStroke: false,

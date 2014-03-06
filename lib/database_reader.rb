@@ -11,6 +11,7 @@ class DatabaseReader
       MIN(#{adjusted_time_stamp}) as ts,
       TRUNCATE(MAX(stroom_dal)-MIN(stroom_dal),3) as d_dal,
       TRUNCATE(MAX(stroom_piek)-MIN(stroom_piek),3) as d_piek,
+      TRUNCATE(MAX(stroom_piek+stroom_dal)-MIN(stroom_piek+stroom_dal),3) as d_totaal,
       TRUNCATE(MAX(gas)-MIN(gas),3) as d_gas
     FROM measurements
     #{where}
@@ -20,6 +21,7 @@ class DatabaseReader
       usage = Usage.new
       usage.stroom_dal = row["d_dal"]
       usage.stroom_piek = row["d_piek"]
+      usage.stroom_totaal = row["d_totaal"]
       usage.gas = row["d_gas"]
       usage.time_stamp = row["ts"].to_datetime
 
