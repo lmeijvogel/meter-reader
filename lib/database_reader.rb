@@ -8,7 +8,7 @@ class DatabaseReader
 
   def read
     query = "SELECT
-      MIN(time_stamp) as ts,
+      MIN(#{adjusted_time_stamp}) as ts,
       TRUNCATE(MAX(stroom_dal)-MIN(stroom_dal),3) as d_dal,
       TRUNCATE(MAX(stroom_piek)-MIN(stroom_piek),3) as d_piek,
       TRUNCATE(MAX(gas)-MIN(gas),3) as d_gas
@@ -29,30 +29,30 @@ class DatabaseReader
 
   def day=(date)
     date = date.to_datetime
-    self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date.next_day}'"
+    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date.next_day}'"
     self.granularity = :hour
   end
 
   def week=(date)
     date = date.to_datetime
-    self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date + 7}'"
+    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date + 7}'"
     self.granularity = :three_hour
   end
 
   def month=(date)
     date = date.to_datetime
-    self.where = "WHERE time_stamp > '#{date}' AND time_stamp < '#{date.next_month}'"
+    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date.next_month}'"
     self.granularity = :three_hour
   end
 
   def granularity
     case @granularity
     when :hour
-      "DAYOFYEAR(time_stamp), HOUR(time_stamp)"
+      "DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
     when :three_hour
-      "DAYOFYEAR(time_stamp), HOUR(time_stamp) DIV 3"
+      "DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp}) DIV 3"
     when :day
-      "DAYOFYEAR(time_stamp)"
+      "DAYOFYEAR(#{adjusted_time_stamp})"
     else
       raise "Unknown granularity for data selection: #{@granularity}"
     end
@@ -61,4 +61,9 @@ class DatabaseReader
   protected
   attr_accessor :where
   attr_writer :granularity
+
+  private
+  def adjusted_time_stamp
+    "CONVERT_TZ(time_stamp, '+00:00', '+01:00')"
+  end
 end
