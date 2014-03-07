@@ -117,6 +117,8 @@ $(function() {
 
     var url = "/day/"+date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
     render(url);
+
+    header( moment(date).format("DD-MM-YYYY") );
   };
 
   renderMonth = function(month) {
@@ -125,6 +127,12 @@ $(function() {
 
     var url = "/month/"+date.getFullYear()+"/"+(date.getMonth()+1);
     render(url);
+
+    header( moment(date).format("MM-YYYY") );
+  };
+
+  header = function(text) {
+    $('.header').text(text);
   };
 
   (function() {
