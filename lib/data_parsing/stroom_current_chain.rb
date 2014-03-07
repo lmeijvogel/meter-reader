@@ -10,6 +10,6 @@ class StroomCurrentChain < Chainable
     line = lines_enumerator.next
 
     match = line.match(/\((.*)\*kW\)/)
-    output.stroom_current = match[1].to_f
+    output.stroom_current = match[1].to_f if match
   end
 end

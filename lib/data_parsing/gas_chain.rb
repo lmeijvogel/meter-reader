@@ -9,6 +9,7 @@ class GasChain < Chainable
     lines_enumerator.next # Skip the intro line
     line = lines_enumerator.next
 
-    output.gas = line.match(/\((\d*\.\d*)\)/)[1].to_f
+    match = line.match(/\((\d*\.\d*)\)/)
+    output.gas = match[1].to_f if match
   end
 end

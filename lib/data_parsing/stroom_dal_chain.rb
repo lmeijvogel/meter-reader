@@ -19,9 +19,11 @@ class StroomDalChain < Chainable
 
     value = KwhReader.read(line)
 
-    output.stroom_dal = value
-    output.diff_stroom_dal = value - last_value
+    if value
+      output.stroom_dal = value
+      output.diff_stroom_dal = value - last_value
 
-    self.last_value = value
+      self.last_value = value
+    end
   end
 end
