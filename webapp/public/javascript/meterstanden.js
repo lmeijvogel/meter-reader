@@ -82,6 +82,14 @@ $(function() {
   });
 
   $('.previous').on('click', function() {
+    previousPeriod();
+  });
+
+  $('.next').on('click', function() {
+    nextPeriod();
+  });
+
+  previousPeriod = function() {
     switch(datasetSize) {
       case 'day':
         date.setDate(date.getDate() - 1);
@@ -94,9 +102,9 @@ $(function() {
         renderMonth(date);
         break;
     }
-  });
+  };
 
-  $('.next').on('click', function() {
+  nextPeriod = function() {
     switch(datasetSize) {
       case 'day':
         date.setDate(date.getDate() + 1);
@@ -109,7 +117,7 @@ $(function() {
         renderMonth(date);
         break;
     }
-  });
+  };
 
   renderDay  = function(day) {
     date = day;
@@ -134,6 +142,17 @@ $(function() {
   header = function(text) {
     $('.header').text(text);
   };
+
+  $("html").keydown(function(event) {
+    switch(event.keyCode) {
+      case 37:
+        previousPeriod();
+        break;
+      case 39:
+        nextPeriod();
+        break;
+    }
+  });
 
   (function() {
     var now = new Date();
