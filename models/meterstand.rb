@@ -26,6 +26,9 @@ class Meterstand
 
     output.time_stamp = DateTime.now
 
+    # Convert to UTC before storing
+    output.time_stamp_utc = DateTime.now.new_offset(0)
+
     while (true)
       @chain.try(input, output)
     end

@@ -1,5 +1,5 @@
 class Measurement
-  attr_accessor :time_stamp, :stroom_dal, :stroom_piek, :stroom_current, :gas
+  attr_accessor :time_stamp, :time_stamp_utc, :stroom_dal, :stroom_piek, :stroom_current, :gas
   attr_accessor :diff_stroom_dal, :diff_stroom_piek, :diff_gas
 
   def to_s

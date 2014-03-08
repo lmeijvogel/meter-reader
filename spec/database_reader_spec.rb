@@ -34,8 +34,8 @@ describe DatabaseReader do
     database_connection.query("DELETE FROM measurements")
     database_connection.query("INSERT INTO measurements(
                               time_stamp, stroom_dal, stroom_piek, gas)
-                              VALUES ('#{time_stamp_1.new_offset(0)}', '#{stroom_dal_1}', '#{stroom_piek_1}', '#{gas_1}'),
-                                     ('#{time_stamp_2.new_offset(0)}', '#{stroom_dal_2}', '#{stroom_piek_2}', '#{gas_2}')")
+                              VALUES ('#{time_stamp_1}', '#{stroom_dal_1}', '#{stroom_piek_1}', '#{gas_1}'),
+                                     ('#{time_stamp_2}', '#{stroom_dal_2}', '#{stroom_piek_2}', '#{gas_2}')")
 
     reader.send(:granularity=, :hour)
     @usage = reader.read().first
