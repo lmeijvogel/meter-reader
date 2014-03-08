@@ -66,6 +66,6 @@ class DatabaseReader
 
   private
   def adjusted_time_stamp
-    "CONVERT_TZ(time_stamp, '+00:00', '+01:00')"
+    "time_stamp"
   end
 end

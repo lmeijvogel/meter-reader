@@ -24,8 +24,7 @@ class Meterstand
 
     input = input.lines.to_enum
 
-    # Convert to UTC before storing
-    output.time_stamp = DateTime.now.new_offset(0)
+    output.time_stamp = DateTime.now
 
     while (true)
       @chain.try(input, output)
