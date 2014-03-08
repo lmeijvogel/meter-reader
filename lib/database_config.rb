@@ -13,7 +13,8 @@ class DatabaseConfig
     { host: config["host"],
       database: config["database"],
       username: config["username"],
-      password: config["password"]
+      password: config["password"],
+      reconnect: true
     }
   end
 end
