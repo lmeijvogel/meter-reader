@@ -1,4 +1,8 @@
 $(function() {
+  var canvas = Canvas('chart');
+
+  window.graph = Graph(canvas);
+
   var makeLabels = function(measurements) {
     return _.map(measurements, function(value, i) {
       var time_stamp = new Date(value.time_stamp);
@@ -21,41 +25,21 @@ $(function() {
   var render = function(url) {
     $("#error_icon").hide();
     $("#loading_spinner").css('display', 'inline-block');
+
     return $.getJSON(url).then( function( measurements ) {
-      var data = {
-        labels : makeLabels(measurements),
-        datasets : [
-        {
-          fillColor : "rgba(220,220,220,0.5)",
-          strokeColor : "rgba(220,220,220,1)",
-          pointColor : "rgba(220,220,220,1)",
-          pointStrokeColor : "#fff",
-          data : _.pluck(measurements, "stroom_totaal")
-        },
-        {
-          datasetStroke: false,
-          datasetFill: false,
-          fillColor : "rgba(255,120,120,0)",
-          strokeColor : "rgba(255,120,120,1)",
-          pointColor : "rgba(255,120,120,1)",
-          pointStrokeColor : "#fff",
-          data : _.pluck(measurements, "gas")
-        },
-        ]
-      }
-
-      var options = {
-        animation: false,
-        scaleOverride: true,
-        scaleStepWidth: 0.25,
-        scaleSteps: determineMaxGridSteps(measurements, 0.25),
-
-        scaleGridLineColor: "rgba(0, 0, 0, 0.2)"
-      }
-
       $("#loading_spinner").hide();
-      var ctx = document.getElementById("chart").getContext("2d");
-      new Chart(ctx).Line(data, options);
+
+      var stroomTotaal = _.pluck(measurements, "stroom_totaal");
+      stroomTotaal.type = "line";
+
+      var gas = _.pluck(measurements, "gas")
+      gas.type = "bar";
+      gas.color = "#f84";
+
+      window.graph.clear();
+      window.graph.data(gas);
+      window.graph.data(stroomTotaal);
+      window.graph.draw();
     }).fail(function() {
       $("#error_icon").css('display', 'inline-block');
       $("#loading_spinner").hide();
