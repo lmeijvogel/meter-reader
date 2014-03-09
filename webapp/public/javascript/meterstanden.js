@@ -21,7 +21,7 @@ $(function() {
   var render = function(url) {
     $("#error_icon").hide();
     $("#loading_spinner").css('display', 'inline-block');
-    $.getJSON(url).then( function( measurements ) {
+    return $.getJSON(url).then( function( measurements ) {
       var data = {
         labels : makeLabels(measurements),
         datasets : [
@@ -130,9 +130,9 @@ $(function() {
     datasetSize = "day";
 
     var url = "/day/"+date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
-    render(url);
-
-    header( moment(date).format("dddd DD-MM-YYYY") );
+    render(url).then(function() {
+      header( moment(date).format("dddd DD-MM-YYYY") );
+    });
   };
 
   renderMonth = function(month) {
@@ -140,9 +140,9 @@ $(function() {
     datasetSize = "month";
 
     var url = "/month/"+date.getFullYear()+"/"+(date.getMonth()+1);
-    render(url);
-
-    header( moment(date).format("MM-YYYY") );
+    render(url).then(function() {
+      header( moment(date).format("MM-YYYY") );
+    });
   };
 
   header = function(text) {
