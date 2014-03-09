@@ -98,14 +98,14 @@ $(function() {
   previousPeriod = function() {
     switch(datasetSize) {
       case 'day':
-        date.setDate(date.getDate() - 1);
+        var newDate = new Date(date).setDate(date.getDate() - 1);
 
-        renderDay(date);
+        renderDay(newDate);
         break;
       case 'month':
-        date.setMonth(date.getMonth() - 1);
+        var newDate = new Date(date).setMonth(date.getMonth() - 1);
 
-        renderMonth(date);
+        renderMonth(newDate);
         break;
     }
   };
@@ -113,34 +113,37 @@ $(function() {
   nextPeriod = function() {
     switch(datasetSize) {
       case 'day':
-        date.setDate(date.getDate() + 1);
+        var newDate = new Date(date).setDate(date.getDate() + 1);
 
-        renderDay(date);
+        renderDay(newDate);
         break;
       case 'month':
-        date.setMonth(date.getMonth() + 1);
+        var newDate = new Date(date).setMonth(date.getMonth() + 1);
 
-        renderMonth(date);
+        renderMonth(newDate);
         break;
     }
   };
 
   renderDay  = function(day) {
-    date = day;
-    datasetSize = "day";
+    day = new Date(day);
+    var url = "/day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
 
-    var url = "/day/"+date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
     render(url).then(function() {
+      date = day;
+      datasetSize = "day";
+
       header( moment(date).format("dddd DD-MM-YYYY") );
     });
   };
 
   renderMonth = function(month) {
-    date = month;
-    datasetSize = "month";
-
-    var url = "/month/"+date.getFullYear()+"/"+(date.getMonth()+1);
+    month = new Date(month);
+    var url = "/month/"+month.getFullYear()+"/"+(month.getMonth()+1);
     render(url).then(function() {
+      date = month;
+      datasetSize = "month";
+
       header( moment(date).format("MM-YYYY") );
     });
   };
