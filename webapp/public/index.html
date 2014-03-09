@@ -5,9 +5,17 @@
     <script src="javascript/Chart.js"></script>
     <script src="javascript/moment.min.js"></script>
     <script src="javascript/meterstanden.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <style>
+      #loading_spinner { display: none; }
+      #error_icon      { display: none; color: red }
+    </style>
   </head>
   <body>
-    <h1 class="header"></h1>
+    <h1><span class="header"></span>
+      <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
+      <i id="error_icon" class="fa fa-exclamation-triangle"></i>
+    </h1>
     <button class="previous">Previous</button>
     <button class="next">Next</button>
     <button class="today">Today</button>

@@ -19,6 +19,8 @@ $(function() {
   };
 
   var render = function(url) {
+    $("#error_icon").hide();
+    $("#loading_spinner").css('display', 'inline-block');
     $.getJSON(url).then( function( measurements ) {
       var data = {
         labels : makeLabels(measurements),
@@ -51,8 +53,12 @@ $(function() {
         scaleGridLineColor: "rgba(0, 0, 0, 0.2)"
       }
 
+      $("#loading_spinner").hide();
       var ctx = document.getElementById("chart").getContext("2d");
       new Chart(ctx).Line(data, options);
+    }).fail(function() {
+      $("#error_icon").css('display', 'inline-block');
+      $("#loading_spinner").hide();
     });
   };
 
