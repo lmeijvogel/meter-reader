@@ -126,7 +126,7 @@ $(function() {
     var url = "/day/"+date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
     render(url);
 
-    header( moment(date).format("DD-MM-YYYY") );
+    header( moment(date).format("dddd DD-MM-YYYY") );
   };
 
   renderMonth = function(month) {
