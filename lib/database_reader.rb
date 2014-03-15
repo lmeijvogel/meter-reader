@@ -44,7 +44,7 @@ class DatabaseReader
   def month=(date)
     date = date.to_datetime
     self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date.next_month}'"
-    self.granularity = :three_hour
+    self.granularity = :day
   end
 
   def granularity
