@@ -114,6 +114,47 @@ var Canvas = Class.$extend({
     this.svg.appendChild(textElement);
   },
 
+  drawPopup: function( element, value ) {
+    var $element = $(element);
+
+    var height = 40;
+    var x = parseInt($element.attr('cx')) + 10;
+    var y = parseInt($element.attr('cy')) - height/2;
+
+    this.popup = this.elementWithAttributes("g", {
+      x: x,
+      y: y,
+      width: 200,
+      height: height,
+    });
+
+    var rect = this.elementWithAttributes("rect", {
+      x: x,
+      y: y,
+      width: 200,
+      height: height,
+      fill: "#ffd",
+      stroke: "#000"
+    });
+
+    var text = this.elementWithAttributes("text", {
+      x: x+5,
+      y: y + height/2,
+      "alignment-baseline": "middle"
+    });
+
+    text.textContent = value;
+
+    this.popup.appendChild(rect);
+    this.popup.appendChild(text);
+
+    this.svg.appendChild(this.popup);
+  },
+
+  hidePopup: function() {
+    this.svg.removeChild(this.popup);
+  },
+
   // private
   x: function(coordinate) {
     return this.marginLeft + 0.5+(coordinate/100)*this.canvasWidth();

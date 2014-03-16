@@ -55,6 +55,14 @@ var Graph = Class.$extend({
     this.dataSets.push(pointsWithDefaults);
   },
 
+  popupValue: function(element, value) {
+    this.canvas.drawPopup( element, value );
+  },
+
+  hidePopup: function() {
+    this.canvas.hidePopup();
+  },
+
   drawDataSets: function() {
     var self = this;
 

@@ -147,6 +147,18 @@ $(function() {
     }
   });
 
+  $("svg").on("mouseover", "circle", function(event) {
+    var circle = event.target;
+    var $circle = jQuery(circle);
+
+    var value = $circle.data("value");
+    window.graph.popupValue( circle, value );
+  });
+
+  $("svg").on("mouseout", "circle", function() {
+    window.graph.hidePopup();
+  });
+
   (function() {
     var now = new Date();
 
