@@ -30,7 +30,7 @@ var Canvas = Class.$extend({
     this.svg.appendChild(element);
   },
 
-  drawLines: function(points, color) {
+  drawLines: function(points, color, data) {
     if (points.length == 0){
       return;
     }
@@ -41,18 +41,18 @@ var Canvas = Class.$extend({
 
     var prev = points.shift();
 
-    var circles = [prev];
+    var circles = [[prev, data[0]]];
 
     _.each(points, function(point, i) {
       self.drawLine(prev, point, strokeStyle);
 
-      circles.push(point);
+      circles.push([point, data[i+1]]);
 
       prev = point;
     });
 
-    _.each(circles, function(position) {
-      self.circle(position);
+    _.each(circles, function(circle) {
+      self.circle(circle[0], circle[1]);
     });
   },
 
@@ -71,7 +71,7 @@ var Canvas = Class.$extend({
   },
 
   bar: function(point, width, fillStyle) {
-    var height = this.y(100-point[1]) - this.marginBottom; // -1 to prevent overwriting the bottom line
+    var height = this.y(100-point[1]) - this.marginBottom;
 
     height = Math.max(0, height);
     
@@ -88,7 +88,7 @@ var Canvas = Class.$extend({
     this.svg.appendChild(bar);
   },
 
-  circle: function( center ) {
+  circle: function( center, value ) {
     var circle = this.elementWithAttributes("circle", {
       cx: this.x(center[0]),
       cy: this.y(center[1]),
@@ -96,6 +96,7 @@ var Canvas = Class.$extend({
       "stroke-width": "3",
       stroke: "#fff",
       fill: "#000",
+      "data-value": value
     });
 
     this.svg.appendChild(circle);

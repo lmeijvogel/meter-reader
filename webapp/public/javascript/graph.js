@@ -72,7 +72,7 @@ var Graph = Class.$extend({
 
       switch(dataSet.type) {
         case 'line':
-          self.canvas.drawLines(mappedDataPoints, dataSet.color);
+          self.canvas.drawLines(mappedDataPoints, dataSet.color, dataSet);
           break;
         case 'bar':
           self.canvas.drawBars(mappedDataPoints, self.entryWidth(), dataSet.color);
