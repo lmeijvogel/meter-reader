@@ -43,3 +43,7 @@ get "/month/:year/:month" do
 
   database_reader.read().to_json
 end
+
+get "/" do
+  redirect to("index.html")
+end
