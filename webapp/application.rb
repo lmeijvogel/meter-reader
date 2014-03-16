@@ -1,9 +1,12 @@
 require 'sinatra'
 require 'mysql2'
 require 'json'
+require 'pathname'
 
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
+
+ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), ".."))
 
 set :bind, '0.0.0.0'
 
