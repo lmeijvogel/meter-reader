@@ -20,10 +20,10 @@ var Canvas = Class.$extend({
 
   drawLine: function( point1, point2, color ) {
     var element = this.elementWithAttributes("line", {
-      x1:      this.x(point1[0]),
-      y1:      this.y(point1[1]),
-      x2:      this.x(point2[0]),
-      y2:      this.y(point2[1]),
+      x1:      this.x(point1.x),
+      y1:      this.y(point1.y),
+      x2:      this.x(point2.x),
+      y2:      this.y(point2.y),
       stroke:  color
     });
 
@@ -41,7 +41,7 @@ var Canvas = Class.$extend({
 
     var prev = points.shift();
 
-    var circles = [[prev, data[0]]];
+    var circles = [[prev, data.x]];
 
     _.each(points, function(point, i) {
       self.drawLine(prev, point, strokeStyle);
@@ -71,15 +71,15 @@ var Canvas = Class.$extend({
   },
 
   bar: function(point, width, fillStyle) {
-    var height = this.y(100-point[1]) - this.marginBottom;
+    var height = this.y(100) - this.y(point.y) - 1; // -1 to not draw over the bottom bar
 
     height = Math.max(0, height);
     
     var barWidth = (width*this.canvasWidth())/100;
 
     var bar = this.elementWithAttributes("rect", {
-      x: this.x(point[0])-(barWidth / 2),
-      y: this.y(point[1]),
+      x: this.x(point.x)-(barWidth / 2),
+      y: this.y(point.y),
       width: barWidth,
       height: height,
       fill: fillStyle,
@@ -89,9 +89,12 @@ var Canvas = Class.$extend({
   },
 
   circle: function( center, value ) {
+    var x = this.x(center.x);
+    var y = this.y(center.y);
+
     var circle = this.elementWithAttributes("circle", {
-      cx: this.x(center[0]),
-      cy: this.y(center[1]),
+      cx: x,
+      cy: y,
       r: 6,
       "stroke-width": "3",
       stroke: "#fff",
@@ -104,8 +107,8 @@ var Canvas = Class.$extend({
 
   text: function( point, text, align ) {
     var textElement = this.elementWithAttributes("text", {
-      x: this.x(point[0]),
-      y: this.y(point[1]),
+      x: this.x(point.x),
+      y: this.y(point.y),
       "text-anchor": "end"
     });
 
@@ -182,5 +185,13 @@ var Canvas = Class.$extend({
     });
 
     return element;
+  }
+});
+
+
+var Point = Class.$extend({
+  __init__: function(x, y) {
+    this.x = x;
+    this.y = y;
   }
 });

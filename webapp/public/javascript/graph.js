@@ -25,11 +25,11 @@ var Graph = Class.$extend({
     var bottom = 100;
     var right = 100;
 
-    this.canvas.drawLine([left, top], [left, bottom], "#000");
-    this.canvas.drawLine([left, bottom], [right, bottom], "#000");
+    this.canvas.drawLine(Point(left, top), Point(left, bottom), "#000");
+    this.canvas.drawLine(Point(left, bottom), Point(right, bottom), "#000");
 
-    this.canvas.drawLine([left, top], [right, top], "#ddf");
-    this.canvas.drawLine([right, top], [right, bottom], "#ddf");
+    this.canvas.drawLine(Point(left, top), Point(right, top), "#ddf");
+    this.canvas.drawLine(Point(right, top), Point(right, bottom), "#ddf");
 
     this.drawYMarkers();
   },
@@ -38,14 +38,14 @@ var Graph = Class.$extend({
     var left = 0;
     var right = 100;
 
-    this.canvas.text([left-1, this.yCoordinateFor(0)], 0, "right");
+    this.canvas.text(Point(left-1, this.yCoordinateFor(0)), 0, "right");
 
     for (var value = this.yStepSize ; value <= this.scaleTop ; value += this.yStepSize) {
       var yCoordinate = this.yCoordinateFor(value)
 
-      this.canvas.text([left-1, yCoordinate], value, "right");
+      this.canvas.text(Point(left-1, yCoordinate), value, "right");
 
-      this.canvas.drawLine([left, yCoordinate], [right, yCoordinate], "#ddf");
+      this.canvas.drawLine(Point(left, yCoordinate), Point(right, yCoordinate), "#ddf");
     }
   },
 
@@ -70,10 +70,10 @@ var Graph = Class.$extend({
 
     _.each(this.dataSets, function(dataSet) {
       var mappedDataPoints = _.map(dataSet, function(point, i) {
-        var mappedPoint = [];
-
-        mappedPoint[0] = self.xCoordinateFor(i);
-        mappedPoint[1] = self.yCoordinateFor(point);
+        var mappedPoint = Point(
+          self.xCoordinateFor(i),
+          self.yCoordinateFor(point)
+        );
 
         return mappedPoint;
       });
