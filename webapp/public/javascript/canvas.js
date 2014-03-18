@@ -98,11 +98,19 @@ var Canvas = Class.$extend({
       r: 6,
       "stroke-width": "3",
       stroke: "#fff",
-      fill: "#000",
+      fill: "#000"
+    });
+
+    var hoverOverlay = this.elementWithAttributes("circle", {
+      cx: x,
+      cy: y,
+      r: 12,
+      "fill-opacity": 0.0,
       "data-value": value
     });
 
     this.svg.appendChild(circle);
+    this.svg.appendChild(hoverOverlay);
   },
 
   text: function( point, text, align ) {
@@ -121,8 +129,11 @@ var Canvas = Class.$extend({
     var $element = $(element);
 
     var height = 40;
-    var x = parseInt($element.attr('cx')) + 10;
-    var y = parseInt($element.attr('cy')) - height/2;
+
+    var elementX = parseInt($element.attr('cx'), 10);
+    var elementY = parseInt($element.attr('cy'), 10);
+    var x = elementX + 10;
+    var y = elementY - height/2;
 
     this.popup = this.elementWithAttributes("g", {
       x: x,
@@ -148,6 +159,15 @@ var Canvas = Class.$extend({
 
     text.textContent = value;
 
+    var line = this.elementWithAttributes("line", {
+      x1: elementX,
+      y1: elementY,
+      x2: this.x(0),
+      y2: elementY,
+      stroke: "#66f"
+    });
+
+    this.popup.appendChild(line);
     this.popup.appendChild(rect);
     this.popup.appendChild(text);
 
