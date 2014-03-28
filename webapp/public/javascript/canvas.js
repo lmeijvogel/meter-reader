@@ -14,8 +14,7 @@ var Canvas = Class.$extend({
     this.marginLeft = 40;
     this.marginRight = 10;
     this.marginTop = 10;
-    this.marginBottom = 10;
-
+    this.marginBottom = 30;
   },
 
   drawLine: function( point1, point2, color ) {
@@ -114,9 +113,11 @@ var Canvas = Class.$extend({
   },
 
   text: function( point, text, align ) {
+    var x = this.x(point.x);
+    var y = this.y(point.y);
     var textElement = this.elementWithAttributes("text", {
-      x: this.x(point.x),
-      y: this.y(point.y),
+      x: x,
+      y: y,
       "text-anchor": "end"
     });
 

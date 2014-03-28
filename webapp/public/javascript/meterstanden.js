@@ -3,26 +3,7 @@ $(function() {
 
   window.graph = Graph(canvas);
 
-  var makeLabels = function(measurements) {
-    return _.map(measurements, function(value, i) {
-      var time_stamp = new Date(value.time_stamp);
-
-      if (time_stamp.getHours() % 3 == 0) {
-        return moment(time_stamp).format("HH:mm");
-      } else {
-        return "";
-      }
-    });
-  }
-
-  var determineMaxGridSteps = function(measurements, stepSize) {
-    var allValues = [_.pluck(measurements, "stroom_totaal"), _.pluck(measurements, "gas")];
-    var maxValue = _.max(_.flatten(allValues));
-
-    return (maxValue / stepSize) + stepSize;
-  };
-
-  var render = function(url) {
+  var render = function(url, periodSize) {
     $("#error_icon").hide();
     $("#loading_spinner").css('display', 'inline-block');
 
@@ -37,6 +18,7 @@ $(function() {
       gas.color = "#f84";
 
       window.graph.clear();
+      window.graph.setPeriodSize(periodSize);
       window.graph.data(gas);
       window.graph.data(stroomTotaal);
       window.graph.draw();
@@ -113,7 +95,7 @@ $(function() {
     day = new Date(day);
     var url = "/day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
 
-    render(url).then(function() {
+    render(url, "day").then(function() {
       date = day;
       datasetSize = "day";
 
@@ -124,7 +106,7 @@ $(function() {
   renderMonth = function(month) {
     month = new Date(month);
     var url = "/month/"+month.getFullYear()+"/"+(month.getMonth()+1);
-    render(url).then(function() {
+    render(url, "month").then(function() {
       date = month;
       datasetSize = "month";
 
