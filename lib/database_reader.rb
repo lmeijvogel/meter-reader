@@ -30,20 +30,24 @@ class DatabaseReader
   end
 
   def day=(date)
-    date = date.to_datetime
-    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date.next_day}'"
+    start_date = sql_date(date)
+    end_date = sql_date(date.next_day)
+
+    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
     self.granularity = :hour
   end
 
   def week=(date)
-    date = date.to_datetime
-    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date + 7}'"
+    start_date = sql_date(date)
+    end_date = sql_date(date + 7)
+    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
     self.granularity = :three_hour
   end
 
   def month=(date)
-    date = date.to_datetime
-    self.where = "WHERE #{adjusted_time_stamp} > '#{date}' AND #{adjusted_time_stamp} < '#{date.next_month}'"
+    start_date = sql_date(date)
+    end_date = date.next_month
+    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
     self.granularity = :day
   end
 
@@ -67,5 +71,9 @@ class DatabaseReader
   private
   def adjusted_time_stamp
     "time_stamp"
+  end
+
+  def sql_date(date)
+    date.to_datetime.strftime("%Y-%m-%d %H:%M:%S")
   end
 end
