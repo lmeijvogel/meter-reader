@@ -43,7 +43,8 @@ var Canvas = Class.$extend({
     var circles = [[prev, data.x]];
 
     _.each(points, function(point, i) {
-      self.drawLine(prev, point, strokeStyle);
+      var thisStrokeStyle = point.interpolated ? "#999" : strokeStyle;
+      self.drawLine(prev, point, thisStrokeStyle);
 
       circles.push([point, data[i+1]]);
 
@@ -51,7 +52,8 @@ var Canvas = Class.$extend({
     });
 
     _.each(circles, function(circle) {
-      self.circle(circle[0], circle[1]);
+      var thisFillStyle = circle[0].interpolated ? "#bbb" : "#000";
+      self.circle(circle[0], circle[1], thisFillStyle);
     });
   },
 
@@ -65,7 +67,9 @@ var Canvas = Class.$extend({
     var fillStyle = color || "#000";
 
     _.each(points, function(point, i) {
-      self.bar(point, width, fillStyle);
+      var thisFillStyle = point.interpolated ? "#bbb" : fillStyle;
+
+      self.bar(point, width, thisFillStyle);
     });
   },
 
@@ -87,7 +91,7 @@ var Canvas = Class.$extend({
     this.svg.appendChild(bar);
   },
 
-  circle: function( center, value ) {
+  circle: function( center, value, fillStyle ) {
     var x = this.x(center.x);
     var y = this.y(center.y);
 
@@ -97,7 +101,7 @@ var Canvas = Class.$extend({
       r: 6,
       "stroke-width": "3",
       stroke: "#fff",
-      fill: "#000"
+      fill: fillStyle
     });
 
     var hoverOverlay = this.elementWithAttributes("circle", {
@@ -211,8 +215,9 @@ var Canvas = Class.$extend({
 
 
 var Point = Class.$extend({
-  __init__: function(x, y) {
+  __init__: function(x, y, interpolated) {
     this.x = x;
     this.y = y;
+    this.interpolated = interpolated;
   }
 });

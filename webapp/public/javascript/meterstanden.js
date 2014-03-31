@@ -8,12 +8,18 @@ $(function() {
     $("#loading_spinner").css('display', 'inline-block');
 
     return $.getJSON(url).then( function( measurements ) {
+      var resultsParser = ResultsParser("day");
+
       $("#loading_spinner").hide();
 
-      var stroomTotaal = _.pluck(measurements, "stroom_totaal");
+      var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
+      var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
+      var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
+
       stroomTotaal.type = "line";
 
-      var gas = _.pluck(measurements, "gas")
+      var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
+      gas = RelativeConverter().convert(gas);
       gas.type = "bar";
       gas.color = "#f84";
 
@@ -21,6 +27,7 @@ $(function() {
       window.graph.setPeriodSize(periodSize);
       window.graph.data(gas);
       window.graph.data(stroomTotaal);
+      window.graph.interpolations(_.pluck(parsedStroomTotaal, "interpolated"));
       window.graph.draw();
     }).fail(function() {
       $("#error_icon").css('display', 'inline-block');

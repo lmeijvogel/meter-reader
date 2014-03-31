@@ -73,6 +73,10 @@ var Graph = Class.$extend({
     this.dataSets.push(pointsWithDefaults);
   },
 
+  interpolations: function(dataPoints) {
+    this.interpolationData = dataPoints;
+  },
+
   popupValue: function(element, value) {
     this.canvas.drawPopup( element, value );
   },
@@ -88,7 +92,8 @@ var Graph = Class.$extend({
       var mappedDataPoints = _.map(dataSet, function(point, i) {
         var mappedPoint = Point(
           self.xCoordinateFor(i),
-          self.yCoordinateFor(point)
+          self.yCoordinateFor(point),
+          self.interpolationData[i]
         );
 
         return mappedPoint;

@@ -9,10 +9,10 @@ class DatabaseReader
   def read
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
-      TRUNCATE(MAX(stroom_dal)-MIN(stroom_dal),3) as d_dal,
-      TRUNCATE(MAX(stroom_piek)-MIN(stroom_piek),3) as d_piek,
-      TRUNCATE(MAX(stroom_piek+stroom_dal)-MIN(stroom_piek+stroom_dal),3) as d_totaal,
-      TRUNCATE(MAX(gas)-MIN(gas),3) as d_gas
+      TRUNCATE(MAX(stroom_dal),3) as d_dal,
+      TRUNCATE(MAX(stroom_piek),3) as d_piek,
+      TRUNCATE(MAX(stroom_piek+stroom_dal),3) as d_totaal,
+      TRUNCATE(MAX(gas),3) as d_gas
     FROM measurements
     #{where}
     GROUP BY #{granularity}"
