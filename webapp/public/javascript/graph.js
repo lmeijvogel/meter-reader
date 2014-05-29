@@ -154,6 +154,6 @@ var Graph = Class.$extend({
   clear: function() {
     this.maxY = undefined;
     this.dataSets = [];
-    this.canvas.$svg.html("");
+    this.canvas.clear();
   }
 });

@@ -183,6 +183,10 @@ var Canvas = Class.$extend({
     this.svg.removeChild(this.popup);
   },
 
+  clear: function() {
+    this.$svg.html("");
+  },
+
   // private
   x: function(coordinate) {
     return this.marginLeft + 0.5+(coordinate/100)*this.canvasWidth();
