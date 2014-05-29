@@ -1,6 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
     <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
     <script src="javascript/lib/underscore-min.js"></script>
     <script src="javascript/lib/classy.js"></script>
     <script src="javascript/lib/moment.min.js"></script>
@@ -15,22 +24,33 @@
     <style>
       #loading_spinner { display: none; }
       #error_icon      { display: none; color: red }
+      .current_energy  { padding: 15px; margin-bottom: 15px; text-align: center; }
     </style>
   </head>
   <body>
-    <h1><span class="header"></span>
-      <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
-      <i id="error_icon" class="fa fa-exclamation-triangle"></i>
-    </h1>
-    <button class="previous">Previous</button>
-    <button class="next">Next</button>
-    <button class="today">Today</button>
-    <button class="this_month">This month</button>
-    <svg xmlns="http://www.w3.org/2000/svg"
-         xmlns:xlink="http://www.w3.org/1999/xlink"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         id="chart" width="700" height="500"></svg>
+    <div class="container">
+      <div class="row">
+        <h3 class="col-sm-8 col-sm-offset-2"><span class="header"></span>
+          <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
+          <i id="error_icon" class="fa fa-exclamation-triangle"></i>
+        </h3>
+      </div>
+      <div class="row">
+        <div class="bg-info col-xs-offset-2 col-xs-2 col-sm-1 current_energy">-</div>
+      </div>
+      <div class="row">
+        <svg xmlns="http://www.w3.org/2000/svg"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:ev="http://www.w3.org/2001/xml-events"
+           class="col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1 img-responsive"
+           id="chart" style="height: 300px"></svg>
+       </div>
 
-    <div class="current_energy"></div>
+      <div class="row">
+        <button class="btn btn-lg btn-default previous col-sm-offset-2 col-sm-4 col-xs-6">Previous</button>
+        <button class="btn btn-lg btn-default next col-sm-4 col-xs-6">Next</button>
+        <button class="btn btn-default today col-sm-offset-2 col-sm-8 col-xs-12">Today</button>
+      </div>
+    </div>
   </body>
 </html>
