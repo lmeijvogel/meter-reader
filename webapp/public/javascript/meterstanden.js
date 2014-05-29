@@ -153,4 +153,11 @@ $(function() {
 
     renderDay( now );
   })();
+
+  setInterval(function() {
+    jQuery.getJSON("/energy/current", function(json) {
+      var current = Math.round(parseFloat(json.current) * 1000);
+      jQuery(".current_energy").text(current+" Watt");
+    });
+  }, 3000);
 });

@@ -51,6 +51,14 @@ get "/month/:year/:month" do
   database_reader.read().to_json
 end
 
+get "/energy/current" do
+  results = database_connection.query("SELECT stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
+
+  @current_measurement = results.first["stroom_current"]
+
+  { current: @current_measurement }.to_json
+end
+
 get "/" do
   redirect to("index.html")
 end
