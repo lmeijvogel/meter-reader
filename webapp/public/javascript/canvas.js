@@ -8,6 +8,29 @@ var Canvas = Class.$extend({
     this.$svg = jQuery("#"+svg_selector);
     this.svgDoc = this.svg.ownerDocument;
 
+    this.determineSize();
+
+    this.resizeObservers = [];
+
+    var self = this;
+    jQuery(function() {
+      var supportsOrientationChange = "onorientationchange" in window;
+
+      var orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+
+      window.addEventListener(orientationEvent, function() {
+        // Wait a bit until doing something: immediately calculating the
+        // screen size causes errors.
+        setTimeout(function() {
+          self.determineSize();
+
+          self.notifyResize();
+        }, 100);
+      }, false);
+    });
+  },
+
+  determineSize: function() {
     this.width = this.$svg.width();
     this.height = this.$svg.height();
 
@@ -15,6 +38,16 @@ var Canvas = Class.$extend({
     this.marginRight = 10;
     this.marginTop = 10;
     this.marginBottom = 30;
+  },
+
+  notifyResize: function() {
+    _.each(this.resizeObservers, function(observer) {
+      observer.canvasResized();
+    });
+  },
+
+  addResizeObserver: function(observer) {
+    this.resizeObservers.push(observer);
   },
 
   drawLine: function( point1, point2, color ) {

@@ -4,6 +4,7 @@ var Graph = Class.$extend({
   __init__: function(canvas) {
     this.canvas = canvas;
 
+    this.canvas.addResizeObserver(this);
     this.paddingX = 0;
 
     this.paddingTop = 0;
@@ -155,5 +156,10 @@ var Graph = Class.$extend({
     this.maxY = undefined;
     this.dataSets = [];
     this.canvas.clear();
+  },
+
+  canvasResized: function() {
+    this.canvas.clear();
+    this.draw();
   }
 });
