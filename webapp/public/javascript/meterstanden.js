@@ -38,13 +38,6 @@ $(function() {
   var datasetSize;
   var date;
 
-  $('.yesterday').on('click', function() {
-    var yesterday = new Date();
-    yesterday.setDate(yesterday.getDate()-1);
-
-    renderDay(yesterday);
-  });
-
   $('.today').on('click', function() {
     var today = new Date();
 
