@@ -125,6 +125,16 @@ $(function() {
     $('.header').text(text);
   };
 
+  refreshCurrentUsage = function() {
+    return RSVP.Promise.cast(jQuery.getJSON("/energy/current")).then(function(json) {
+      var current = Math.round(parseFloat(json.current) * 1000);
+      jQuery(".current_energy").text(current+" Watt");
+    }).catch(function() {
+      jQuery(".current_energy").text("-");
+    });
+  };
+
+
   $("html").keydown(function(event) {
     switch(event.keyCode) {
       case 37:
@@ -155,9 +165,15 @@ $(function() {
   })();
 
   setInterval(function() {
-    jQuery.getJSON("/energy/current", function(json) {
-      var current = Math.round(parseFloat(json.current) * 1000);
-      jQuery(".current_energy").text(current+" Watt");
-    });
+    jQuery(".energy_spinner").show();
+
+    refreshCurrentUsage()
+      .then(function() {
+        // Slight timeout to make sure the spinner is noticeable: this increases
+        // trust.
+        setTimeout(function() {
+          jQuery(".energy_spinner").hide();
+        }, 100);
+      });
   }, 3000);
 });
