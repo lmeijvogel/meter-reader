@@ -1,28 +1,3 @@
-deepObjectDefaults = function(input, defaults) {
-  var result = {};
-
-  for (var prop in defaults) {
-    if (prop in input) {
-      var propertyValue = input[prop];
-      if (typeof(propertyValue) === "object") {
-        result[prop] = deepObjectDefaults(input[prop], defaults[prop]);
-      } else {
-        result[prop] = input[prop];
-      }
-    } else {
-      result[prop] = defaults[prop];
-    }
-  }
-
-  for (var inputProp in input) {
-    if (!(inputProp in result)) {
-      result[inputProp] = input[inputProp];
-    }
-  }
-
-  return result;
-}
-
 $(function() {
   var render = function(url, periodSize) {
     $("#error_icon").hide();
@@ -85,7 +60,7 @@ $(function() {
         }
       };
 
-      var stroomOptions = deepObjectDefaults({
+      var stroomOptions = DeepObjectDefaults.merge({
         // Custom labels for the series are specified with the "label"
         // option on the series option.  Here a series option object
         // is specified for each series.
@@ -100,7 +75,7 @@ $(function() {
 
       }, defaultPlotOptions);
 
-      var gasOptions = deepObjectDefaults({
+      var gasOptions = DeepObjectDefaults.merge({
         series: [
           { label: 'Gas', color: '#f0ad4e'}
         ]
