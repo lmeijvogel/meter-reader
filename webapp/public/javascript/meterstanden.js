@@ -1,8 +1,29 @@
+deepObjectDefaults = function(input, defaults) {
+  var result = {};
+
+  for (var prop in defaults) {
+    if (prop in input) {
+      var propertyValue = input[prop];
+      if (typeof(propertyValue) === "object") {
+        result[prop] = deepObjectDefaults(input[prop], defaults[prop]);
+      } else {
+        result[prop] = input[prop];
+      }
+    } else {
+      result[prop] = defaults[prop];
+    }
+  }
+
+  for (var inputProp in input) {
+    if (!(inputProp in result)) {
+      result[inputProp] = input[inputProp];
+    }
+  }
+
+  return result;
+}
+
 $(function() {
-  var canvas = Canvas('chart');
-
-  window.graph = Graph(canvas);
-
   var render = function(url, periodSize) {
     $("#error_icon").hide();
     $("#loading_spinner").css('display', 'inline-block');
@@ -11,24 +32,75 @@ $(function() {
       var resultsParser = ResultsParser("day");
 
       $("#loading_spinner").hide();
+      $("#stroom,#gas").empty();
 
       var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
       var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
       var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
-
-      stroomTotaal.type = "line";
+      var stroomWHTotaal = _.map(stroomTotaal, function(kwh) { return kwh*1000; });
 
       var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
       gas = RelativeConverter().convert(gas);
-      gas.type = "bar";
-      gas.color = "#f84";
 
-      window.graph.clear();
-      window.graph.setPeriodSize(periodSize);
-      window.graph.data(gas);
-      window.graph.data(stroomTotaal);
-      window.graph.interpolations(_.pluck(parsedStroomTotaal, "interpolated"));
-      window.graph.draw();
+      // Can specify a custom tick Array.
+      // Ticks should match up one for each y value (category) in the series.
+      var hourTicks = _.range(0, 24);
+
+      var defaultPlotOptions = {
+        seriesDefaults:{
+          renderer:$.jqplot.BarRenderer,
+          rendererOptions: {
+            barMargin: 20
+          },
+          pointLabels: {
+            show: true
+          }
+        },
+
+        grid: {
+          background: 'white'
+        },
+
+        // Show the legend and put it outside the grid, but inside the
+        // plot container, shrinking the grid to accomodate the legend.
+        // A value of "outside" would not shrink the grid and allow
+        // the legend to overflow the container.
+        axes: {
+          xaxis: {
+            ticks: hourTicks,
+            tickOptions: {formatString: '%i'}
+          },
+
+          yaxis: {
+            min: 0,
+            tickOptions: {formatString: '%0.2f'}
+          }
+        }
+      };
+
+      var stroomOptions = deepObjectDefaults({
+        // Custom labels for the series are specified with the "label"
+        // option on the series option.  Here a series option object
+        // is specified for each series.
+        series:[
+          {label:'Stroom', color: '#428bca'}
+        ],
+        axes: {
+          yaxis: {
+            tickOptions: {formatString: '%d'}
+          }
+        }
+
+      }, defaultPlotOptions);
+
+      var gasOptions = deepObjectDefaults({
+        series: [
+          { label: 'Gas', color: '#f0ad4e'}
+        ]
+      }, defaultPlotOptions);
+
+      var stroomPlot = $.jqplot('stroom', [stroomWHTotaal], stroomOptions);
+      var gasPlot    = $.jqplot('gas',    [gas],          gasOptions);
     }).fail(function() {
       $("#error_icon").css('display', 'inline-block');
       $("#loading_spinner").hide();
@@ -137,18 +209,6 @@ $(function() {
         nextPeriod();
         break;
     }
-  });
-
-  $("svg").on("mouseover", "circle", function(event) {
-    var circle = event.target;
-    var $circle = jQuery(circle);
-
-    var value = $circle.data("value");
-    window.graph.popupValue( circle, value );
-  });
-
-  $("svg").on("mouseout", "circle", function() {
-    window.graph.hidePopup();
   });
 
   (function() {
