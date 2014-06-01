@@ -184,6 +184,18 @@ $(function() {
     $('.header').text(text);
   };
 
+  delayAndExecuteOnce = function(method, timeout, timerName) {
+    if (window[timerName]) {
+      clearTimeout(window[timerName]);
+      delete window[timerName];
+    }
+
+    window[timerName] = setTimeout(function() {
+      delete window[timerName];
+      method();
+    }, timeout);
+  };
+
   refreshCurrentUsage = function() {
     return RSVP.Promise.cast(jQuery.getJSON("/energy/current")).then(function(json) {
       var current = Math.round(parseFloat(json.current) * 1000);
@@ -211,6 +223,11 @@ $(function() {
     renderDay( now );
   })();
 
+  jQuery(window).on("resize", function() {
+    delayAndExecuteOnce( function() {
+      graphsPlotter.render();
+    }, 1000, "resizeTimer");
+  });
   setInterval(function() {
     jQuery(".energy_spinner").show();
 
