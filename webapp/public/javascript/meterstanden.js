@@ -34,6 +34,10 @@ $(function() {
       $("#loading_spinner").hide();
       $("#stroom,#gas").empty();
 
+      // Both graphs have the same width:
+      var graphWidth = jQuery("#gas").innerWidth();
+      var barMargin = graphWidth / 40;
+
       var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
       var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
       var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
@@ -51,7 +55,7 @@ $(function() {
         seriesDefaults:{
           renderer:$.jqplot.BarRenderer,
           rendererOptions: {
-            barMargin: 20
+            barMargin: barMargin
           },
           pointLabels: {
             show: true
