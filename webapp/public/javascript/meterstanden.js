@@ -37,6 +37,7 @@ $(function() {
       // Both graphs have the same width:
       var graphWidth = jQuery("#gas").innerWidth();
       var barMargin = graphWidth / 40;
+      var showPointLabels = graphWidth > 300;
 
       var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
       var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
@@ -58,10 +59,11 @@ $(function() {
             barMargin: barMargin
           },
           pointLabels: {
-            show: true
+            show: showPointLabels,
+            hideZeros: true
+
           }
         },
-
         grid: {
           background: 'white'
         },
