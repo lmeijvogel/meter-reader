@@ -41,6 +41,7 @@ $(function() {
 
       var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
       gas = RelativeConverter().convert(gas);
+      var gasdm3 = _.map(gas, function(m3) { return m3*1000; });
 
       // Can specify a custom tick Array.
       // Ticks should match up one for each y value (category) in the series.
@@ -68,12 +69,12 @@ $(function() {
         axes: {
           xaxis: {
             ticks: hourTicks,
-            tickOptions: {formatString: '%i'}
+            tickOptions: {formatString: '%d'}
           },
 
           yaxis: {
             min: 0,
-            tickOptions: {formatString: '%0.2f'}
+            tickOptions: {formatString: '%d'}
           }
         }
       };
@@ -100,7 +101,7 @@ $(function() {
       }, defaultPlotOptions);
 
       var stroomPlot = $.jqplot('stroom', [stroomWHTotaal], stroomOptions);
-      var gasPlot    = $.jqplot('gas',    [gas],          gasOptions);
+      var gasPlot    = $.jqplot('gas',    [gasdm3],          gasOptions);
     }).fail(function() {
       $("#error_icon").css('display', 'inline-block');
       $("#loading_spinner").hide();
