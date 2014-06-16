@@ -127,6 +127,12 @@ $(function() {
     nextPeriod();
   });
 
+  Hammer(window).on("swipeleft", function() {
+    nextPeriod();
+  }).on("swiperight", function() {
+    previousPeriod();
+  });
+
   previousPeriod = function() {
     switch(datasetSize) {
       case 'day':
