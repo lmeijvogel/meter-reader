@@ -17,7 +17,7 @@
     <script src="javascript/relative_converter.js"></script>
     <script src="javascript/deep_object_defaults.js"></script>
     <script src="javascript/graphs_plotter.js"></script>
-    <script src="javascript/meterstanden.js"></script>
+    <script src="javascript/main.js"></script>
     <script src="javascript/rsvp-latest.js"></script>
     <script src="javascript/hammer.min.js"></script>
 
@@ -61,4 +61,13 @@
       </div>
     </div>
   </body>
+
+  <script>
+    $(function() {
+      var main = Main();
+      var now = new Date();
+
+      main.renderDay( now );
+    });
+  </script>
 </html>
