@@ -92,13 +92,27 @@ $(function() {
     $("#error_icon").hide();
     $("#loading_spinner").css('display', 'inline-block');
 
-    return $.getJSON(url).then( function( measurements ) {
-      graphsPlotter.load(measurements);
-      graphsPlotter.render();
-    }).fail(function() {
-      $("#error_icon").css('display', 'inline-block');
-      $("#loading_spinner").hide();
+    var $graph = $(".graph");
+
+    var fadeOut = new Promise(function(resolve, reject) {
+      $graph.animate({
+        opacity: 0.5
+      }, function() {
+        resolve();
+      });
     });
+
+    return Promise.cast(fadeOut.then(function() {
+      $.getJSON(url).then( function( measurements ) {
+        graphsPlotter.load(measurements);
+        graphsPlotter.render();
+      }).fail(function() {
+        $("#error_icon").css('display', 'inline-block');
+        $("#loading_spinner").hide();
+      }).then(function() {
+        $graph.css("opacity", "1");
+      });
+    }));
   };
 
   var datasetSize;
