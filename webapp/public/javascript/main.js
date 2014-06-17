@@ -1,7 +1,9 @@
 var Main = Class.$extend({
   __init__: function() {
     this.date = null;
-    this.graphsPlotter = GraphsPlotter();
+    this.observers = [];
+
+    this.graphsPlotter = GraphsPlotter(this);
 
     this.setEventHandlers();
   },
@@ -24,8 +26,9 @@ var Main = Class.$extend({
 
     return Promise.cast(fadeOut.then(function() {
       $.getJSON(url).then( function( measurements ) {
-        self.graphsPlotter.load(measurements);
-        self.graphsPlotter.render();
+        _.each(self.observers, function(observer) {
+          observer.notifyNewMeasurements(measurements);
+        });
       }).fail(function() {
         $("#error_icon").css('display', 'inline-block');
         $("#loading_spinner").hide();
@@ -71,7 +74,7 @@ var Main = Class.$extend({
       });
 
       jQuery(window).on("resize", function() {
-        delayAndExecuteOnce( function() {
+        self.delayAndExecuteOnce( function() {
           self.graphsPlotter.render();
         }, 1000, "resizeTimer");
       });
@@ -140,4 +143,7 @@ var Main = Class.$extend({
     });
   },
 
+  registerObserver: function(observer) {
+    this.observers.push(observer);
+  }
 });

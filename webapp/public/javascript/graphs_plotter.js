@@ -1,4 +1,8 @@
 var GraphsPlotter = Class.$extend({
+  __init__: function(main) {
+    main.registerObserver(this);
+  },
+
   load: function(measurements) {
     var resultsParser = ResultsParser("day");
 
@@ -82,5 +86,10 @@ var GraphsPlotter = Class.$extend({
 
     var stroomPlot = $.jqplot('stroom', [this.stroomWHTotaal], stroomOptions);
     var gasPlot    = $.jqplot('gas',    [this.gasdm3],          gasOptions);
+  },
+
+  notifyNewMeasurements: function(measurements) {
+    this.load(measurements);
+    this.render();
   }
 });
