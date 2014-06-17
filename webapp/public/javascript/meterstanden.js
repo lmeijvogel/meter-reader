@@ -37,15 +37,6 @@ $(function() {
     renderDay(today);
   });
 
-  $('.this_month').on('click', function() {
-    var this_month = new Date();
-    // make sure that adding months on e.g. the 31st doesn't
-    // skip months if the next month only has 30 days.
-    this_month.setDate(1);
-
-    renderMonth(this_month);
-  });
-
   $('.previous').on('click', function() {
     previousPeriod();
   });
@@ -61,33 +52,15 @@ $(function() {
   });
 
   previousPeriod = function() {
-    switch(datasetSize) {
-      case 'day':
-        var newDate = new Date(date).setDate(date.getDate() - 1);
+    var newDate = new Date(date).setDate(date.getDate() - 1);
 
-        renderDay(newDate);
-        break;
-      case 'month':
-        var newDate = new Date(date).setMonth(date.getMonth() - 1);
-
-        renderMonth(newDate);
-        break;
-    }
+    renderDay(newDate);
   };
 
   nextPeriod = function() {
-    switch(datasetSize) {
-      case 'day':
-        var newDate = new Date(date).setDate(date.getDate() + 1);
+    var newDate = new Date(date).setDate(date.getDate() + 1);
 
-        renderDay(newDate);
-        break;
-      case 'month':
-        var newDate = new Date(date).setMonth(date.getMonth() + 1);
-
-        renderMonth(newDate);
-        break;
-    }
+    renderDay(newDate);
   };
 
   renderDay  = function(day) {
@@ -99,17 +72,6 @@ $(function() {
       datasetSize = "day";
 
       header( moment(date).format("dddd DD-MM-YYYY") );
-    });
-  };
-
-  renderMonth = function(month) {
-    month = new Date(month);
-    var url = "/month/"+month.getFullYear()+"/"+(month.getMonth()+1);
-    render(url, "month").then(function() {
-      date = month;
-      datasetSize = "month";
-
-      header( moment(date).format("MM-YYYY") );
     });
   };
 
