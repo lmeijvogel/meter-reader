@@ -4,6 +4,7 @@ var Main = Class.$extend({
     this.observers = [];
 
     this.graphsPlotter = GraphsPlotter(this);
+    DayStats(this);
 
     this.setEventHandlers();
   },
@@ -79,14 +80,14 @@ var Main = Class.$extend({
         }, 1000, "resizeTimer");
       });
       setInterval(function() {
-        jQuery(".energy_spinner").show();
+        jQuery(".energy_spinner").css("visibility", "visible");
 
         self.refreshCurrentUsage()
           .then(function() {
             // Slight timeout to make sure the spinner is noticeable: this increases
             // trust.
             setTimeout(function() {
-              jQuery(".energy_spinner").hide();
+              jQuery(".energy_spinner").css("visibility", "hidden");
             }, 100);
           });
       }, 3000);
