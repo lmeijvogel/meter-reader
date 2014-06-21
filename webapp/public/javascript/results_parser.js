@@ -32,7 +32,12 @@ var ResultsParser = Class.$extend({
     var sortedInput = _.sortBy(input, "timeStamp");
 
     _.each(sortedInput, function(element) {
-      var hour = moment(element.time_stamp).hour();
+      var mTimestamp = moment(element.time_stamp);
+      var hour = mTimestamp.hour();
+
+      if (mTimestamp.day() != self.firstTimeStamp.day()) {
+        hour += 24;
+      }
       var value = element[field];
 
       if (previousValue != null) {

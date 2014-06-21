@@ -9,9 +9,9 @@ class DatabaseReader
   def read
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
-      TRUNCATE(MAX(stroom_dal),3) as d_dal,
-      TRUNCATE(MAX(stroom_piek),3) as d_piek,
-      TRUNCATE(MAX(stroom_piek+stroom_dal),3) as d_totaal,
+      TRUNCATE(MIN(stroom_dal),3) as d_dal,
+      TRUNCATE(MIN(stroom_piek),3) as d_piek,
+      TRUNCATE(MIN(stroom_piek+stroom_dal),3) as d_totaal,
       TRUNCATE(MAX(gas),3) as d_gas
     FROM measurements
     #{where}
@@ -31,8 +31,10 @@ class DatabaseReader
 
   def day=(date)
     start_date = sql_date(date)
-    end_date = sql_date(date.next_day)
+    next_day = date.next_day
 
+    # Include one measurement at the end of the day (the first one in the new day)
+    end_date = sql_date(DateTime.civil(next_day.year, next_day.month, next_day.day, 1))
     self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
     self.granularity = :hour
   end
