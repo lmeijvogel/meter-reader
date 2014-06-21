@@ -3,6 +3,7 @@ require 'mysql2'
 require 'json'
 require 'pathname'
 require 'fileutils'
+require 'connection_pool'
 
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
@@ -13,25 +14,31 @@ set :bind, '0.0.0.0'
 
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
-database_connection = Mysql2::Client.new(DatabaseConfig.for(settings.environment))
+$database = ConnectionPool.new(size: 2) do
+  Mysql2::Client.new(DatabaseConfig.for(settings.environment))
+end
 
 get "/day/today" do
-  database_reader = DatabaseReader.new(database_connection)
+  $database.with {|database_connection|
+    database_reader = DatabaseReader.new(database_connection)
 
-  database_reader.day = :today
+    database_reader.day = :today
 
-  database_reader.read().to_json
+    database_reader.read().to_json
+  }
 end
 
 get "/day/:year/:month/:day" do
   day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
   cached(:day, day) do
-    database_reader = DatabaseReader.new(database_connection)
+    $database.with {|database_connection|
+      database_reader = DatabaseReader.new(database_connection)
 
-    database_reader.day = day
+      database_reader.day = day
 
-    database_reader.read().to_json
+      database_reader.read().to_json
+    }
   end
 end
 
@@ -52,11 +59,13 @@ get "/month/:year/:month" do
 end
 
 get "/energy/current" do
-  results = database_connection.query("SELECT stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
+  $database.with {|database_connection|
+    results = database_connection.query("SELECT stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
 
-  @current_measurement = results.first["stroom_current"]
+    @current_measurement = results.first["stroom_current"]
 
-  { current: @current_measurement }.to_json
+    { current: @current_measurement }.to_json
+  }
 end
 
 get "/" do
