@@ -4,7 +4,8 @@ var Main = Class.$extend({
     this.observers = [];
 
     this.graphsPlotter = GraphsPlotter(this);
-    DayStats(this);
+    EnergyTotals($(".energy_totals"), this);
+    GasTotals($(".gas_totals"), this);
 
     this.setEventHandlers();
   },
