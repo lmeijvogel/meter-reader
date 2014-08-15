@@ -35,7 +35,7 @@
       #loading_spinner { display: none; }
       #error_icon      { display: none; color: red }
       .numeric         { padding: 15px; margin-bottom: 15px; text-align: center; }
-      .energy_spinner  { padding: 15px; }
+      .energy_spinner  { padding: 15px; visibility: hidden; }
     </style>
   </head>
   <body>
@@ -47,17 +47,12 @@
         </h3>
       </div>
       <div class="row">
-        <div class="bg-info col-xs-offset-3 col-xs-3 col-sm-2">Huidig energie</div>
-        <div class="bg-info col-xs-3 col-sm-2">totaal energie</div>
-        <div class="bg-info col-xs-3 col-sm-2">totaal gas</div>
-      </div>
-      <div class="row">
-        <div class="col-xs-offset-2 col-xs-1 energy_spinner">
+        <div class="col-xs-offset-1 col-xs-1 energy_spinner">
           <i class="fa fa-spinner fa-spin"></i>
         </div>
-        <div class="bg-info col-xs-3 col-sm-2 numeric current_energy">-</div>
-        <div class="bg-info col-xs-3 col-sm-2 numeric energy_totals">-</div>
-        <div class="bg-info col-xs-3 col-sm-2 numeric gas_totals">-</div>
+        <div class="bg-info col-xs-2 col-sm-2 numeric current_energy">-</div>
+        <div class="bg-info col-xs-2 col-sm-2 numeric energy_totals">-</div>
+        <div class="bg-info col-xs-2 col-sm-2 numeric gas_totals">-</div>
       </div>
       <div class="row">
         <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="stroom" style="height: 300px"></div>
