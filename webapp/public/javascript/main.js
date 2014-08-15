@@ -45,9 +45,7 @@ var Main = Class.$extend({
 
     $(function() {
       $('.today').on('click', function() {
-        var today = new Date();
-
-        self.renderDay(today);
+        self.renderToday();
       });
 
       $('.previous').on('click', function() {
@@ -105,6 +103,12 @@ var Main = Class.$extend({
     var newDate = new Date(this.date).setDate(this.date.getDate() + 1);
 
     this.renderDay(newDate);
+  },
+
+  renderToday: function() {
+    var today = new Date();
+
+    this.renderDay(today);
   },
 
   renderDay: function(day) {
