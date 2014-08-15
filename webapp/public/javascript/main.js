@@ -146,6 +146,12 @@ var Main = Class.$extend({
       jQuery(".current_energy").text(current+" Watt");
     }).catch(function() {
       jQuery(".current_energy").text("-");
+    }).then(function() {
+      // Slight timeout to make sure the spinner is noticeable: this increases
+      // trust.
+      setTimeout(function() {
+        jQuery(".energy_spinner").css("visibility", "hidden");
+      }, 100);
     });
   },
 
