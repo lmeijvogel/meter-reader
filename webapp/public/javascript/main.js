@@ -26,7 +26,7 @@ var Main = Class.$extend({
       });
     });
 
-    return Promise.cast(fadeOut.then(function() {
+    return fadeOut.then(function() {
       $.getJSON(url).then( function( measurements ) {
         _.each(self.observers, function(observer) {
           observer.notifyNewMeasurements(measurements);
@@ -37,7 +37,7 @@ var Main = Class.$extend({
       }).then(function() {
         $graph.css("opacity", "1");
       });
-    }));
+    });
   },
 
   setEventHandlers: function() {
