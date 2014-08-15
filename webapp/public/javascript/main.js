@@ -78,19 +78,12 @@ var Main = Class.$extend({
           self.graphsPlotter.render();
         }, 1000, "resizeTimer");
       });
-      setInterval(function() {
-        jQuery(".energy_spinner").css("visibility", "visible");
-
-        self.refreshCurrentUsage()
-          .then(function() {
-            // Slight timeout to make sure the spinner is noticeable: this increases
-            // trust.
-            setTimeout(function() {
-              jQuery(".energy_spinner").css("visibility", "hidden");
-            }, 100);
-          });
-      }, 3000);
     });
+  },
+
+  start: function() {
+    this.scheduleCurrentUsage();
+    this.renderToday();
   },
 
   previousPeriod: function() {
@@ -140,8 +133,26 @@ var Main = Class.$extend({
     }, timeout);
   },
 
+  scheduleCurrentUsage: function() {
+    this.refreshCurrentUsageAndScheduleNew();
+  },
+
+  refreshCurrentUsageAndScheduleNew: function() {
+    var self = this;
+
+    this.refreshCurrentUsage()
+    .then(function() {
+      setTimeout(function() {
+        self.refreshCurrentUsageAndScheduleNew();
+      }, 3000);
+    });
+  },
+
   refreshCurrentUsage: function() {
-    return RSVP.Promise.cast(jQuery.getJSON("/energy/current")).then(function(json) {
+    jQuery(".energy_spinner").css("visibility", "visible");
+
+    return RSVP.Promise.cast(jQuery.getJSON("/energy/current"))
+    .then(function(json) {
       var current = Math.round(parseFloat(json.current) * 1000);
       jQuery(".current_energy").text(current+" Watt");
     }).catch(function() {
