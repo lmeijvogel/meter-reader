@@ -149,12 +149,27 @@ var Main = Class.$extend({
   },
 
   refreshCurrentUsage: function() {
+    var self = this;
+
     jQuery(".energy_spinner").css("visibility", "visible");
 
     return RSVP.Promise.cast(jQuery.getJSON("/energy/current"))
     .then(function(json) {
+      var element = jQuery(".current_energy");
+      var oldColor = element.css("background-color");
+
+      if (json.id != self.old_energy_id) {
+        self.old_energy_id = json.id;
+        element.css("background-color", "#fff");
+
+        setTimeout(function() {
+          element.css("background-color", oldColor);
+        }, 1100);
+
+      }
+
       var current = Math.round(parseFloat(json.current) * 1000);
-      jQuery(".current_energy").text(current+" Watt");
+      element.text(current+" Watt");
     }).catch(function() {
       jQuery(".current_energy").text("-");
     }).then(function() {

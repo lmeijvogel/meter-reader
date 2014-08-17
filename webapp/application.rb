@@ -60,11 +60,12 @@ end
 
 get "/energy/current" do
   $database.with {|database_connection|
-    results = database_connection.query("SELECT stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
+    results = database_connection.query("SELECT id, stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
 
+    @id = results.first["id"];
     @current_measurement = results.first["stroom_current"]
 
-    { current: @current_measurement }.to_json
+    { id: @id, current: @current_measurement }.to_json
   }
 end
 
