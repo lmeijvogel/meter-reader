@@ -4,9 +4,13 @@ require 'json'
 require 'pathname'
 require 'fileutils'
 require 'connection_pool'
+require 'bcrypt'
 
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
+
+NoPasswordsFile = Class.new(StandardError)
+UsernameNotFound = Class.new(StandardError)
 
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), ".."))
 
@@ -16,6 +20,17 @@ FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
 $database = ConnectionPool.new(size: 2) do
   Mysql2::Client.new(DatabaseConfig.for(settings.environment))
+end
+
+configure do
+  # Storing login information in cookies is good enough for our purposes
+  one_year = 60*60*24*365
+  secret = File.read('session_secret.txt')
+  use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
+end
+
+before do
+  check_login_or_redirect unless request.path.include?("login")
 end
 
 get "/day/today" do
@@ -88,5 +103,50 @@ def cached(prefix, date)
     end
   else
     yield
+  end
+end
+
+post "/login/create" do
+  username = params["username"]
+  password = params["password"]
+
+  begin
+    stored_password_hash = read_password_hash(username)
+
+    password_valid = BCrypt::Password.new(stored_password_hash) == password
+    if password_valid
+      session.clear
+      session[:username] = username
+
+      redirect(url("/", false))
+    else
+      invalid_username_or_password!
+    end
+  rescue UsernameNotFound, BCrypt::Errors::InvalidHash
+    invalid_username_or_password!
+  rescue NoPasswordsFile
+    status 401
+    "No passwords file"
+  end
+end
+
+def read_password_hash(username)
+  raise NoPasswordsFile unless File.exists? "passwords"
+
+  password_hashes = YAML.load(File.read("passwords"))
+
+  password_hashes.fetch(username) { raise UsernameNotFound }
+end
+
+def invalid_username_or_password!
+  status 401
+  "Invalid username or password"
+end
+
+def check_login_or_redirect
+  if session[:username].nil?
+    redirect "/login.html"
+  else
+    pass
   end
 end

@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem "serialport"
 gem "mysql2"
 gem "trollop"
+gem "bcrypt"
 
 gem "sinatra"
 gem 'thin'

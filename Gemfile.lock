@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    bcrypt (3.1.7)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     celluloid-io (0.15.0)
@@ -69,6 +70,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bcrypt
   connection_pool
   guard
   guard-rspec
