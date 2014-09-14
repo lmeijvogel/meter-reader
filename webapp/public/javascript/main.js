@@ -8,6 +8,11 @@ var Main = Class.$extend({
     GasTotals($(".gas_totals"), this);
 
     this.setEventHandlers();
+
+    this.urls = {};
+
+    this.urls.current = jQuery("body").data('current-url');
+    this.urls.prefix = jQuery("body").data('url-prefix');
   },
 
   render: function(url, periodSize) {
@@ -108,7 +113,7 @@ var Main = Class.$extend({
     var self = this;
 
     day = new Date(day);
-    var url = "/day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
+    var url = this.urls.prefix+"/day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
 
     this.render(url, "day").then(function() {
       self.date = day;
@@ -153,7 +158,7 @@ var Main = Class.$extend({
 
     jQuery(".energy_spinner").css("visibility", "visible");
 
-    return RSVP.Promise.cast(jQuery.getJSON("/energy/current"))
+    return RSVP.Promise.cast(jQuery.getJSON(this.urls.current))
     .then(function(json) {
       var element = jQuery(".current_energy");
       var oldColor = element.css("background-color");
