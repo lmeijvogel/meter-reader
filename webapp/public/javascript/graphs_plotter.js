@@ -72,7 +72,8 @@ var GraphsPlotter = Class.$extend({
       ],
       axes: {
         yaxis: {
-          tickOptions: {formatString: '%d'}
+          tickOptions: {formatString: '%d'},
+          max: 1500
         }
       }
 
@@ -81,7 +82,12 @@ var GraphsPlotter = Class.$extend({
     var gasOptions = DeepObjectDefaults.merge({
       series: [
         { label: 'Gas', color: '#f0ad4e'}
-      ]
+      ],
+      axes: {
+        yaxis: {
+          max: 600
+        }
+      }
     }, defaultPlotOptions);
 
     var stroomPlot = $.jqplot('stroom', [this.stroomWHTotaal], stroomOptions);
