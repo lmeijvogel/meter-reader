@@ -52,32 +52,36 @@
     });
   </script>
 
-  <script type="text/x-handlebars" data-template-name="day/show">
+  <script type="text/x-handlebars" data-template-name="day">
     <div class="container">
-      <div class="row">
-        <h3 class="col-sm-8 col-sm-offset-2"><span class="header"></span>
-          <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
-          <i id="error_icon" class="fa fa-exclamation-triangle"></i>
-        </h3>
-      </div>
-      <div class="row">
-        <div class="col-xs-offset-1 col-xs-1 energy_spinner">
-          <i class="fa fa-spinner fa-spin"></i>
-        </div>
-        <div class="bg-info col-xs-2 col-sm-2 numeric current_energy">-</div>
-        <div class="bg-info col-xs-2 col-sm-2 numeric energy_totals">-</div>
-        <div class="bg-info col-xs-2 col-sm-2 numeric gas_totals">-</div>
-      </div>
-      <div class="row">
-        <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="stroom" style="height: 300px"></div>
-        <div class="col-sm-5 col-xs-10 col-sm-offset-0 col-xs-offset-1 img-responsive graph" id="gas" style="height: 300px"></div>
-      </div>
+      {{outlet}}
 
       <div class="row">
         <button class="btn btn-lg btn-default previous col-sm-offset-1 col-sm-5 col-xs-6">Previous</button>
         <button class="btn btn-lg btn-default next col-sm-5 col-xs-6">Next</button>
         <button class="btn btn-default today col-sm-offset-1 col-sm-10 col-xs-12">Today</button>
       </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="day/show">
+    <div class="row">
+      <h3 class="col-sm-8 col-sm-offset-2"><span class="header"></span>
+        <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
+        <i id="error_icon" class="fa fa-exclamation-triangle"></i>
+      </h3>
+    </div>
+    <div class="row">
+      <div class="col-xs-offset-1 col-xs-1 energy_spinner">
+        <i class="fa fa-spinner fa-spin"></i>
+      </div>
+      <div class="bg-info col-xs-2 col-sm-2 numeric current_energy">-</div>
+      <div class="bg-info col-xs-2 col-sm-2 numeric energy_totals">-</div>
+      <div class="bg-info col-xs-2 col-sm-2 numeric gas_totals">-</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="stroom" style="height: 300px"></div>
+      <div class="col-sm-5 col-xs-10 col-sm-offset-0 col-xs-offset-1 img-responsive graph" id="gas" style="height: 300px"></div>
     </div>
   </script>
 </html>
