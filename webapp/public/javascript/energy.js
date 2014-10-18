@@ -6,8 +6,21 @@ Energy.Router.map(function() {
     });
 });
 
+Energy.ApplicationRoute = Ember.Route.extend({
+    beforeModel: function() {
+        window.main.scheduleCurrentUsage();
+    }
+});
 Energy.IndexRoute = Ember.Route.extend({
     beforeModel: function() {
         this.transitionTo('day.show', "today");
+    }
+});
+
+Energy.DayShowRoute = Ember.Route.extend({
+    beforeModel: function(args) {
+        Ember.run.next(function() {
+            window.main.renderToday();
+        });
     }
 });

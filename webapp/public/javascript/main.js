@@ -86,11 +86,6 @@ var Main = Class.$extend({
     });
   },
 
-  start: function() {
-    this.scheduleCurrentUsage();
-    this.renderToday();
-  },
-
   previousPeriod: function() {
     var newDate = new Date(this.date).setDate(this.date.getDate() - 1);
 
