@@ -49,35 +49,6 @@ var Main = Class.$extend({
     var self = this;
 
     $(function() {
-      $('.today').on('click', function() {
-        self.renderToday();
-      });
-
-      $('.previous').on('click', function() {
-        self.previousPeriod();
-      });
-
-      $('.next').on('click', function() {
-        self.nextPeriod();
-      });
-
-      Hammer(window).on("swipeleft", function() {
-        self.nextPeriod();
-      }).on("swiperight", function() {
-        self.previousPeriod();
-      });
-
-      $("html").keydown(function(event) {
-        switch(event.keyCode) {
-          case 37:
-            self.previousPeriod();
-            break;
-          case 39:
-            self.nextPeriod();
-            break;
-        }
-      });
-
       jQuery(window).on("resize", function() {
         self.delayAndExecuteOnce( function() {
           self.graphsPlotter.render();
@@ -86,29 +57,11 @@ var Main = Class.$extend({
     });
   },
 
-  previousPeriod: function() {
-    var newDate = new Date(this.date).setDate(this.date.getDate() - 1);
-
-    this.renderDay(newDate);
-  },
-
-  nextPeriod: function() {
-    var newDate = new Date(this.date).setDate(this.date.getDate() + 1);
-
-    this.renderDay(newDate);
-  },
-
-  renderToday: function() {
-    var today = new Date();
-
-    this.renderDay(today);
-  },
-
   renderDay: function(day) {
     var self = this;
 
     day = new Date(day);
-    var url = this.urls.prefix+"/day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
+    var url = this.urls.prefix+"day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
 
     this.render(url, "day").then(function() {
       self.date = day;
