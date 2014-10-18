@@ -42,19 +42,19 @@ describe DatabaseReader do
   end
 
   it "sets the correct stroom_dal" do
-    @usage.stroom_dal.should == stroom_dal_2 - stroom_dal_1
+    @usage.stroom_dal.should be_within(0.01).of(stroom_dal_1)
   end
 
   it "sets the correct stroom_piek" do
-    @usage.stroom_piek.should == stroom_piek_2 - stroom_piek_1
+    @usage.stroom_piek.should be_within(0.01).of(stroom_piek_1)
   end
 
   it "sets the correct stroom_totaal" do
-    @usage.stroom_totaal.should == stroom_totaal_2 - stroom_totaal_1
+    @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal_1)
   end
 
   it "sets the correct gas" do
-    @usage.gas.should == gas_2 - gas_1
+    @usage.gas.should be_within(0.01).of(gas_1)
   end
 
   it "sets the correct time_stamp" do
