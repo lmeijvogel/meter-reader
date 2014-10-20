@@ -77,6 +77,12 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         this.triggerAction({action: "previous"});
     },
 
+    resizeHandler: function() {
+        window.main.delayAndExecuteOnce( function() {
+            window.main.graphsPlotter.render();
+        }, 1000, "resizeTimer");
+    },
+
     didInsertElement: function() {
       this._keyDownHandler = this.keyDownHandler.bind(this);
       $(document).on("keydown", this._keyDownHandler);
@@ -86,11 +92,15 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
 
       Hammer(window).on("swipeleft", this._swipeLeftHandler);
       Hammer(window).on("swiperight", this._swipeRightHandler);
+
+      this._resizeHandler = this.resizeHandler.bind(this);
+      $(window).on("resize", this._resizeHandler);
     },
 
     willDestroyElement: function() {
         $(document).off("keydown", this._keyDownHandler);
         Hammer(window).off("swipeleft", this._swipeLeftHandler);
         Hammer(window).off("swiperight", this._swipeRightHandler);
+        $(window).off("resize", this._resizeHandler);
     }
 });

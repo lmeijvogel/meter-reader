@@ -7,8 +7,6 @@ var Main = Class.$extend({
     EnergyTotals($(".energy_totals"), this);
     GasTotals($(".gas_totals"), this);
 
-    this.setEventHandlers();
-
     this.urls = {};
 
     this.urls.current = jQuery("body").data('current-url');
@@ -41,18 +39,6 @@ var Main = Class.$extend({
         $("#loading_spinner").hide();
       }).then(function() {
         $graph.css("opacity", "1");
-      });
-    });
-  },
-
-  setEventHandlers: function() {
-    var self = this;
-
-    $(function() {
-      jQuery(window).on("resize", function() {
-        self.delayAndExecuteOnce( function() {
-          self.graphsPlotter.render();
-        }, 1000, "resizeTimer");
       });
     });
   },
