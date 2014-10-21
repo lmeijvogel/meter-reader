@@ -33,11 +33,23 @@ Energy.DayShowRoute = Ember.Route.extend({
         var day = new Date(dateParts[0], dateParts[1]-1, dateParts[2]);
 
         this.set("date", day)
-
-        Ember.run.next(function() {
-            window.main.renderDay(day);
-        });
     },
+
+    model: function(params) {
+        var day = moment(params.date);
+        this.set("day", day);
+
+        var url_prefix = jQuery("body").data('url-prefix');
+        var url = url_prefix+"day/"+day.format("YYYY/MM/DD");
+
+        return RSVP.Promise.cast($.getJSON(url));
+    },
+
+    setupController: function(controller, model) {
+        this._super(controller, model);
+        controller.set("day", this.get("day"));
+    },
+
     actions: {
         previous: function() {
             var newDate = moment(this.get("date")).add(-1, "d");
@@ -57,7 +69,17 @@ Energy.DayShowRoute = Ember.Route.extend({
     }
 });
 
+Energy.DayShowController = Ember.Controller.extend({
+    header: function() {
+        return moment(this.get("day")).format("dddd DD-MM-YYYY");
+    }.property("day")
+});
+
 Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
+    contentObserver: function() {
+        window.main.renderDay(this.get("controller.content"));
+    }.observes("controller.content"),
+
     keyDownHandler: function(event) {
         switch(event.keyCode) {
           case 37:

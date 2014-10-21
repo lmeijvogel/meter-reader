@@ -1,6 +1,5 @@
 var Main = Class.$extend({
   __init__: function() {
-    this.date = null;
     this.observers = [];
 
     this.graphsPlotter = GraphsPlotter(this);
@@ -13,7 +12,7 @@ var Main = Class.$extend({
     this.urls.prefix = jQuery("body").data('url-prefix');
   },
 
-  render: function(url, periodSize) {
+  renderDay: function(data) {
     var self = this;
 
     $("#error_icon").hide();
@@ -21,38 +20,25 @@ var Main = Class.$extend({
 
     var $graph = $(".graph");
 
-    var fadeOut = new Promise(function(resolve, reject) {
-      $graph.animate({
-        opacity: 0.5
-      }, function() {
-        resolve();
-      });
-    });
+    var fadeOut;
 
-    return fadeOut.then(function() {
-      $.getJSON(url).then( function( measurements ) {
-        _.each(self.observers, function(observer) {
-          observer.notifyNewMeasurements(measurements);
+    if ($graph.length > 0) {
+        fadeOut = new Promise(function(resolve, reject) {
+            $graph.animate({
+                opacity: 0.5
+            }, function() {
+                resolve();
+            });
         });
-      }).fail(function() {
-        $("#error_icon").css('display', 'inline-block');
-        $("#loading_spinner").hide();
-      }).then(function() {
-        $graph.css("opacity", "1");
+    } else {
+        fadeOut = RSVP.Promise.resolve();
+    }
+
+    return fadeOut .then(function() {
+      _.each(self.observers, function(observer) {
+        observer.notifyNewMeasurements(data);
       });
-    });
-  },
-
-  renderDay: function(day) {
-    var self = this;
-
-    day = new Date(day);
-    var url = this.urls.prefix+"day/"+day.getFullYear()+"/"+(day.getMonth()+1)+"/"+day.getDate();
-
-    this.render(url, "day").then(function() {
-      self.date = day;
-
-      self.header( moment(day).format("dddd DD-MM-YYYY") );
+      $graph.css("opacity", "1");
     });
   },
 
