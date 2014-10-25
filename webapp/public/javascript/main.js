@@ -42,10 +42,6 @@ var Main = Class.$extend({
     });
   },
 
-  header: function(text) {
-    $('.header').text(text);
-  },
-
   delayAndExecuteOnce: function(method, timeout, timerName) {
     if (window[timerName]) {
       clearTimeout(window[timerName]);
@@ -58,21 +54,7 @@ var Main = Class.$extend({
     }, timeout);
   },
 
-  scheduleCurrentUsage: function() {
-    this.refreshCurrentUsageAndScheduleNew();
-  },
-
-  refreshCurrentUsageAndScheduleNew: function() {
-    var self = this;
-
-    this.refreshCurrentUsage()
-    .then(function() {
-      setTimeout(function() {
-        self.refreshCurrentUsageAndScheduleNew();
-      }, 3000);
-    });
-  },
-
+  /* TODO: Move this to the CurrentUsageView */
   refreshCurrentUsage: function() {
     var self = this;
 

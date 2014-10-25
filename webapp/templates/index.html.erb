@@ -71,7 +71,7 @@
       <div class="col-xs-offset-1 col-xs-1 energy_spinner">
         <i class="fa fa-spinner fa-spin"></i>
       </div>
-      <div class="bg-info col-xs-2 col-sm-2 numeric current_energy">-</div>
+      <div class="bg-info col-xs-2 col-sm-2 numeric current_energy">{{render "current-energy-usage"}}</div>
       <div class="bg-info col-xs-2 col-sm-2 numeric energy_totals">-</div>
       <div class="bg-info col-xs-2 col-sm-2 numeric gas_totals">-</div>
     </div>
@@ -79,5 +79,9 @@
       <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="stroom" style="height: 300px"></div>
       <div class="col-sm-5 col-xs-10 col-sm-offset-0 col-xs-offset-1 img-responsive graph" id="gas" style="height: 300px"></div>
     </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="current-energy-usage">
+    {{valueInWatts}} Watt
   </script>
 </html>

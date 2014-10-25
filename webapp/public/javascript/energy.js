@@ -8,9 +8,6 @@ Energy.Router.map(function() {
 });
 
 Energy.ApplicationRoute = Ember.Route.extend({
-    beforeModel: function() {
-        window.main.scheduleCurrentUsage();
-    }
 });
 Energy.IndexRoute = Ember.Route.extend({
     beforeModel: function() {
@@ -124,5 +121,39 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         Hammer(window).off("swipeleft", this._swipeLeftHandler);
         Hammer(window).off("swiperight", this._swipeRightHandler);
         $(window).off("resize", this._resizeHandler);
+    }
+});
+
+Energy.CurrentEnergyUsageController = Ember.Controller.extend({
+    valueInWatts: function() {
+        return ""+ 1000*this.get("value");
+    }.property("value"),
+
+    init: function() {
+        var self = this;
+        this.set("url", jQuery("body").data('current-url'));
+
+        this.scheduleLoadValue();
+
+        Ember.run.next(function() {
+            self.loadValue();
+        });
+    },
+
+    scheduleLoadValue: function() {
+        var self = this;
+
+        Ember.run.later(function() {
+            self.loadValue();
+            self.scheduleLoadValue();
+        }, 3000);
+    },
+
+    loadValue: function() {
+        var self = this;
+        RSVP.Promise.cast(jQuery.getJSON(this.get("url")))
+        .then(function(json) {
+            self.set("value", json.current);
+        });
     }
 });
