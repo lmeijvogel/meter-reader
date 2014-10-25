@@ -153,7 +153,23 @@ Energy.CurrentEnergyUsageController = Ember.Controller.extend({
         var self = this;
         RSVP.Promise.cast(jQuery.getJSON(this.get("url")))
         .then(function(json) {
+            self.set("id", json.id);
             self.set("value", json.current);
         });
     }
+});
+
+Energy.CurrentEnergyUsageView = Ember.View.extend({
+    classNameBindings: ["newValue"],
+    classNames: ["current_energy bg-info col-xs-2 col-sm-2 numeric"],
+
+    idObserver: function() {
+        var self = this;
+
+        this.set("newValue", true);
+
+        setTimeout(function() {
+            self.set("newValue", false);
+        }, 1100);
+    }.observes("controller.id")
 });
