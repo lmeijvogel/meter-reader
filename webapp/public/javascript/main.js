@@ -3,11 +3,8 @@ var Main = Class.$extend({
     this.observers = [];
 
     this.graphsPlotter = GraphsPlotter(this);
-    EnergyTotals($(".energy_totals"), this);
-    GasTotals($(".gas_totals"), this);
 
     this.urls = {};
-
     this.urls.current = jQuery("body").data('current-url');
     this.urls.prefix = jQuery("body").data('url-prefix');
   },

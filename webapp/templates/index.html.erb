@@ -23,7 +23,6 @@
     <script src="javascript/relative_converter.js"></script>
     <script src="javascript/deep_object_defaults.js"></script>
     <script src="javascript/graphs_plotter.js"></script>
-    <script src="javascript/totals_display.js"></script>
 
     <script src="javascript/main.js"></script>
 
@@ -73,10 +72,8 @@
         <i class="fa fa-spinner fa-spin"></i>
       </div>
       {{render "current-energy-usage"}}
-      <div class="bg-info col-xs-2 col-sm-2 numeric energy_totals">-</div>
-      {{render "energy-totals"}}
-
-      <div class="bg-info col-xs-2 col-sm-2 numeric gas_totals">-</div>
+      {{view Energy.EnergyTotalsView}}
+      {{view Energy.GasTotalsView}}
     </div>
     <div class="row">
       {{view Energy.GraphsView}}
@@ -90,5 +87,9 @@
 
   <script type="text/x-handlebars" data-template-name="current-energy-usage">
     {{valueInWatts}} Watt
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="totals">
+    <div class="bg-info col-xs-2 col-sm-2 numeric">{{{view.formattedValue}}}</div>
   </script>
 </html>

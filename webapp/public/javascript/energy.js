@@ -197,3 +197,40 @@ Energy.GraphsView = Ember.View.extend({
             throttleDistance, immediate);
     }
 });
+
+Energy.TotalsView = Ember.View.extend({
+    templateName: "totals",
+
+    value: function() {
+        var stroom_totaal_measurements = _.chain(this.get("controller.content")).pluck(this.get("fieldName"));
+
+        var min = stroom_totaal_measurements.min().value();
+        var max = stroom_totaal_measurements.max().value();
+
+        return this.truncateDigits(max-min);
+    }.property("controller.content"),
+
+    truncateDigits: function(value) {
+        var multiplier = Math.pow(10, this.get("accuracy"));
+
+        return parseFloat(Math.round((value) * multiplier) / multiplier).toFixed(this.get("accuracy"));
+    },
+});
+
+Energy.EnergyTotalsView = Energy.TotalsView.extend({
+    fieldName: "stroom_totaal",
+    accuracy: 2,
+
+    formattedValue: function() {
+        return this.get("value") +" kWh"
+    }.property("value")
+});
+
+Energy.GasTotalsView = Energy.TotalsView.extend({
+    fieldName: "gas",
+    accuracy: 3,
+
+    formattedValue: function() {
+        return this.get("value") +" m<sup>3</sup>"
+    }.property("value")
+});
