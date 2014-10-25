@@ -9,6 +9,7 @@ Energy.Router.map(function() {
 
 Energy.ApplicationRoute = Ember.Route.extend({
 });
+
 Energy.IndexRoute = Ember.Route.extend({
     beforeModel: function() {
         this.transitionTo('day.index');
@@ -73,10 +74,6 @@ Energy.DayShowController = Ember.Controller.extend({
 });
 
 Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
-    contentObserver: function() {
-        window.main.renderDay(this.get("controller.content"));
-    }.observes("controller.content"),
-
     keyDownHandler: function(event) {
         switch(event.keyCode) {
           case 37:
@@ -96,12 +93,6 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         this.triggerAction({action: "previous"});
     },
 
-    resizeHandler: function() {
-        window.main.delayAndExecuteOnce( function() {
-            window.main.graphsPlotter.render();
-        }, 1000, "resizeTimer");
-    },
-
     didInsertElement: function() {
       this._keyDownHandler = this.keyDownHandler.bind(this);
       $(document).on("keydown", this._keyDownHandler);
@@ -111,16 +102,12 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
 
       Hammer(window).on("swipeleft", this._swipeLeftHandler);
       Hammer(window).on("swiperight", this._swipeRightHandler);
-
-      this._resizeHandler = this.resizeHandler.bind(this);
-      $(window).on("resize", this._resizeHandler);
     },
 
     willDestroyElement: function() {
         $(document).off("keydown", this._keyDownHandler);
         Hammer(window).off("swipeleft", this._swipeLeftHandler);
         Hammer(window).off("swiperight", this._swipeRightHandler);
-        $(window).off("resize", this._resizeHandler);
     }
 });
 
@@ -172,4 +159,41 @@ Energy.CurrentEnergyUsageView = Ember.View.extend({
             self.set("newValue", false);
         }, 1100);
     }.observes("controller.id")
+});
+
+Energy.GraphsView = Ember.View.extend({
+    templateName: "graphs",
+
+    contentObserver: function() {
+        this.renderContent();
+    }.observes("controller.content"),
+
+    didInsertElement: function() {
+        this._resizeHandler = this.resizeHandler.bind(this);
+        $(window).on("resize", this._resizeHandler);
+
+        this.renderContent();
+    },
+
+    willDestroyElement: function() {
+        $(window).off("resize", this._resizeHandler);
+    },
+
+    renderContent: function() {
+        var self = this;
+        Ember.run.next(function() {
+            window.main.renderDay(self.get("controller.content"));
+        });
+    },
+
+    resizeHandler: function() {
+        var throttleDistance = 1000;
+        var immediate        = false;
+
+        this._rerenderAfterResize = this._rerenderAfterResize || function() { window.main.graphsPlotter.render(); };
+        Ember.run.throttle(
+            window.main,
+            this._rerenderAfterResize,
+            throttleDistance, immediate);
+    }
 });
