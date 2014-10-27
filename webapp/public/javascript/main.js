@@ -2,7 +2,8 @@ var Main = Class.$extend({
   __init__: function() {
     this.observers = [];
 
-    this.graphsPlotter = GraphsPlotter(this);
+    this.gasPlotter = GasPlotter(this, "#gas");
+    this.stroomPlotter = StroomPlotter(this, "#stroom");
 
     this.urls = {};
     this.urls.current = jQuery("body").data('current-url');
