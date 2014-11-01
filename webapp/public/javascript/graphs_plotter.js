@@ -20,8 +20,6 @@ var GraphsPlotter = Class.$extend({
   },
 
   load: function(measurements) {
-    $("#loading_spinner").hide();
-
     this.data = this.processData(measurements);
   },
 

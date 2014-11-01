@@ -49,6 +49,12 @@ Energy.DayShowRoute = Ember.Route.extend({
     },
 
     actions: {
+        loading: function() {
+            this.controllerFor("day.show").set("loading", true);
+        },
+        didTransition: function() {
+            this.controllerFor("day.show").set("loading", false);
+        },
         previous: function() {
             var newDate = moment(this.get("date")).add(-1, "d");
 

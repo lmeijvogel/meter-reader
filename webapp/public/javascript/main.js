@@ -14,8 +14,6 @@ var Main = Class.$extend({
     var self = this;
 
     $("#error_icon").hide();
-    $("#loading_spinner").css('display', 'inline-block');
-
     var $graph = $(".graph");
 
     var fadeOut;

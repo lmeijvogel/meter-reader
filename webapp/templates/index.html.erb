@@ -34,7 +34,8 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
     <style>
-      #loading_spinner { display: none; }
+      .loading_spinner.loading { display: inline-block; }
+      .loading_spinner { display: none; }
       #error_icon      { display: none; color: red }
       .numeric         { padding: 15px; margin-bottom: 15px; text-align: center; }
       .energy_spinner  { padding: 15px; visibility: hidden; }
@@ -63,7 +64,7 @@
   <script type="text/x-handlebars" data-template-name="day/show">
     <div class="row">
       <h3 class="col-sm-8 col-sm-offset-2"><span class="header">{{header}}</span>
-        <i id="loading_spinner" class="fa fa-spinner fa-spin"></i>
+        <i {{bind-attr class=":loading-spinner :fa :fa-spinner :fa-spin loading::hidden"}}></i>
         <i id="error_icon" class="fa fa-exclamation-triangle"></i>
       </h3>
     </div>
