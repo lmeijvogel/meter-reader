@@ -1,6 +1,9 @@
 var GraphsPlotter = Class.$extend({
   __init__: function(main, selector) {
-    main.registerObserver(this);
+    if (main) {
+        main.registerObserver(this);
+    }
+
     this.selector = selector;
   },
 

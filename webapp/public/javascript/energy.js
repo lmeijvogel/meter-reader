@@ -196,7 +196,7 @@ Energy.GraphsView = Ember.View.extend({
         var throttleDistance = 1000;
         var immediate        = false;
 
-        this._rerenderAfterResize = this._rerenderAfterResize || function() { window.main.graphsPlotter.render(); };
+        this._rerenderAfterResize = this._rerenderAfterResize;
         Ember.run.throttle(
             window.main,
             this._rerenderAfterResize,
@@ -240,3 +240,51 @@ Energy.GasTotalsView = Energy.TotalsView.extend({
         return this.get("value") +" m<sup>3</sup>"
     }.property("value")
 });
+
+Energy.GraphView = Ember.View.extend({
+    didInsertElement: function() {
+        this.graph = this.initGraph();
+
+        this.drawMeasurements();
+
+    },
+
+    contentObserver: function() {
+        if (!this.graph) { return; }
+
+        this.drawMeasurements();
+    }.observes("controller.content"),
+
+    drawMeasurements: function() {
+        var self = this;
+
+        return new Promise(function(resolve, reject) {
+            self.$().animate({
+                opacity: 0.5
+            }, function() {
+                resolve();
+            });
+        }).then(function() {
+            self.graph.notifyNewMeasurements(self.get("controller.content"));
+            self.$().css("opacity", "1");
+        });
+    }
+});
+
+Energy.StroomGraphView = Energy.GraphView.extend({
+    templateName: "stroom-graph",
+    selector: "#stroom",
+
+    initGraph: function() {
+        return StroomPlotter(null, this.get("selector"));
+    }
+});
+
+Energy.GasGraphView = Energy.GraphView.extend({
+    templateName: "gas-graph",
+    selector: "#gas",
+
+    initGraph: function() {
+        return GasPlotter(null, this.get("selector"));
+    }
+})

@@ -14,28 +14,6 @@ var Main = Class.$extend({
     var self = this;
 
     $("#error_icon").hide();
-    var $graph = $(".graph");
-
-    var fadeOut;
-
-    if ($graph.length > 0) {
-        fadeOut = new Promise(function(resolve, reject) {
-            $graph.animate({
-                opacity: 0.5
-            }, function() {
-                resolve();
-            });
-        });
-    } else {
-        fadeOut = RSVP.Promise.resolve();
-    }
-
-    return fadeOut .then(function() {
-      _.each(self.observers, function(observer) {
-        observer.notifyNewMeasurements(data);
-      });
-      $graph.css("opacity", "1");
-    });
   },
 
   registerObserver: function(observer) {
