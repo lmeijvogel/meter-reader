@@ -271,7 +271,7 @@ Energy.StroomGraphView = Energy.GraphView.extend({
 
 Energy.GasGraphView = Energy.GraphView.extend({
     attributeBindings: ['style'],
-    classNames: "col-sm-5 col-xs-10 img-responsive graph",
+    classNames: "col-sm-5 col-xs-10 col-sm-offset-0 col-xs-offset-1 img-responsive graph",
     style: "height: 300px",
 
     initGraph: function() {
