@@ -71,9 +71,8 @@
       {{view Energy.EnergyTotalsView}}
       {{view Energy.GasTotalsView}}
     </div>
-    <div class="row">
-      {{view Energy.GraphsView}}
-    </div>
+
+    {{view Energy.GraphsView}}
   </script>
 
   <script type="text/x-handlebars" data-template-name="graphs">
@@ -87,13 +86,5 @@
 
   <script type="text/x-handlebars" data-template-name="totals">
     <div class="bg-info col-xs-2 col-sm-2 numeric">{{{view.formattedValue}}}</div>
-  </script>
-
-  <script type="text/x-handlebars" data-template-name="stroom-graph">
-    <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="stroom" style="height: 300px"></div>
-  </script>
-
-  <script type="text/x-handlebars" data-template-name="gas-graph">
-    <div class="col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph" id="gas" style="height: 300px"></div>
   </script>
 </html>

@@ -1,16 +1,13 @@
 var GraphsPlotter = Class.$extend({
-  __init__: function(selector) {
-    this.selector = selector;
+  __init__: function(element) {
+    this.element = element;
   },
 
   render: function() {
-    $(this.selector).empty();
-
-    // Strip leading '#' from selector
-    var jqPlotSelector = this.selector.substring(1);
+    this.element.empty();
 
     var options = DeepObjectDefaults.merge(this.options(), this.defaultPlotOptions());
-    $.jqplot(jqPlotSelector, [this.data], options);
+    this.element.jqplot([this.data], options);
   },
 
   notifyNewMeasurements: function(measurements) {
@@ -23,8 +20,7 @@ var GraphsPlotter = Class.$extend({
   },
 
   defaultPlotOptions: function() {
-    // Both graphs have the same width:
-    var graphWidth = jQuery(this.selector).innerWidth();
+    var graphWidth = this.element.innerWidth();
     var barMargin = graphWidth / 40;
     var showPointLabels = graphWidth > 300;
 
