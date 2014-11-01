@@ -170,26 +170,13 @@ Energy.CurrentEnergyUsageView = Ember.View.extend({
 Energy.GraphsView = Ember.View.extend({
     templateName: "graphs",
 
-    contentObserver: function() {
-        this.renderContent();
-    }.observes("controller.content"),
-
     didInsertElement: function() {
         this._resizeHandler = this.resizeHandler.bind(this);
         $(window).on("resize", this._resizeHandler);
-
-        this.renderContent();
     },
 
     willDestroyElement: function() {
         $(window).off("resize", this._resizeHandler);
-    },
-
-    renderContent: function() {
-        var self = this;
-        Ember.run.next(function() {
-            window.main.renderDay(self.get("controller.content"));
-        });
     },
 
     resizeHandler: function() {
@@ -276,7 +263,7 @@ Energy.StroomGraphView = Energy.GraphView.extend({
     selector: "#stroom",
 
     initGraph: function() {
-        return StroomPlotter(null, this.get("selector"));
+        return StroomPlotter(this.get("selector"));
     }
 });
 
@@ -285,6 +272,6 @@ Energy.GasGraphView = Energy.GraphView.extend({
     selector: "#gas",
 
     initGraph: function() {
-        return GasPlotter(null, this.get("selector"));
+        return GasPlotter(this.get("selector"));
     }
 })
