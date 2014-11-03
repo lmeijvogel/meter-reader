@@ -104,7 +104,7 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
       $(document).on("keydown", this._keyDownHandler);
 
       this._swipeLeftHandler = this.swipeLeftHandler.bind(this);
-      this._swipeRighttHandler = this.swipeRightHandler.bind(this);
+      this._swipeRightHandler = this.swipeRightHandler.bind(this);
 
       Hammer(window).on("swipeleft", this._swipeLeftHandler);
       Hammer(window).on("swiperight", this._swipeRightHandler);
