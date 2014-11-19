@@ -3,6 +3,10 @@ class DatabaseWriter
     @database_connection = database_connection
   end
 
+  def save_unless_exists(measurement)
+    save(measurement) unless exists?(measurement)
+  end
+
   def save(measurement)
     c = @database_connection
     query = <<-QUERY
@@ -19,5 +23,28 @@ class DatabaseWriter
     QUERY
 
     @database_connection.query( query )
+  end
+
+  private
+  def exists?(measurement)
+    sql_date_format  = "%Y-%m-%d %H:%i"
+    ruby_date_format = "%Y-%m-%d %H:%M"
+
+    previous_half_hour   = (measurement.time_stamp - 30.0/(24*60))
+
+    formatted_start_time = previous_half_hour.strftime(ruby_date_format)
+    formatted_end_time   = measurement.time_stamp.strftime(ruby_date_format)
+
+    c = @database_connection
+    escaped_start_time  = c.escape formatted_start_time
+    escaped_end_time    = c.escape formatted_end_time
+
+    exists_query = <<-QUERY
+      SELECT * FROM measurements
+      WHERE time_stamp >= str_to_date('#{escaped_start_time}', '#{sql_date_format}')
+      AND   time_stamp <  str_to_date('#{escaped_end_time}',   '#{sql_date_format}')
+    QUERY
+
+    @database_connection.query(exists_query).any?
   end
 end

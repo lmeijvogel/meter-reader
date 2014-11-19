@@ -31,7 +31,7 @@ class MeterstandenRecorder
       message = stream_splitter.read
 
       measurement = meterstanden_parser.parse(message)
-      database_writer.save(measurement)
+      database_writer.save_unless_exists(measurement)
 
       File.open("/tmp/last_measurement.txt", "w") do |file|
         file.puts measurement
