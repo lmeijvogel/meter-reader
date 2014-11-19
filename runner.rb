@@ -6,6 +6,7 @@ require 'trollop'
 require_relative "models/meterstand.rb"
 require_relative "lib/data_parsing/stream_splitter.rb"
 require_relative "lib/output/database_writer.rb"
+require_relative "lib/output/redis_writer.rb"
 require_relative "lib/database_config.rb"
 
 require_relative 'daemon.rb'
@@ -22,6 +23,7 @@ class MeterstandenRecorder
     database_connection = Mysql2::Client.new(DatabaseConfig.for(options[:environment]))
 
     self.database_writer = DatabaseWriter.new(database_connection)
+    self.redis_writer    = RedisWriter.new
     self.meterstanden_parser = Meterstand.new
     self.stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")
   end
@@ -32,15 +34,12 @@ class MeterstandenRecorder
 
       measurement = meterstanden_parser.parse(message)
       database_writer.save_unless_exists(measurement)
-
-      File.open("/tmp/last_measurement.txt", "w") do |file|
-        file.puts measurement
-      end
+      redis_writer.save(measurement)
     end
   end
 
   protected
-  attr_accessor :database_writer, :meterstanden_parser, :stream_splitter
+  attr_accessor :database_writer, :redis_writer, :meterstanden_parser, :stream_splitter
 
   private
   def serial_port

@@ -7,6 +7,7 @@ require 'pathname'
 require 'fileutils'
 require 'connection_pool'
 require 'bcrypt'
+require 'redis'
 
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
@@ -80,22 +81,22 @@ class Energie < Sinatra::Base
   end
 
   get "/month/:year/:month" do
-    database_reader = DatabaseReader.new(database_connection)
+    $database.with {|database_connection|
+      database_reader = DatabaseReader.new(database_connection)
 
-    database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
+      database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
 
-    database_reader.read().to_json
+      database_reader.read().to_json
+    }
   end
 
   get "/energy/current" do
-    $database.with {|database_connection|
-      results = database_connection.query("SELECT id, stroom_current FROM measurements ORDER BY id DESC LIMIT 1")
+    result = JSON.parse(Redis.new.get("measurement"))
 
-      @id = results.first["id"];
-      @current_measurement = results.first["stroom_current"]
+    @id = result["id"];
+    @current_measurement = result["stroom_current"]
 
-      { id: @id, current: @current_measurement }.to_json
-    }
+    { id: @id, current: @current_measurement }.to_json
   end
 
   get "/" do
