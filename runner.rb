@@ -23,6 +23,7 @@ class MeterstandenRecorder
     database_connection = Mysql2::Client.new(DatabaseConfig.for(options[:environment]))
 
     self.database_writer = DatabaseWriter.new(database_connection)
+    self.database_writer.save_interval = 15
     self.redis_writer    = RedisWriter.new
     self.meterstanden_parser = Meterstand.new
     self.stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")

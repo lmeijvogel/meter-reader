@@ -1,6 +1,9 @@
 class DatabaseWriter
+  attr_accessor :save_interval
+
   def initialize(database_connection)
     @database_connection = database_connection
+    save_interval = 0
   end
 
   def save_unless_exists(measurement)
@@ -30,7 +33,8 @@ class DatabaseWriter
     sql_date_format  = "%Y-%m-%d %H:%i:%S"
     ruby_date_format = "%Y-%m-%d %H:%M:%S"
 
-    previous_half_hour   = (measurement.time_stamp - 30.0/(24*60))
+    save_interval_in_days = Float(save_interval)/(24*60)
+    previous_half_hour   = measurement.time_stamp - save_interval_in_days
 
     formatted_start_time = previous_half_hour.strftime(ruby_date_format)
     formatted_end_time   = measurement.time_stamp.strftime(ruby_date_format)
