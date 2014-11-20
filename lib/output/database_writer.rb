@@ -27,8 +27,8 @@ class DatabaseWriter
 
   private
   def exists?(measurement)
-    sql_date_format  = "%Y-%m-%d %H:%i"
-    ruby_date_format = "%Y-%m-%d %H:%M"
+    sql_date_format  = "%Y-%m-%d %H:%i:%S"
+    ruby_date_format = "%Y-%m-%d %H:%M:%S"
 
     previous_half_hour   = (measurement.time_stamp - 30.0/(24*60))
 
@@ -41,8 +41,8 @@ class DatabaseWriter
 
     exists_query = <<-QUERY
       SELECT * FROM measurements
-      WHERE time_stamp >= str_to_date('#{escaped_start_time}', '#{sql_date_format}')
-      AND   time_stamp <  str_to_date('#{escaped_end_time}',   '#{sql_date_format}')
+      WHERE str_to_date('#{escaped_start_time}', '#{sql_date_format}') < time_stamp
+      AND   time_stamp <=  str_to_date('#{escaped_end_time}',   '#{sql_date_format}')
     QUERY
 
     @database_connection.query(exists_query).any?

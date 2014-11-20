@@ -123,6 +123,15 @@ describe DatabaseWriter do
       end
     end
 
+    context "when another measurement close to this one exists (regression)" do
+      let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 0, 40) }
+      let(:new_time_stamp)      { DateTime.civil(2014, 11, 20, 20, 0, 50) }
+
+      it "is true" do
+        expect(writer.send(:exists?, @measurement)).to be_true
+      end
+    end
+
     context "when no other measurement exists" do
       let(:new_time_stamp) { DateTime.now + 31.0/(24*60) }
 
