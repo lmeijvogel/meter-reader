@@ -35,21 +35,21 @@ class DatabaseReader
 
     # Include one measurement at the end of the day (the first one in the new day)
     end_date = sql_date(DateTime.civil(next_day.year, next_day.month, next_day.day, 1))
-    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
+    self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
     self.granularity = :hour
   end
 
   def week=(date)
     start_date = sql_date(date)
     end_date = sql_date(date + 7)
-    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
+    self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
     self.granularity = :three_hour
   end
 
   def month=(date)
     start_date = sql_date(date)
-    end_date = date.next_month
-    self.where = "WHERE #{adjusted_time_stamp} > '#{start_date}' AND #{adjusted_time_stamp} < '#{end_date}'"
+    end_date = sql_date(date.next_month)
+    self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
     self.granularity = :day
   end
 
@@ -76,6 +76,6 @@ class DatabaseReader
   end
 
   def sql_date(date)
-    date.to_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    %Q|str_to_date('#{date.to_datetime.strftime("%Y-%m-%d %H:%M:%S")}', "%Y-%m-%d %H:%i:%S")|
   end
 end
