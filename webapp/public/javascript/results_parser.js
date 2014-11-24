@@ -1,6 +1,8 @@
 "use strict";
 
 var ResultsParser = Class.$extend({
+  unit: "hour",
+
   __init__: function(periodSize) {
     this.periodSize = periodSize;
   },
@@ -14,61 +16,77 @@ var ResultsParser = Class.$extend({
 
     this.firstTimeStamp = moment(input[0].time_stamp);
 
-    var result = _.map(_.range(24), function(i) {
-      var row = {time_stamp: self.firstTimeStamp.clone().hour(i)};
-      row[field] = 0;
-
-      return row;
-    });
+    var result = this.initializeResult(this.firstTimeStamp, field);
 
     if (input.length == 1) {
       // Nothing to interpolate, stop
       return result;
     }
 
-    var previousHour = 0;
+    var previousTimestamp = 0;
     var previousValue = null;
 
     var sortedInput = _.sortBy(input, "timeStamp");
 
     _.each(sortedInput, function(element) {
       var mTimestamp = moment(element.time_stamp);
-      var hour = mTimestamp.hour();
+      var timestamp = mTimestamp[self.unit]();
 
-      if (mTimestamp.day() != self.firstTimeStamp.day()) {
-        hour += 24;
+      if (!self.inCurrentPeriod(mTimestamp)) {
+        timestamp += self.singlePeriod();
       }
       var value = element[field];
 
       if (previousValue != null) {
-        var numberOfHours = hour - previousHour;
+        var numberOfTimestamps = timestamp - previousTimestamp;
 
-        var step = (value - previousValue) / numberOfHours;
+        var step = (value - previousValue) / numberOfTimestamps;
 
-        result[previousHour] = self.measurement( previousHour, field, previousValue );
+        result[previousTimestamp] = self.measurement( previousTimestamp, field, previousValue );
 
-        for (var i = 1 ; i < hour - previousHour ; i++) {
+        for (var i = 1 ; i < numberOfTimestamps; i++) {
           var currentValue = i*step + previousValue;
 
-          var index = i + previousHour;
+          var index = i + previousTimestamp;
           result[index] = self.measurement(index, field, currentValue);
           result[index].interpolated = true;
         }
       }
 
-      result[hour] = self.measurement( hour, field, value );
+      result[timestamp] = self.measurement( timestamp, field, value );
 
-      previousHour = hour;
+      previousTimestamp = timestamp;
       previousValue = value;
     });
 
     return result;
   },
 
-  measurement: function( hour, field, value ) {
-    var result = { time_stamp: this.firstTimeStamp.clone().hour(hour) }
+  initializeResult: function(firstTimestamp, field) {
+    var self = this;
+
+    var resultLength = this.singlePeriod();
+
+    return _.map(_.range(resultLength), function(i) {
+      var row = {time_stamp: firstTimestamp.clone()[self.unit](i)};
+      row[field] = 0;
+
+      return row;
+    });
+  },
+
+  measurement: function( timestamp, field, value ) {
+    var result = { time_stamp: this.firstTimeStamp.clone()[this.unit](timestamp) }
     result[field] = value;
 
     return result;
+  },
+
+  inCurrentPeriod: function( timestamp ) {
+    return timestamp.date() == this.firstTimeStamp.date();
+  },
+
+  singlePeriod: function() {
+    return 24;
   }
 });
