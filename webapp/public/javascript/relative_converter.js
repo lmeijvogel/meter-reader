@@ -9,7 +9,7 @@ var RelativeConverter = Class.$extend({
     return _.map(copy, function(value) {
       var result;
 
-      if (value != 0) {
+      if (previousValue != null && value != null) {
         result = value - previousValue;
       } else {
         result = 0;

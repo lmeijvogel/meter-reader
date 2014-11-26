@@ -5,14 +5,16 @@ Energy.Router.map(function() {
         this.route("index");
         this.route("show", {path: "show/:date"});
     });
-});
 
-Energy.ApplicationRoute = Ember.Route.extend({
+    this.resource("month", function() {
+        this.route("index");
+        this.route("show", {path: "show/:date"});
+    });
 });
 
 Energy.IndexRoute = Ember.Route.extend({
     beforeModel: function() {
-        this.transitionTo('day.index');
+        this.transitionTo('month.index');
     }
 });
 
@@ -121,6 +123,110 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
     }
 });
 
+Energy.MonthIndexRoute = Ember.Route.extend({
+    beforeModel: function() {
+        var date = moment();
+        this.transitionTo("month.show", date.format("YYYY-MM"));
+    }
+});
+
+Energy.MonthShowRoute = Ember.Route.extend({
+    beforeModel: function(args) {
+        var date = args.params["month.show"].date;
+
+        var dateParts = date.split("-");
+        var month = new Date(dateParts[0], dateParts[1]-1);
+
+        this.set("date", month)
+    },
+
+    model: function(params) {
+        var month = moment(params.date);
+        this.set("month", month);
+
+        var url_prefix = jQuery("body").data('url-prefix');
+        var url = url_prefix+"month/"+month.format("YYYY/MM");
+
+        return RSVP.Promise.cast($.getJSON(url));
+    },
+
+    setupController: function(controller, model) {
+        this._super(controller, model);
+        controller.set("month", this.get("month"));
+    },
+
+    actions: {
+        loading: function() {
+            this.controllerFor("month.show").set("loading", true);
+        },
+        didTransition: function() {
+            this.controllerFor("month.show").set("loading", false);
+        },
+        previous: function() {
+            var newDate = moment(this.get("date")).add(-1, "M");
+
+            this.transitionTo("month.show", newDate.format("YYYY-MM"));
+        },
+
+        next: function() {
+            var newDate = moment(this.get("date")).add(1, "M");
+
+            this.transitionTo("month.show", newDate.format("YYYY-MM"));
+        },
+
+        today: function() {
+            this.transitionTo("month.index");
+        }
+    }
+});
+
+Energy.MonthShowController = Ember.Controller.extend({
+    resultsParser: function() {
+        return MonthResultsParser();
+    }.property(),
+
+    header: function() {
+        return moment(this.get("month")).format("MM-YYYY");
+    }.property("month")
+});
+
+Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
+    keyDownHandler: function(event) {
+        switch(event.keyCode) {
+          case 37:
+            this.triggerAction({action: "previous"});
+            break;
+          case 39:
+            this.triggerAction({action: "next"});
+            break;
+        }
+    },
+
+    swipeLeftHandler: function() {
+        this.triggerAction({action: "next"});
+    },
+
+    swipeRightHandler: function() {
+        this.triggerAction({action: "previous"});
+    },
+
+    didInsertElement: function() {
+      this._keyDownHandler = this.keyDownHandler.bind(this);
+      $(document).on("keydown", this._keyDownHandler);
+
+      this._swipeLeftHandler = this.swipeLeftHandler.bind(this);
+      this._swipeRightHandler = this.swipeRightHandler.bind(this);
+
+      Hammer(window).on("swipeleft", this._swipeLeftHandler);
+      Hammer(window).on("swiperight", this._swipeRightHandler);
+    },
+
+    willDestroyElement: function() {
+        $(document).off("keydown", this._keyDownHandler);
+        Hammer(window).off("swipeleft", this._swipeLeftHandler);
+        Hammer(window).off("swiperight", this._swipeRightHandler);
+    }
+});
 Energy.CurrentEnergyUsageController = Ember.Controller.extend({
     valueInWatts: function() {
         return ""+ 1000*this.get("value");

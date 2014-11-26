@@ -18,10 +18,14 @@ var ResultsParser = Class.$extend({
     var arrayInterpolator = ArrayInterpolator();
     var interpolatedArray = arrayInterpolator.call(resultArray);
 
-    return interpolatedArray;
+    return this.postfilter(interpolatedArray);
   },
 
   prefilter: function(input) {
+    return input;
+  },
+
+  postfilter: function(input) {
     return input;
   },
 });
@@ -47,6 +51,10 @@ var DayResultsParser = ResultsParser.$extend({
 
 var MonthResultsParser = ResultsParser.$extend({
   unit: "date",
+
+  postfilter: function(input) {
+    return _.tail(input);
+  },
 
   singlePeriod: function(input) {
     var ts = moment(_.head(input).time_stamp);

@@ -17,7 +17,8 @@ var GraphsPlotter = Class.$extend({
   },
 
   load: function(measurements) {
-    this.data = this.processData(measurements);
+    this.measurements = measurements;
+    this.data = this.processData();
   },
 
   defaultPlotOptions: function() {
@@ -47,28 +48,30 @@ var GraphsPlotter = Class.$extend({
       // the legend to overflow the container.
       axes: {
         xaxis: {
-          ticks: this.hourTicks(),
+          ticks: this.ticks(),
           tickOptions: {formatString: '%d'}
         },
 
         yaxis: {
           min: 0,
+          max: this.ticks().length * this.expectedDailyMax(),
           tickOptions: {formatString: '%d'}
         }
       }
     };
   },
 
-  hourTicks: function() {
+  ticks: function() {
     // Can specify a custom tick Array.
     // Ticks should match up one for each y value (category) in the series.
-    return _.range(0, 24);
+    return _.range(0, this.resultsParser.singlePeriod(this.measurements));
   }
 });
 
 var StroomPlotter = GraphsPlotter.$extend({
-  processData: function(measurements) {
-    var parsedStroomTotaal = this.resultsParser.parse(measurements, "stroom_totaal");
+  expectedDailyMax: function() { return 1500; },
+  processData: function() {
+    var parsedStroomTotaal = this.resultsParser.parse(this.measurements, "stroom_totaal");
     var stroomRelative = RelativeConverter().convert(parsedStroomTotaal);
 
     return _.map(stroomRelative, function(kwh) { return kwh*1000; });
@@ -85,7 +88,6 @@ var StroomPlotter = GraphsPlotter.$extend({
       axes: {
         yaxis: {
           tickOptions: {formatString: '%d'},
-          max: 1500
         }
       }
     };
@@ -93,8 +95,9 @@ var StroomPlotter = GraphsPlotter.$extend({
 });
 
 var GasPlotter = GraphsPlotter.$extend({
-  processData: function(measurements) {
-    var gas = this.resultsParser.parse(measurements, "gas");
+  expectedDailyMax: function() { return 600; },
+  processData: function() {
+    var gas = this.resultsParser.parse(this.measurements, "gas");
     var gasRelative = RelativeConverter().convert(gas);
 
     return _.map(gasRelative, function(m3) { return m3*1000; });
@@ -107,7 +110,6 @@ var GasPlotter = GraphsPlotter.$extend({
       ],
       axes: {
         yaxis: {
-          max: 600
         }
       }
     };
