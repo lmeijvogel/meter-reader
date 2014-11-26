@@ -53,6 +53,7 @@ describe("results_parser", function() {
       // The value for the last hour overwrote the first measurement since they both had
       // hour() == 0.
       it("works as expected", function() {
+        pending();
         result = ResultsParser("day").parse(input, "value");
 
         expect(result[0]).toBe(0);
