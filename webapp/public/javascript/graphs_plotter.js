@@ -1,6 +1,7 @@
 var GraphsPlotter = Class.$extend({
-  __init__: function(element) {
+  __init__: function(element, resultsParser) {
     this.element = element;
+    this.resultsParser = resultsParser;
   },
 
   render: function() {
@@ -67,9 +68,7 @@ var GraphsPlotter = Class.$extend({
 
 var StroomPlotter = GraphsPlotter.$extend({
   processData: function(measurements) {
-    var resultsParser = ResultsParser("day");
-
-    var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
+    var parsedStroomTotaal = this.resultsParser.parse(measurements, "stroom_totaal");
     var stroomRelative = RelativeConverter().convert(parsedStroomTotaal);
 
     return _.map(stroomRelative, function(kwh) { return kwh*1000; });
@@ -95,9 +94,7 @@ var StroomPlotter = GraphsPlotter.$extend({
 
 var GasPlotter = GraphsPlotter.$extend({
   processData: function(measurements) {
-    var resultsParser = ResultsParser("day");
-
-    var gas = resultsParser.parse(measurements, "gas");
+    var gas = this.resultsParser.parse(measurements, "gas");
     var gasRelative = RelativeConverter().convert(gas);
 
     return _.map(gasRelative, function(m3) { return m3*1000; });

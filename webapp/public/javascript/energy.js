@@ -74,6 +74,10 @@ Energy.DayShowRoute = Ember.Route.extend({
 });
 
 Energy.DayShowController = Ember.Controller.extend({
+    resultsParser: function() {
+        return DayResultsParser();
+    }.property(),
+
     header: function() {
         return moment(this.get("day")).format("dddd DD-MM-YYYY");
     }.property("day")
@@ -265,7 +269,7 @@ Energy.StroomGraphView = Energy.GraphView.extend({
     style: "height: 300px",
 
     initGraph: function() {
-        return StroomPlotter(this.$());
+        return StroomPlotter(this.$(), this.get("controller.resultsParser"));
     }
 });
 
@@ -275,6 +279,6 @@ Energy.GasGraphView = Energy.GraphView.extend({
     style: "height: 300px",
 
     initGraph: function() {
-        return GasPlotter(this.$());
+        return GasPlotter(this.$(), this.get("controller.resultsParser"));
     }
 })

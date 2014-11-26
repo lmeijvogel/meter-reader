@@ -32,7 +32,7 @@ describe("results_parser", function() {
     });
 
     it("returns all elements", function() {
-      result = ResultsParser("day").parse(input, "value");
+      result = DayResultsParser().parse(input, "value");
 
       expect(result).toEqual(_.range(24));
     });
@@ -67,7 +67,7 @@ describe("results_parser", function() {
     var input = [{time_stamp: moment({hour: 12, month: 5}), value: 10}, {time_stamp: moment({hour: 16, month: 5}), value: 18}];
 
     it("interpolates only between the elements", function() {
-      var result = ResultsParser("day").parse(input, "value");
+      var result = DayResultsParser().parse(input, "value");
       expect(result).toEqual(
         [null, null, null, null, null, null, null, null, null, null, null, null, 10, 12, 14, 16, 18, null, null, null, null, null, null, null]
       );
