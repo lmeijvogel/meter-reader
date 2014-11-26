@@ -70,10 +70,9 @@ var StroomPlotter = GraphsPlotter.$extend({
     var resultsParser = ResultsParser("day");
 
     var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
-    var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
-    var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
+    var stroomRelative = RelativeConverter().convert(parsedStroomTotaal);
 
-    return _.map(stroomTotaal, function(kwh) { return kwh*1000; });
+    return _.map(stroomRelative, function(kwh) { return kwh*1000; });
   },
 
   options: function() {
@@ -98,10 +97,10 @@ var GasPlotter = GraphsPlotter.$extend({
   processData: function(measurements) {
     var resultsParser = ResultsParser("day");
 
-    var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
-    gas = RelativeConverter().convert(gas);
+    var gas = resultsParser.parse(measurements, "gas");
+    var gasRelative = RelativeConverter().convert(gas);
 
-    return _.map(gas, function(m3) { return m3*1000; });
+    return _.map(gasRelative, function(m3) { return m3*1000; });
   },
 
   options: function() {

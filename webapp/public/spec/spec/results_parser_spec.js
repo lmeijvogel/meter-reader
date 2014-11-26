@@ -1,4 +1,4 @@
-var emptyArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var emptyArray = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 
 describe("results_parser", function() {
   describe("when the input is empty", function() {
@@ -34,7 +34,7 @@ describe("results_parser", function() {
     it("returns all elements", function() {
       result = ResultsParser("day").parse(input, "value");
 
-      expect(result).toContainData(_.range(24));
+      expect(result).toEqual(_.range(24));
     });
 
     describe("when the input contains an element on the next day", function() {
@@ -55,8 +55,8 @@ describe("results_parser", function() {
       it("works as expected", function() {
         result = ResultsParser("day").parse(input, "value");
 
-        expect(result[0].value).toBe(0);
-        expect(result[result.length-1].value).toBe(24);
+        expect(result[0]).toBe(0);
+        expect(result[result.length-1]).toBe(24);
       });
     });
   });
@@ -67,19 +67,9 @@ describe("results_parser", function() {
 
     it("interpolates only between the elements", function() {
       var result = ResultsParser("day").parse(input, "value");
-      expect(result).toContainData(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 12, 14, 16, 18, 0, 0, 0, 0, 0, 0, 0]
+      expect(result).toEqual(
+        [null, null, null, null, null, null, null, null, null, null, null, null, 10, 12, 14, 16, 18, null, null, null, null, null, null, null]
       );
-    });
-
-    it("marks (only) the interpolated values", function() {
-      var result = ResultsParser("day").parse(input, "value");
-
-      expect(result[12].interpolated).not.toBe(true);
-      _.each(_.range(13, 15), function(hour) {
-        expect(result[hour].interpolated).toBe(true);
-      });
-      expect(result[16].interpolated).not.toBe(true);
     });
   });
 });
