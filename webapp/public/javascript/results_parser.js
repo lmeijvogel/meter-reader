@@ -50,6 +50,7 @@ var DayResultsParser = ResultsParser.$extend({
     }
   },
 
+  periodStartIndex: function() { return 0; },
   singlePeriod: function(input) {
     return 24;
   }
@@ -63,6 +64,7 @@ var MonthResultsParser = ResultsParser.$extend({
     return _.tail(input);
   },
 
+  periodStartIndex: function() { return 1; },
   singlePeriod: function(input) {
     var ts = moment(_.head(input).time_stamp);
 
