@@ -306,7 +306,7 @@ Energy.TotalsView = Ember.View.extend({
     templateName: "totals",
 
     value: function() {
-        var stroom_totaal_measurements = _.chain(this.get("controller.content")).pluck(this.get("fieldName"));
+        var stroom_totaal_measurements = _.chain(this.get("controller.content")).pluck(this.get("fieldName")).filter(function(el) { return el > 0; });
 
         var min = stroom_totaal_measurements.min().value();
         var max = stroom_totaal_measurements.max().value();
