@@ -48,7 +48,7 @@ class DatabaseReader
 
   def month=(date)
     start_date = sql_date(date)
-    end_date = sql_date(date.next_month)
+    end_date = sql_date(date.next_month + 1.0 / (24 * 4));
     self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
     self.granularity = :day
   end
