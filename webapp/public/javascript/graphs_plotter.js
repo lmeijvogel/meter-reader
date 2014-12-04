@@ -54,7 +54,7 @@ var GraphsPlotter = Class.$extend({
 
         yaxis: {
           min: 0,
-          max: this.ticks().length * this.expectedDailyMax(),
+          max: this.daysPerSet() * this.expectedDailyMax(),
           tickOptions: {formatString: '%d'}
         }
       }
@@ -65,6 +65,10 @@ var GraphsPlotter = Class.$extend({
     // Can specify a custom tick Array.
     // Ticks should match up one for each y value (category) in the series.
     return _.range(0, this.resultsParser.singlePeriod(this.measurements));
+  },
+
+  daysPerSet: function() {
+    return this.resultsParser.approxDaysPerPeriod();
   }
 });
 

@@ -37,6 +37,7 @@ var ResultsParser = Class.$extend({
 
 var DayResultsParser = ResultsParser.$extend({
   unit: "hour",
+  approxDaysPerPeriod: function() { return 1; },
 
   prefilter: function(input) {
     // Workaround for invalid first element (which is overlapped by the last element):
@@ -56,6 +57,7 @@ var DayResultsParser = ResultsParser.$extend({
 
 var MonthResultsParser = ResultsParser.$extend({
   unit: "date",
+  approxDaysPerPeriod: function() { return 31; },
 
   postfilter: function(input) {
     return _.tail(input);
