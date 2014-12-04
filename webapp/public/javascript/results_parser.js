@@ -16,7 +16,7 @@ var ResultsParser = Class.$extend({
     });
 
     var arrayFiller = SparseArrayFiller(function(el) { return moment(el.time_stamp)[self.unit](); }, function(el) { return el[field]; });
-    var emptyArray = _.map(_.range(this.singlePeriod(input)), function() { return null; });
+    var emptyArray = _.map(_.range(this.singlePeriod(input)+1), function() { return null; });
 
     var resultArray = arrayFiller.call(input, emptyArray );
 
