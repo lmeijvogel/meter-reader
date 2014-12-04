@@ -2,58 +2,57 @@
 
 window.ArrayInterpolator = Class.$extend({
   call: function(input) {
-    if (input.length == 0) {
-      return [];
-    }
-    var result = this.callRecursive(input, null);
+    var firstNonNull = this.firstNonNull(input);
 
-    return result;
-  },
-
-  callRecursive: function(input, lastValue) {
-    if (input.length == 0) {
-      return [];
+    if (firstNonNull == -1) {
+      // No elements are filled in!
+      return input;
     }
 
-    var head = _.head(input);
+    if (firstNonNull == 0) {
+      // Fill a single range by finding the next non-null element and
+      // interpolate between them
 
-    if (head != null) {
-      var tail = _.tail(input);
-      return [head].concat(this.callRecursive(tail, head));
-    } else {
-      var tail = _.tail(input);
+      // Skip the first element, but still count it in the offset
+      var nextNonNull = this.firstNonNull(_.tail(input)) + 1;
 
-      // There is no known previous value, so don't try to interpolate.
-      if (lastValue == null) {
-        return [null].concat(this.callRecursive(tail, null));
-      }
-
-      var nextExistingElementIndex = this.firstIndexWhere(input, function(el) { return el != null; });
-
-      if (nextExistingElementIndex == -1) {
+      // No further elements are filled in, nothing to interpolate
+      if (nextNonNull == 0) {
         return input;
       }
 
-      var nextValue = input[nextExistingElementIndex];
+      var first = _.take(input, nextNonNull+1);
+      var rest  = _.drop(input, nextNonNull);
 
-      // +1 because lastValue is *before* the array (index: -1),
-      var stepSize = (nextValue - lastValue) / (nextExistingElementIndex + 1);
+      var interpolatedFirst = this.interpolate(first);
 
-      var filledIn = _.map(_.range(nextExistingElementIndex), function(el) {
-        return lastValue + (el+1) * stepSize;
-      });
+      return _.initial(interpolatedFirst).concat(this.call(rest));
+    } else {
+      var nulls = _.take(input, firstNonNull);
+      var rest  = _.drop(input, firstNonNull);
 
-      var rest = _.drop(input, nextExistingElementIndex);
-
-      return filledIn.concat(this.callRecursive(rest, nextValue));
+      return nulls.concat(this.call(rest));
     }
   },
 
-  firstIndexWhere: function(input, test) {
-    var firstIndexWhereInt = function(input, test) {
-      var head = _.head(input);
+  interpolate: function(array) {
+    var first = _.head(array);
+    var last  = _.last(array);
 
+    var count = array.length;
+
+    var stepSize = (last - first) / (count - 1);
+
+    return _.map(_.range(count), function(el) {
+      return first + el*stepSize;
+    });
+  },
+
+  firstNonNull: function(input) {
+    var firstIndexWhereInt = function(input, test) {
       if (input.length == 0) { return -1; }
+
+      var head = _.head(input);
 
       if (test(head)) {
         return 0;
@@ -65,7 +64,7 @@ window.ArrayInterpolator = Class.$extend({
       }
     };
 
-    return firstIndexWhereInt(input, test);
+    return firstIndexWhereInt(input, function(el) { return el != null; });
   }
 
 });
