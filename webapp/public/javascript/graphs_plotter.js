@@ -1,36 +1,30 @@
 var GraphsPlotter = Class.$extend({
-  __init__: function(main) {
-    main.registerObserver(this);
-  },
-
-  load: function(measurements) {
-    var resultsParser = ResultsParser("day");
-
-    $("#loading_spinner").hide();
-
-    var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
-    var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
-    var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
-    this.stroomWHTotaal = _.map(stroomTotaal, function(kwh) { return kwh*1000; });
-
-    var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
-    gas = RelativeConverter().convert(gas);
-    this.gasdm3 = _.map(gas, function(m3) { return m3*1000; });
+  __init__: function(element) {
+    this.element = element;
   },
 
   render: function() {
-    $("#stroom,#gas").empty();
+    this.element.empty();
 
-    // Both graphs have the same width:
-    var graphWidth = jQuery("#gas").innerWidth();
+    var options = DeepObjectDefaults.merge(this.options(), this.defaultPlotOptions());
+    this.element.jqplot([this.data], options);
+  },
+
+  notifyNewMeasurements: function(measurements) {
+    this.load(measurements);
+    this.render();
+  },
+
+  load: function(measurements) {
+    this.data = this.processData(measurements);
+  },
+
+  defaultPlotOptions: function() {
+    var graphWidth = this.element.innerWidth();
     var barMargin = graphWidth / 40;
     var showPointLabels = graphWidth > 300;
 
-    // Can specify a custom tick Array.
-    // Ticks should match up one for each y value (category) in the series.
-    var hourTicks = _.range(0, 24);
-
-    var defaultPlotOptions = {
+    return {
       seriesDefaults:{
         renderer:$.jqplot.BarRenderer,
         rendererOptions: {
@@ -52,7 +46,7 @@ var GraphsPlotter = Class.$extend({
       // the legend to overflow the container.
       axes: {
         xaxis: {
-          ticks: hourTicks,
+          ticks: this.hourTicks(),
           tickOptions: {formatString: '%d'}
         },
 
@@ -62,8 +56,28 @@ var GraphsPlotter = Class.$extend({
         }
       }
     };
+  },
 
-    var stroomOptions = DeepObjectDefaults.merge({
+  hourTicks: function() {
+    // Can specify a custom tick Array.
+    // Ticks should match up one for each y value (category) in the series.
+    return _.range(0, 24);
+  }
+});
+
+var StroomPlotter = GraphsPlotter.$extend({
+  processData: function(measurements) {
+    var resultsParser = ResultsParser("day");
+
+    var parsedStroomTotaal = resultsParser.parse(measurements, "stroom_totaal");
+    var stroomTotaalAbsolute = _.pluck(parsedStroomTotaal, "stroom_totaal");
+    var stroomTotaal = RelativeConverter().convert(stroomTotaalAbsolute);
+
+    return _.map(stroomTotaal, function(kwh) { return kwh*1000; });
+  },
+
+  options: function() {
+    return {
       // Custom labels for the series are specified with the "label"
       // option on the series option.  Here a series option object
       // is specified for each series.
@@ -76,10 +90,22 @@ var GraphsPlotter = Class.$extend({
           max: 1500
         }
       }
+    };
+  },
+});
 
-    }, defaultPlotOptions);
+var GasPlotter = GraphsPlotter.$extend({
+  processData: function(measurements) {
+    var resultsParser = ResultsParser("day");
 
-    var gasOptions = DeepObjectDefaults.merge({
+    var gas = _.pluck(resultsParser.parse(measurements, "gas"), "gas");
+    gas = RelativeConverter().convert(gas);
+
+    return _.map(gas, function(m3) { return m3*1000; });
+  },
+
+  options: function() {
+    return {
       series: [
         { label: 'Gas', color: '#f0ad4e'}
       ],
@@ -88,14 +114,6 @@ var GraphsPlotter = Class.$extend({
           max: 600
         }
       }
-    }, defaultPlotOptions);
-
-    var stroomPlot = $.jqplot('stroom', [this.stroomWHTotaal], stroomOptions);
-    var gasPlot    = $.jqplot('gas',    [this.gasdm3],          gasOptions);
-  },
-
-  notifyNewMeasurements: function(measurements) {
-    this.load(measurements);
-    this.render();
+    };
   }
 });

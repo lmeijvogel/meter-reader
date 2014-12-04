@@ -7,7 +7,7 @@ require ROOT_PATH.join("lib/output/database_writer.rb")
 require ROOT_PATH.join("models/measurement.rb")
 
 describe DatabaseWriter do
-  describe :write do
+  describe :save do
     let(:time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23.kWh }
     let(:stroom_piek) { 23.34.kWh }
@@ -15,14 +15,14 @@ describe DatabaseWriter do
     let(:diff_stroom_dal) { 14.23.kWh }
     let(:diff_stroom_piek) { 15.23.kWh }
     let(:gas) { 12.23 }
-    
+
     let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
     let(:database_connection) { Mysql2::Client.new(host: config["host"],
                                                    database: config["database"],
                                                    username: config["username"],
                                                    password: config["password"])
     }
-    
+
     let(:writer) { DatabaseWriter.new(database_connection) }
 
     before do
@@ -77,6 +77,66 @@ describe DatabaseWriter do
 
       it "should have the correct timestamp" do
         subject["time_stamp"].to_datetime.to_s.should == time_stamp.to_s
+      end
+    end
+  end
+
+  describe :exists? do
+    let(:existing_time_stamp) { DateTime.now }
+    let(:stroom_dal) { 12.23.kWh }
+    let(:stroom_piek) { 23.34.kWh }
+    let(:stroom_current) { 0.23 }
+    let(:diff_stroom_dal) { 14.23.kWh }
+    let(:diff_stroom_piek) { 15.23.kWh }
+    let(:gas) { 12.23 }
+
+    let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
+    let(:database_connection) { Mysql2::Client.new(host: config["host"],
+                                                   database: config["database"],
+                                                   username: config["username"],
+                                                   password: config["password"])
+    }
+
+    let(:writer) { DatabaseWriter.new(database_connection) }
+
+    before do
+      @measurement = Measurement.new
+      @measurement.time_stamp = existing_time_stamp
+      @measurement.stroom_dal = stroom_dal
+      @measurement.stroom_piek = stroom_piek
+      @measurement.stroom_current = stroom_current
+      @measurement.diff_stroom_dal = diff_stroom_dal
+      @measurement.diff_stroom_piek = diff_stroom_piek
+      @measurement.gas = gas
+
+      database_connection.query("DELETE FROM measurements")
+
+      writer.save(@measurement)
+      @measurement.time_stamp = new_time_stamp
+    end
+
+    context "when another measurement already exists" do
+      let(:new_time_stamp) { DateTime.now + 15.0/(24*60) }
+
+      it "is true" do
+        expect(writer.send(:exists?, @measurement)).to be_true
+      end
+    end
+
+    context "when another measurement close to this one exists (regression)" do
+      let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 0, 40) }
+      let(:new_time_stamp)      { DateTime.civil(2014, 11, 20, 20, 0, 50) }
+
+      it "is true" do
+        expect(writer.send(:exists?, @measurement)).to be_true
+      end
+    end
+
+    context "when no other measurement exists" do
+      let(:new_time_stamp) { DateTime.now + 31.0/(24*60) }
+
+      it "is false" do
+        expect(writer.send(:exists?, @measurement)).to be_false
       end
     end
   end

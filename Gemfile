@@ -8,6 +8,7 @@ gem "bcrypt"
 gem "sinatra"
 gem 'thin'
 gem 'connection_pool'
+gem 'redis'
 
 group :development do
   gem "guard"
