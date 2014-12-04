@@ -10,6 +10,11 @@ var ResultsParser = Class.$extend({
 
     input = this.prefilter(input);
 
+    input = _.map(input, function(el) {
+      if (el[field] == 0) { el[field] = null; }
+      return el;
+    });
+
     var arrayFiller = SparseArrayFiller(function(el) { return moment(el.time_stamp)[self.unit](); }, function(el) { return el[field]; });
     var emptyArray = _.map(_.range(this.singlePeriod(input)), function() { return null; });
 
