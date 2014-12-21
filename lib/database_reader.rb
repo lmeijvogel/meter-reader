@@ -9,8 +9,6 @@ class DatabaseReader
   def read
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
-      TRUNCATE(MIN(stroom_dal),3) as d_dal,
-      TRUNCATE(MIN(stroom_piek),3) as d_piek,
       TRUNCATE(MIN(stroom_piek+stroom_dal),3) as d_totaal,
       TRUNCATE(MAX(gas),3) as d_gas
     FROM measurements
@@ -19,8 +17,6 @@ class DatabaseReader
 
     @client.query(query).map do |row|
       usage = Usage.new
-      usage.stroom_dal = row["d_dal"]
-      usage.stroom_piek = row["d_piek"]
       usage.stroom_totaal = row["d_totaal"]
       usage.gas = row["d_gas"]
       usage.time_stamp = row["ts"].to_datetime
@@ -39,13 +35,6 @@ class DatabaseReader
     self.granularity = :hour
   end
 
-  def week=(date)
-    start_date = sql_date(date)
-    end_date = sql_date(date + 7)
-    self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
-    self.granularity = :three_hour
-  end
-
   def month=(date)
     start_date = sql_date(date)
     end_date = sql_date(date.next_month + 1.0 / (24 * 4));
@@ -57,8 +46,6 @@ class DatabaseReader
     case @granularity
     when :hour
       "DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
-    when :three_hour
-      "DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp}) DIV 3"
     when :day
       "DAYOFYEAR(#{adjusted_time_stamp})"
     else
