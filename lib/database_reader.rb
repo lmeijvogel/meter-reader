@@ -10,7 +10,7 @@ class DatabaseReader
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
       TRUNCATE(MIN(stroom_piek+stroom_dal),3) as d_totaal,
-      TRUNCATE(MAX(gas),3) as d_gas
+      TRUNCATE(MIN(gas),3) as d_gas
     FROM measurements
     #{where}
     GROUP BY #{granularity}"
