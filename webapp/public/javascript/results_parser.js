@@ -8,14 +8,12 @@ var ResultsParser = Class.$extend({
       return [];
     }
 
-    input = this.prefilter(input);
-
     input = _.map(input, function(el) {
       if (el[field] == 0) { el[field] = null; }
       return el;
     });
 
-    var arrayFiller = SparseArrayFiller(function(el) { return moment(el.time_stamp)[self.unit](); }, function(el) { return el[field]; });
+    var arrayFiller = SparseArrayFiller(this.positionInArray.bind(this), function(el) { return el[field]; });
     var emptyArray = _.map(_.range(this.singlePeriod(input)+1), function() { return null; });
 
     var resultArray = arrayFiller.call(input, emptyArray );
@@ -23,31 +21,23 @@ var ResultsParser = Class.$extend({
     var arrayInterpolator = ArrayInterpolator();
     var interpolatedArray = arrayInterpolator.call(resultArray);
 
-    return this.postfilter(interpolatedArray);
-  },
-
-  prefilter: function(input) {
-    return input;
-  },
-
-  postfilter: function(input) {
-    return input;
-  },
+    return interpolatedArray;
+  }
 });
 
 var DayResultsParser = ResultsParser.$extend({
   unit: "hour",
   approxDaysPerPeriod: function() { return 1; },
 
-  prefilter: function(input) {
-    // Workaround for invalid first element (which is overlapped by the last element):
-    // Just don't render the last element for now. This will result in the last element not
-    // being rendered correctly, but that is already the case: The graph is not drawn correctly.
-    if (moment(_.last(input).time_stamp).hour() == 0) {
-        return _.initial(input);
-    } else {
-        return input;
-    }
+  positionInArray: function(element, allElements) {
+    var time_stamp = moment(element.time_stamp);
+    var hour = time_stamp.hour();
+    var day = time_stamp.date();
+    var firstElement = _.first(allElements);
+    var firstDay = moment(firstElement.time_stamp).date();
+
+    if (day != firstDay) { hour += this.singlePeriod(allElements); }
+    return hour;
   },
 
   periodStartIndex: function() { return 0; },
@@ -60,8 +50,15 @@ var MonthResultsParser = ResultsParser.$extend({
   unit: "date",
   approxDaysPerPeriod: function() { return 31; },
 
-  postfilter: function(input) {
-    return _.tail(input);
+  positionInArray: function(element, allElements) {
+    var time_stamp = moment(element.time_stamp);
+    var day = time_stamp.date() - 1;
+    var month = time_stamp.month();
+    var firstElement = _.first(allElements);
+    var firstMonth = moment(firstElement.time_stamp).month();
+
+    if (month != firstMonth) { day += this.singlePeriod(allElements); }
+    return day;
   },
 
   periodStartIndex: function() { return 1; },

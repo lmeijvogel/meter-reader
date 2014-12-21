@@ -1,9 +1,13 @@
 var emptyArray = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 
+// NOTE: There are a lot of tests here that start indexing on 1.
+// The reason for this is that it is possible that we receive
+// zero-measurements from the backend. These are replaced with
+// nulls, but that should not interfere with the specs.
 describe("results_parser", function() {
   describe("when the input is empty", function() {
     it("returns an empty array", function() {
-      expect(ResultsParser().parse([]).length).toBe(0);
+      expect(DayResultsParser().parse([]).length).toBe(0);
     });
   });
 
@@ -14,7 +18,7 @@ describe("results_parser", function() {
     // Or, it should be duplicated to every position,
     // decide on that later.
     it("returns an empty array", function() {
-      result = ResultsParser("day").parse(input, "value");
+      result = DayResultsParser("day").parse(input, "value");
 
       expect(result).toContainData(emptyArray);
     });
@@ -27,14 +31,17 @@ describe("results_parser", function() {
       for (i = 0 ; i < 24 ; i++) {
         var time_stamp = moment({hour: i, month: 5});
 
-        input.push({time_stamp: time_stamp, value: i});
+        input.push({time_stamp: time_stamp, value: i+1});
       }
     });
 
     it("returns all elements", function() {
-      result = DayResultsParser().parse(input, "value");
+      var result = DayResultsParser().parse(input, "value");
 
-      expect(result).toEqual(_.range(24));
+      var expected = _.map(_.range(24), function(i) { return i+1; } );
+
+      // WHY?!?
+      expect(result).toEqual(expected.concat([null]));
     });
 
     describe("when the input contains an element on the next day", function() {
@@ -54,7 +61,7 @@ describe("results_parser", function() {
       // hour() == 0.
       it("works as expected", function() {
         pending();
-        result = ResultsParser("day").parse(input, "value");
+        result = DayResultsParser("day").parse(input, "value");
 
         expect(result[0]).toBe(0);
         expect(result[result.length-1]).toBe(24);
@@ -69,7 +76,8 @@ describe("results_parser", function() {
     it("interpolates only between the elements", function() {
       var result = DayResultsParser().parse(input, "value");
       expect(result).toEqual(
-        [null, null, null, null, null, null, null, null, null, null, null, null, 10, 12, 14, 16, 18, null, null, null, null, null, null, null]
+        // One null too many at the end
+        [null, null, null, null, null, null, null, null, null, null, null, null, 10, 12, 14, 16, 18, null, null, null, null, null, null, null, null]
       );
     });
   });

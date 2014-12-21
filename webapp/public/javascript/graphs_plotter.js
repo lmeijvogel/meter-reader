@@ -66,7 +66,7 @@ var GraphsPlotter = Class.$extend({
     // Ticks should match up one for each y value (category) in the series.
     var startIndex = this.resultsParser.periodStartIndex();
 
-    return _.range(startIndex, this.resultsParser.singlePeriod(this.measurements)+startIndex);
+    return _.range(startIndex - 1, this.resultsParser.singlePeriod(this.measurements)+startIndex+1);
   },
 
   daysPerSet: function() {
