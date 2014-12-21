@@ -74,6 +74,10 @@ Energy.DayShowRoute = Ember.Route.extend({
         },
 
         barClicked: Em.K,
+
+        upToMonth: function() {
+          var today = moment(this.get("day"));
+          this.transitionTo("month.show", today.format("YYYY-MM"));
         }
     }
 });
