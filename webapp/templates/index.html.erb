@@ -92,8 +92,8 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="graphs">
-      {{view Energy.StroomGraphView}}
-      {{view Energy.GasGraphView}}
+      {{stroom-graph resultsParser=resultsParser content=content}}
+      {{gas-graph resultsParser=resultsParser content=content}}
   </script>
 
   <script type="text/x-handlebars" data-template-name="current-energy-usage">
