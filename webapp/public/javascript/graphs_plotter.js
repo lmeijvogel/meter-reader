@@ -2,13 +2,31 @@ var GraphsPlotter = Class.$extend({
   __init__: function(element, resultsParser) {
     this.element = element;
     this.resultsParser = resultsParser;
+    this.barClickedHandlers = [];
+  },
+
+  onBarClicked: function(handler) {
+    this.barClickedHandlers.push(handler);
   },
 
   render: function() {
+    var self = this;
     this.element.empty();
 
     var options = DeepObjectDefaults.merge(this.options(), this.defaultPlotOptions());
     this.element.jqplot([this.data], options);
+
+    this.element.bind('jqplotDataClick',
+      function (ev, seriesIndex, pointIndex, data) {
+        self.emitBarClicked(pointIndex);
+      }
+    );
+  },
+
+  emitBarClicked: function(pointIndex) {
+    _.each(this.barClickedHandlers, function(handler) {
+      handler.call(this, pointIndex);
+    });
   },
 
   notifyNewMeasurements: function(measurements) {

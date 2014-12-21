@@ -71,6 +71,9 @@ Energy.DayShowRoute = Ember.Route.extend({
 
         today: function() {
             this.transitionTo("day.index");
+        },
+
+        barClicked: Em.K,
         }
     }
 });
@@ -156,6 +159,13 @@ Energy.MonthShowRoute = Ember.Route.extend({
     },
 
     actions: {
+        barClicked: function(barIndex) {
+          var date = this.get("month").clone();
+          date.set("date", (barIndex+1));
+
+          this.transitionTo("day.show", date.format("YYYY-MM-DD"));
+        },
+
         loading: function() {
             this.controllerFor("month.show").set("loading", true);
         },
@@ -344,7 +354,6 @@ Energy.GraphComponent = Ember.Component.extend({
         this.graph = this.initGraph();
 
         this.drawMeasurements();
-
     },
 
     contentObserver: function() {
@@ -375,7 +384,14 @@ Energy.StroomGraphComponent = Energy.GraphComponent.extend({
     style: "height: 300px",
 
     initGraph: function() {
-        return StroomPlotter(this.$(), this.get("resultsParser"));
+        var self = this;
+
+        var plotter = StroomPlotter(this.$(), this.get("controller.resultsParser"));
+        plotter.onBarClicked(function(value) {
+          self.sendAction('action', value);
+        });
+
+        return plotter;
     }
 });
 
@@ -385,6 +401,14 @@ Energy.GasGraphComponent = Energy.GraphComponent.extend({
     style: "height: 300px",
 
     initGraph: function() {
-        return GasPlotter(this.$(), this.get("resultsParser"));
+        var self = this;
+
+        var plotter = GasPlotter(this.$(), this.get("controller.resultsParser"));
+
+        plotter.onBarClicked(function(value) {
+          self.sendAction('action', value);
+        });
+
+        return plotter;
     }
 })
