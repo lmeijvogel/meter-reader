@@ -98,10 +98,14 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
           case 37:
             this.triggerAction({action: "previous"});
             break;
+          case 38:
+            this.triggerAction({action: "upToMonth"});
+            break;
           case 39:
             this.triggerAction({action: "next"});
             break;
         }
+        event.preventDefault();
     },
 
     swipeLeftHandler: function() {
