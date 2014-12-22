@@ -41,7 +41,7 @@ var GraphsPlotter = Class.$extend({
 
   defaultPlotOptions: function() {
     var graphWidth = this.element.innerWidth();
-    var barMargin = graphWidth / 40;
+    var barMargin = 9;
     var showPointLabels = graphWidth > 300;
 
     return {
