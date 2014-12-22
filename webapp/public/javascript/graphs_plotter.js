@@ -44,6 +44,14 @@ var GraphsPlotter = Class.$extend({
     var barMargin = 9;
     var showPointLabels = graphWidth > 300;
 
+    var maxY = (this.daysPerSet() * this.expectedDailyMax());
+
+    // Divide by two since daily maximum is (probably? :) ) not reached
+    // every hour of the day.
+    if (this.daysPerSet() > 1) {
+      maxY = maxY / 2;
+    }
+
     return {
       seriesDefaults:{
         renderer:$.jqplot.BarRenderer,
@@ -72,7 +80,7 @@ var GraphsPlotter = Class.$extend({
 
         yaxis: {
           min: 0,
-          max: this.daysPerSet() * this.expectedDailyMax(),
+          max: maxY,
           tickOptions: {formatString: '%d'}
         }
       }
@@ -119,7 +127,7 @@ var StroomPlotter = GraphsPlotter.$extend({
 });
 
 var GasPlotter = GraphsPlotter.$extend({
-  expectedDailyMax: function() { return 600; },
+  expectedDailyMax: function() { return 1200; },
   processData: function() {
     var gas = this.resultsParser.parse(this.measurements, "gas");
     var gasRelative = RelativeConverter().convert(gas);
