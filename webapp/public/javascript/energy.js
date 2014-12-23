@@ -193,7 +193,7 @@ Energy.MonthShowRoute = Ember.Route.extend({
         },
 
         today: function() {
-            this.transitionTo("month.index");
+            this.transitionTo("day.index");
         }
     }
 });
