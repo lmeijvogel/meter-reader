@@ -329,31 +329,37 @@ Energy.TotalsView = Ember.View.extend({
         var min = stroom_totaal_measurements.min().value();
         var max = stroom_totaal_measurements.max().value();
 
-        return this.truncateDigits(max-min);
+        return this.truncateDigits(max-min, this.get("accuracy"));
     }.property("controller.content"),
 
-    truncateDigits: function(value) {
-        var multiplier = Math.pow(10, this.get("accuracy"));
+    truncateDigits: function(value, accuracy) {
+        var multiplier = Math.pow(10, accuracy);
 
-        return parseFloat(Math.round((value) * multiplier) / multiplier).toFixed(this.get("accuracy"));
+        return parseFloat(Math.round((value) * multiplier) / multiplier).toFixed(accuracy);
     },
+
+    cost: function() {
+        return this.truncateDigits(this.get("value") * this.get("costPerUnit"), 2);
+    }.property("value", "costPerUnit")
 });
 
 Energy.EnergyTotalsView = Energy.TotalsView.extend({
     fieldName: "stroom_totaal",
     accuracy: 2,
+    costPerUnit: 0.2345,
 
-    formattedValue: function() {
-        return this.get("value") +" kWh"
+    formattedUsage: function() {
+        return this.get("value") +" kWh";
     }.property("value")
 });
 
 Energy.GasTotalsView = Energy.TotalsView.extend({
     fieldName: "gas",
     accuracy: 3,
+    costPerUnit: 0.7184,
 
-    formattedValue: function() {
-        return this.get("value") +" m<sup>3</sup>"
+    formattedUsage: function() {
+      return this.get("value") +" m³";
     }.property("value")
 });
 

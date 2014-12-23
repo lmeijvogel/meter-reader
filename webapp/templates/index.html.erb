@@ -102,10 +102,13 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="totals">
-    <div class="bg-info col-xs-2 col-sm-2 numeric">{{{view.formattedValue}}}</div>
+    <div class="bg-info col-xs-2 col-sm-2 numeric" {{bind-attr title=view.formattedUsage}}>&euro; {{{view.cost}}}</div>
   </script>
-    <% libs.each do |lib| %><script src="javascript/lib/<%= lib %>.js"></script>
-    <% end %>
-    <% own_js_files.each do |file| %><script src="javascript/<%= file %>.js"></script>
-    <% end %>
+
+  <% libs.each do |lib| %>
+    <script src="javascript/lib/<%= lib %>.js"></script>
+  <% end %>
+  <% own_js_files.each do |file| %>
+    <script src="javascript/<%= file %>.js"></script>
+  <% end %>
 </html>
