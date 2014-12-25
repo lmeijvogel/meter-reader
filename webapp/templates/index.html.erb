@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="javascript/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <% libs = %w|jquery-2.1.1.min handlebars-v1.3.0 ember bootstrap.min underscore-min classy moment.min rsvp-latest hammer.min
-                 jqplot-1.0.8/jquery.jqplot.min jqplot-1.0.8/plugins/jqplot.barRenderer.min jqplot-1.0.8/plugins/jqplot.pointLabels.min|
+    <% libs = %w|jquery/dist/jquery.min handlebars/handlebars.min ember/ember rsvp/rsvp bootstrap/dist/js/bootstrap.min underscore/underscore-min classy/classy moment/moment hammerjs/hammer
+                 jqplot/jquery.jqplot.min jqplot/plugins/jqplot.barRenderer.min jqplot/plugins/jqplot.pointLabels.min|
 
     own_js_files = %w|energy results_parser relative_converter deep_object_defaults graphs_plotter sparse_array_filler array_interpolator| %>
 
-    <link href="css/jquery.jqplot.min.css" rel="stylesheet">
+    <link href="javascript/vendor/jqplot/jquery.jqplot.min.css" rel="stylesheet">
 
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
@@ -26,7 +26,7 @@
       .current_energy.new-value { background-color: white; }
     </style>
   </head>
-  <body data-url-prefix="<%= url("", false) %>" data-current-url="<%= url("energy/current", false) %>">
+  <body id="body" data-url-prefix="<%= url("", false) %>" data-current-url="<%= url("energy/current", false) %>">
   </body>
 
   <script type="text/x-handlebars" data-template-name="month">
@@ -106,7 +106,7 @@
   </script>
 
   <% libs.each do |lib| %>
-    <script src="javascript/lib/<%= lib %>.js"></script>
+    <script src="javascript/vendor/<%= lib %>.js"></script>
   <% end %>
   <% own_js_files.each do |file| %>
     <script src="javascript/<%= file %>.js"></script>

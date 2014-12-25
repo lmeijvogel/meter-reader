@@ -117,20 +117,22 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
     },
 
     didInsertElement: function() {
+      var root = document.getElementById("body");
+      this.hammer = Hammer(root);
       this._keyDownHandler = this.keyDownHandler.bind(this);
       $(document).on("keydown", this._keyDownHandler);
 
       this._swipeLeftHandler = this.swipeLeftHandler.bind(this);
       this._swipeRightHandler = this.swipeRightHandler.bind(this);
 
-      Hammer(window).on("swipeleft", this._swipeLeftHandler);
-      Hammer(window).on("swiperight", this._swipeRightHandler);
+      this.hammer.on("swipeleft", this._swipeLeftHandler);
+      this.hammer.on("swiperight", this._swipeRightHandler);
     },
 
     willDestroyElement: function() {
         $(document).off("keydown", this._keyDownHandler);
-        Hammer(window).off("swipeleft", this._swipeLeftHandler);
-        Hammer(window).off("swiperight", this._swipeRightHandler);
+        this.hammer.off("swipeleft", this._swipeLeftHandler);
+        this.hammer.off("swiperight", this._swipeRightHandler);
     }
 });
 
@@ -229,20 +231,23 @@ Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
     },
 
     didInsertElement: function() {
+      var root = document.getElementById("body");
+      this.hammer = Hammer(root);
+
       this._keyDownHandler = this.keyDownHandler.bind(this);
       $(document).on("keydown", this._keyDownHandler);
 
       this._swipeLeftHandler = this.swipeLeftHandler.bind(this);
       this._swipeRightHandler = this.swipeRightHandler.bind(this);
 
-      Hammer(window).on("swipeleft", this._swipeLeftHandler);
-      Hammer(window).on("swiperight", this._swipeRightHandler);
+      this.hammer.on("swipeleft", this._swipeLeftHandler);
+      this.hammer.on("swiperight", this._swipeRightHandler);
     },
 
     willDestroyElement: function() {
         $(document).off("keydown", this._keyDownHandler);
-        Hammer(window).off("swipeleft", this._swipeLeftHandler);
-        Hammer(window).off("swiperight", this._swipeRightHandler);
+        this.hammer.off("swipeleft", this._swipeLeftHandler);
+        this.hammer.off("swiperight", this._swipeRightHandler);
     }
 });
 Energy.CurrentEnergyUsageController = Ember.Controller.extend({
