@@ -7,8 +7,26 @@
 
     <link href="javascript/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <% libs = %w|jquery/dist/jquery.min handlebars/handlebars.min ember/ember rsvp/rsvp bootstrap/dist/js/bootstrap.min underscore/underscore-min classy/classy moment/moment hammerjs/hammer
-                 jqplot/jquery.jqplot.min jqplot/plugins/jqplot.barRenderer.min jqplot/plugins/jqplot.pointLabels.min|
+    <% def minified_lib_for(lib)
+        case lib
+        when /rsvp/, /classy/
+          lib
+        when /underscore/
+          "#{lib}-min"
+        when /moment/
+          "moment/min/moment.min"
+        else
+          "#{lib}.min"
+        end
+      end
+    %>
+
+    <% libs = %w|jquery/dist/jquery handlebars/handlebars rsvp/rsvp ember/ember bootstrap/dist/js/bootstrap underscore/underscore classy/classy moment/moment hammerjs/hammer
+                 jqplot/jquery.jqplot jqplot/plugins/jqplot.barRenderer jqplot/plugins/jqplot.pointLabels|
+
+    if ENV["RACK_ENV"] != "development"
+      libs.map! { |lib| minified_lib_for(lib) }
+    end
 
     own_js_files = %w|energy results_parser relative_converter deep_object_defaults graphs_plotter sparse_array_filler array_interpolator| %>
 
