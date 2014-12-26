@@ -36,7 +36,7 @@ Energy.DayShowRoute = Ember.Route.extend({
     },
 
     model: function(params) {
-        var day = moment(params.date);
+        var day = moment(params.date, "YYYY-MM-DD");
         this.set("day", day);
 
         var url_prefix = jQuery("body").data('url-prefix');
@@ -154,7 +154,7 @@ Energy.MonthShowRoute = Ember.Route.extend({
     },
 
     model: function(params) {
-        var month = moment(params.date);
+        var month = moment(params.date, "YYYY-MM");
         this.set("month", month);
 
         var url_prefix = jQuery("body").data('url-prefix');
