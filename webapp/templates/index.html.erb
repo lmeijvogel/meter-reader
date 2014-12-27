@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="javascript/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/javascript/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <% def minified_lib_for(lib)
         case lib
@@ -30,7 +30,7 @@
 
     own_js_files = %w|energy results_parser relative_converter deep_object_defaults graphs_plotter sparse_array_filler array_interpolator| %>
 
-    <link href="javascript/vendor/jqplot/jquery.jqplot.min.css" rel="stylesheet">
+    <link href="assets/javascript/vendor/jqplot/jquery.jqplot.min.css" rel="stylesheet">
 
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
@@ -124,9 +124,9 @@
   </script>
 
   <% libs.each do |lib| %>
-    <script src="javascript/vendor/<%= lib %>.js"></script>
+    <script src="assets/javascript/vendor/<%= lib %>.js"></script>
   <% end %>
   <% own_js_files.each do |file| %>
-    <script src="javascript/<%= file %>.js"></script>
+    <script src="assets/javascript/<%= file %>.js"></script>
   <% end %>
 </html>
