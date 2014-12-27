@@ -9,13 +9,15 @@ require 'connection_pool'
 require 'bcrypt'
 require 'redis'
 
+require 'digest/sha1'
+
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
 
 NoPasswordsFile = Class.new(StandardError)
 UsernameNotFound = Class.new(StandardError)
 
-ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), ".."))
+ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 
 set :bind, '0.0.0.0'
 
@@ -32,12 +34,29 @@ class Energie < Sinatra::Base
     secret = File.read('session_secret.txt')
     use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
     set :protection, :origin_whitelist => ['https://energie.maybird.nl']
+
+    set :static, false
   end
 
   before do
     @templates = create_templates unless defined?(@templates)
 
     check_login_or_redirect unless request.path.include?("login")
+  end
+
+  get "/assets/*" do
+    requested_path = params[:splat]
+
+    full_path = ROOT_PATH.join("webapp", "public", "assets", *requested_path)
+
+    if !File.exists?(full_path) || path_outside_webapp(full_path.realpath)
+      halt 404 and return
+    end
+
+    cache_control :public, max_age: 3600
+
+    etag Digest::SHA1.file(full_path)
+    send_file full_path
   end
 
   get "/index.html" do
@@ -178,5 +197,11 @@ class Energie < Sinatra::Base
     end
 
     templates
+  end
+
+  def path_outside_webapp(path)
+    webapp_path = ROOT_PATH.join("webapp")
+
+    path.enum_for(:ascend).none? {|p| p == webapp_path }
   end
 end
