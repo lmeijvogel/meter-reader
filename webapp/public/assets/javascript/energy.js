@@ -312,25 +312,6 @@ Energy.GraphsView = Ember.View.extend({
     classNames: ["row"],
     templateName: "graphs",
 
-    didInsertElement: function() {
-        this._resizeHandler = this.resizeHandler.bind(this);
-        $(window).on("resize", this._resizeHandler);
-    },
-
-    willDestroyElement: function() {
-        $(window).off("resize", this._resizeHandler);
-    },
-
-    resizeHandler: function() {
-        var throttleDistance = 1000;
-        var immediate        = false;
-
-        this._rerenderAfterResize = this._rerenderAfterResize;
-        Ember.run.throttle(
-            window.main,
-            this._rerenderAfterResize,
-            throttleDistance, immediate);
-    }
 });
 
 Energy.TotalsView = Ember.View.extend({
@@ -381,6 +362,13 @@ Energy.GraphComponent = Ember.Component.extend({
         this.graph = this.initGraph();
 
         this.drawMeasurements();
+
+        this._resizeHandler = this.resizeHandler.bind(this);
+        $(window).on("resize", this._resizeHandler);
+    },
+
+    willDestroyElement: function() {
+        $(window).off("resize", this._resizeHandler);
     },
 
     contentObserver: function() {
@@ -402,6 +390,18 @@ Energy.GraphComponent = Ember.Component.extend({
             self.graph.notifyNewMeasurements(self.get("controller.content"));
             self.$().css("opacity", "1");
         });
+    },
+
+    resizeHandler: function() {
+        var throttleDistance = 1000;
+        var immediate        = false;
+
+        this._rerenderAfterResize = this._rerenderAfterResize || function() { this.graph.render(); };
+
+        Ember.run.throttle(
+            this,
+            this._rerenderAfterResize,
+            throttleDistance, immediate);
     }
 });
 
