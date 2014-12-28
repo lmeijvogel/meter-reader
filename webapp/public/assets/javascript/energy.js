@@ -250,14 +250,19 @@ Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         this.hammer.off("swiperight", this._swipeRightHandler);
     }
 });
-Energy.CurrentEnergyUsageController = Ember.Controller.extend({
+Energy.CurrentEnergyUsageComponent = Ember.Component.extend({
+    classNameBindings: ["newValue"],
+    classNames: ["current_energy bg-info col-xs-2 col-sm-2 numeric"],
+
     valueInWatts: function() {
         return ""+ 1000*this.get("value");
     }.property("value"),
 
-    init: function() {
+    didInsertElement: function() {
         var self = this;
         this.set("url", jQuery("body").data('current-url'));
+
+        this.set("stopPolling", false);
 
         this.scheduleLoadValue();
 
@@ -266,7 +271,15 @@ Energy.CurrentEnergyUsageController = Ember.Controller.extend({
         });
     },
 
+    willDestroyElement: function() {
+        this.set("stopPolling", true);
+    },
+
     scheduleLoadValue: function() {
+        if (this.get("stopPolling")) {
+            return;
+        }
+
         var self = this;
 
         Ember.run.later(function() {
@@ -282,12 +295,7 @@ Energy.CurrentEnergyUsageController = Ember.Controller.extend({
             self.set("id", json.id);
             self.set("value", json.current);
         });
-    }
-});
-
-Energy.CurrentEnergyUsageView = Ember.View.extend({
-    classNameBindings: ["newValue"],
-    classNames: ["current_energy bg-info col-xs-2 col-sm-2 numeric"],
+    },
 
     idObserver: function() {
         var self = this;
@@ -297,7 +305,7 @@ Energy.CurrentEnergyUsageView = Ember.View.extend({
         setTimeout(function() {
             self.set("newValue", false);
         }, 1100);
-    }.observes("controller.id")
+    }.observes("id")
 });
 
 Energy.GraphsView = Ember.View.extend({
