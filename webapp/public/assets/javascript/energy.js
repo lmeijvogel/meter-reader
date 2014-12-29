@@ -105,7 +105,6 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
             this.triggerAction({action: "next"});
             break;
         }
-        event.preventDefault();
     },
 
     swipeLeftHandler: function() {
