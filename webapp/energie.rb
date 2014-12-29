@@ -33,7 +33,6 @@ class Energie < Sinatra::Base
     one_year = 60*60*24*365
     secret = File.read('session_secret.txt')
     use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
-    set :protection, :origin_whitelist => ['https://energie.maybird.nl']
 
     set :static, false
   end
