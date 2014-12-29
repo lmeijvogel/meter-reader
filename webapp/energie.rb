@@ -39,8 +39,6 @@ class Energie < Sinatra::Base
   end
 
   before do
-    @templates = create_templates unless defined?(@templates)
-
     check_login_or_redirect unless request.path.include?("login")
   end
 
@@ -60,11 +58,11 @@ class Energie < Sinatra::Base
   end
 
   get "/index.html" do
-    @templates["index.html"]
+    render_template("index.html.erb")
   end
 
   get "/login.html" do
-    @templates["login.html"]
+    render_template("login.html.erb")
   end
 
   get "/day/today" do
@@ -185,18 +183,13 @@ class Energie < Sinatra::Base
     end
   end
 
-  def create_templates
-    templates = {}
+  def render_template(template_name)
+    template = File.read(File.join(templates_path, template_name))
+    ERB.new(template).result(binding)
+  end
 
-    templates_glob = File.join(File.dirname(__FILE__), "templates", "*")
-    Dir.glob(templates_glob) do |template|
-      renderer = ERB.new(File.read(template))
-
-      key_name = File.basename(template.gsub(/.erb$/, ""))
-      templates[key_name] = renderer.result(binding)
-    end
-
-    templates
+  def templates_path
+    @_templates_path ||= File.join(File.dirname(__FILE__), "templates")
   end
 
   def path_outside_webapp(path)
