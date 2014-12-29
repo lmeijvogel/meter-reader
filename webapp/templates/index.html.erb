@@ -80,12 +80,12 @@
       {{gas-totals content=content}}
     </div>
 
-    {{view "graphs"}}
+    {{usage-graphs resultsParser=resultsParser content=content barClicked="barClicked"}}
 
     {{navigation-buttons isMonth=controller.isMonth upToMonth="upToMonth" previous="previous" next="next" today="today"}}
   </script>
 
-  <script type="text/x-handlebars" data-template-name="graphs">
+  <script type="text/x-handlebars" data-template-name="components/usage-graphs">
       {{stroom-graph resultsParser=resultsParser content=content action='barClicked'}}
       {{gas-graph resultsParser=resultsParser content=content action='barClicked'}}
   </script>

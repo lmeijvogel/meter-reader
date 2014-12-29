@@ -327,10 +327,13 @@ Energy.CurrentEnergyUsageComponent = Ember.Component.extend({
     }.observes("id")
 });
 
-Energy.GraphsView = Ember.View.extend({
+Energy.UsageGraphsComponent = Ember.Component.extend({
     classNames: ["row"],
-    templateName: "graphs",
+    layoutName: "components/usage-graphs",
 
+    actions: {
+      barClicked: function(data) { this.sendAction('barClicked', data); }
+    }
 });
 
 Energy.TotalsComponent = Ember.Component.extend({
