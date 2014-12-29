@@ -65,16 +65,6 @@ class Energie < Sinatra::Base
     render_template("login.html.erb")
   end
 
-  get "/day/today" do
-    $database.with {|database_connection|
-      database_reader = DatabaseReader.new(database_connection)
-
-      database_reader.day = :today
-
-      database_reader.read().to_json
-    }
-  end
-
   get "/day/:year/:month/:day" do
     day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
