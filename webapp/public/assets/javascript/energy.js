@@ -93,6 +93,8 @@ Energy.DayShowController = Ember.Controller.extend({
 });
 
 Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
+    templateName: "show",
+
     keyDownHandler: function(event) {
         switch(event.keyCode) {
           case 37:
@@ -210,6 +212,8 @@ Energy.MonthShowController = Ember.Controller.extend({
 });
 
 Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
+    templateName: "show",
+
     keyDownHandler: function(event) {
         switch(event.keyCode) {
           case 37:
