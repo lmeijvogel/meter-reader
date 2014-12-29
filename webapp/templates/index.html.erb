@@ -47,29 +47,21 @@
   <body id="body" data-url-prefix="<%= url("", false) %>" data-current-url="<%= url("energy/current", false) %>">
   </body>
 
-  <script type="text/x-handlebars" data-template-name="month">
+  <script type="text/x-handlebars" data-template-name="application">
     <div class="container">
       {{outlet}}
-
-      <div class="row">
-        <button class="btn btn-lg btn-default previous col-sm-offset-1 col-sm-5 col-xs-6" {{action 'previous'}}>Previous</button>
-        <button class="btn btn-lg btn-default next col-sm-5 col-xs-6" {{action 'next'}}>Next</button>
-        <button class="btn btn-default today col-sm-offset-1 col-sm-10 col-xs-12" {{action 'today'}}>Today</button>
-      </div>
     </div>
   </script>
 
-  <script type="text/x-handlebars" data-template-name="day">
-    <div class="container">
-      {{outlet}}
-
+  <script type="text/x-handlebars" data-template-name="components/navigation-buttons">
       <div class="row">
-        <button class="btn btn-default today col-sm-offset-1 col-sm-10 col-xs-12" {{action 'upToMonth'}}>Up to month</button>
+        {{#unless isMonth}}
+          <button class="btn btn-default today col-sm-offset-1 col-sm-10 col-xs-12" {{action 'upToMonth'}}>Up to month</button>
+        {{/unless}}
         <button class="btn btn-lg btn-default previous col-sm-offset-1 col-sm-5 col-xs-6" {{action 'previous'}}>Previous</button>
         <button class="btn btn-lg btn-default next col-sm-5 col-xs-6" {{action 'next'}}>Next</button>
         <button class="btn btn-default today col-sm-offset-1 col-sm-10 col-xs-12" {{action 'today'}}>Today</button>
       </div>
-    </div>
   </script>
 
   <script type="text/x-handlebars" data-template-name="show">
@@ -89,6 +81,8 @@
     </div>
 
     {{view "graphs"}}
+
+    {{navigation-buttons isMonth=controller.isMonth upToMonth="upToMonth" previous="previous" next="next" today="today"}}
   </script>
 
   <script type="text/x-handlebars" data-template-name="graphs">

@@ -83,6 +83,8 @@ Energy.DayShowRoute = Ember.Route.extend({
 });
 
 Energy.DayShowController = Ember.Controller.extend({
+    isMonth: false,
+
     resultsParser: function() {
         return DayResultsParser();
     }.property(),
@@ -202,6 +204,8 @@ Energy.MonthShowRoute = Ember.Route.extend({
 });
 
 Energy.MonthShowController = Ember.Controller.extend({
+    isMonth: true,
+
     resultsParser: function() {
         return MonthResultsParser();
     }.property(),
@@ -253,6 +257,18 @@ Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         this.hammer.off("swiperight", this._swipeRightHandler);
     }
 });
+
+Energy.NavigationButtonsComponent = Ember.Component.extend({
+  layoutName: "components/navigation-buttons",
+
+  actions: {
+    previous:  function() { this.sendAction('previous') },
+    next:      function() { this.sendAction('next') },
+    upToMonth: function() { this.sendAction('upToMonth') },
+    today:     function() { this.sendAction('today') }
+  }
+});
+
 Energy.CurrentEnergyUsageComponent = Ember.Component.extend({
     classNameBindings: ["newValue"],
     classNames: ["current_energy bg-info col-xs-2 col-sm-2 numeric"],
