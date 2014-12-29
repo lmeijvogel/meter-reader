@@ -342,6 +342,15 @@ Energy.GasTotalsComponent = Energy.TotalsComponent.extend({
 });
 
 Energy.GraphComponent = Ember.Component.extend({
+    attributeBindings: ['style'],
+    style: "height: 300px",
+    classNames: "col-sm-5 col-xs-10 img-responsive graph",
+    classNameBindings: ['offsetLeft'],
+
+    offsetLeft: function() {
+      return "col-sm-offset-"+ this.get("offsetSmall") +" col-xs-offset-1";
+    }.property("offsetSmall"),
+
     didInsertElement: function() {
         this.graph = this.initGraph();
 
@@ -390,9 +399,7 @@ Energy.GraphComponent = Ember.Component.extend({
 });
 
 Energy.StroomGraphComponent = Energy.GraphComponent.extend({
-    attributeBindings: ['style'],
-    classNames: "col-sm-5 col-sm-offset-1 col-xs-10 col-xs-offset-1 img-responsive graph",
-    style: "height: 300px",
+    offsetSmall: 1,
 
     initGraph: function() {
         var self = this;
@@ -407,9 +414,7 @@ Energy.StroomGraphComponent = Energy.GraphComponent.extend({
 });
 
 Energy.GasGraphComponent = Energy.GraphComponent.extend({
-    attributeBindings: ['style'],
-    classNames: "col-sm-5 col-xs-10 col-sm-offset-0 col-xs-offset-1 img-responsive graph",
-    style: "height: 300px",
+    offsetSmall: 0,
 
     initGraph: function() {
         var self = this;
