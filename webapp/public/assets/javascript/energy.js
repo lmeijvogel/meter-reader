@@ -94,7 +94,7 @@ Energy.DayShowController = Ember.Controller.extend({
     }.property("day")
 });
 
-Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
+Energy.ShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
     templateName: "show",
 
     keyDownHandler: function(event) {
@@ -138,6 +138,9 @@ Energy.DayShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
         this.hammer.off("swiperight", this._swipeRightHandler);
     }
 });
+
+Energy.DayShowView   = Energy.ShowView.extend({});
+Energy.MonthShowView = Energy.ShowView.extend({});
 
 Energy.MonthIndexRoute = Ember.Route.extend({
     beforeModel: function() {
@@ -199,7 +202,9 @@ Energy.MonthShowRoute = Ember.Route.extend({
 
         today: function() {
             this.transitionTo("day.index");
-        }
+        },
+
+        upToMonth: Em.K
     }
 });
 
@@ -213,49 +218,6 @@ Energy.MonthShowController = Ember.Controller.extend({
     header: function() {
         return moment(this.get("month")).format("MM-YYYY");
     }.property("month")
-});
-
-Energy.MonthShowView = Ember.View.extend(Ember.ViewTargetActionSupport, {
-    templateName: "show",
-
-    keyDownHandler: function(event) {
-        switch(event.keyCode) {
-          case 37:
-            this.triggerAction({action: "previous"});
-            break;
-          case 39:
-            this.triggerAction({action: "next"});
-            break;
-        }
-    },
-
-    swipeLeftHandler: function() {
-        this.triggerAction({action: "next"});
-    },
-
-    swipeRightHandler: function() {
-        this.triggerAction({action: "previous"});
-    },
-
-    didInsertElement: function() {
-      var root = document.getElementById("body");
-      this.hammer = Hammer(root);
-
-      this._keyDownHandler = this.keyDownHandler.bind(this);
-      $(document).on("keydown", this._keyDownHandler);
-
-      this._swipeLeftHandler = this.swipeLeftHandler.bind(this);
-      this._swipeRightHandler = this.swipeRightHandler.bind(this);
-
-      this.hammer.on("swipeleft", this._swipeLeftHandler);
-      this.hammer.on("swiperight", this._swipeRightHandler);
-    },
-
-    willDestroyElement: function() {
-        $(document).off("keydown", this._keyDownHandler);
-        this.hammer.off("swipeleft", this._swipeLeftHandler);
-        this.hammer.off("swiperight", this._swipeRightHandler);
-    }
 });
 
 Energy.NavigationButtonsComponent = Ember.Component.extend({
