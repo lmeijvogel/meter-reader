@@ -308,7 +308,7 @@ Energy.TotalsComponent = Ember.Component.extend({
         var max = stroom_totaal_measurements.max().value();
 
         return this.truncateDigits(max-min, this.get("accuracy"));
-    }.property("controller.content"),
+    }.property("content"),
 
     truncateDigits: function(value, accuracy) {
         var multiplier = Math.pow(10, accuracy);
@@ -368,7 +368,7 @@ Energy.GraphComponent = Ember.Component.extend({
         if (!this.graph) { return; }
 
         this.drawMeasurements();
-    }.observes("controller.content"),
+    }.observes("content"),
 
     drawMeasurements: function() {
         var self = this;
@@ -380,7 +380,7 @@ Energy.GraphComponent = Ember.Component.extend({
                 resolve();
             });
         }).then(function() {
-            self.graph.notifyNewMeasurements(self.get("controller.content"));
+            self.graph.notifyNewMeasurements(self.get("content"));
             self.$().css("opacity", "1");
         });
     },
@@ -404,7 +404,7 @@ Energy.StroomGraphComponent = Energy.GraphComponent.extend({
     initGraph: function() {
         var self = this;
 
-        var plotter = StroomPlotter(this.$(), this.get("controller.resultsParser"));
+        var plotter = StroomPlotter(this.$(), this.get("resultsParser"));
         plotter.onBarClicked(function(value) {
           self.sendAction('action', value);
         });
@@ -419,7 +419,7 @@ Energy.GasGraphComponent = Energy.GraphComponent.extend({
     initGraph: function() {
         var self = this;
 
-        var plotter = GasPlotter(this.$(), this.get("controller.resultsParser"));
+        var plotter = GasPlotter(this.$(), this.get("resultsParser"));
 
         plotter.onBarClicked(function(value) {
           self.sendAction('action', value);
