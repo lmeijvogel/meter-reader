@@ -71,8 +71,8 @@
         <i class="fa fa-spinner fa-spin"></i>
       </div>
       {{current-energy-usage}}
-      {{view "energy-totals"}}
-      {{view "gas-totals"}}
+      {{energy-totals content=content}}
+      {{gas-totals content=content}}
     </div>
 
     {{view "graphs"}}
@@ -103,8 +103,8 @@
         <i class="fa fa-spinner fa-spin"></i>
       </div>
       {{current-energy-usage}}
-      {{view "energy-totals"}}
-      {{view "gas-totals"}}
+      {{energy-totals content=content}}
+      {{gas-totals content=content}}
     </div>
 
     {{view "graphs"}}
@@ -119,8 +119,8 @@
     {{valueInWatts}} Watt
   </script>
 
-  <script type="text/x-handlebars" data-template-name="totals">
-    <div class="bg-info col-xs-2 col-sm-2 numeric" {{bind-attr title=view.formattedUsage}}>&euro; {{{view.cost}}}</div>
+  <script type="text/x-handlebars" data-template-name="components/totals">
+    <div class="bg-info col-xs-2 col-sm-2 numeric" {{bind-attr title=formattedUsage}}>&euro; {{{cost}}}</div>
   </script>
 
   <% libs.each do |lib| %>

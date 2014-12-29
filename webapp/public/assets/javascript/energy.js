@@ -313,11 +313,11 @@ Energy.GraphsView = Ember.View.extend({
 
 });
 
-Energy.TotalsView = Ember.View.extend({
-    templateName: "totals",
+Energy.TotalsComponent = Ember.Component.extend({
+    layoutName: "components/totals",
 
     value: function() {
-        var stroom_totaal_measurements = _.chain(this.get("controller.content")).pluck(this.get("fieldName")).filter(function(el) { return el > 0; });
+        var stroom_totaal_measurements = _.chain(this.get("content")).pluck(this.get("fieldName")).filter(function(el) { return el > 0; });
 
         var min = stroom_totaal_measurements.min().value();
         var max = stroom_totaal_measurements.max().value();
@@ -336,7 +336,7 @@ Energy.TotalsView = Ember.View.extend({
     }.property("value", "costPerUnit")
 });
 
-Energy.EnergyTotalsView = Energy.TotalsView.extend({
+Energy.EnergyTotalsComponent = Energy.TotalsComponent.extend({
     fieldName: "stroom_totaal",
     accuracy: 2,
     costPerUnit: 0.2345,
@@ -346,7 +346,7 @@ Energy.EnergyTotalsView = Energy.TotalsView.extend({
     }.property("value")
 });
 
-Energy.GasTotalsView = Energy.TotalsView.extend({
+Energy.GasTotalsComponent = Energy.TotalsComponent.extend({
     fieldName: "gas",
     accuracy: 3,
     costPerUnit: 0.7184,
