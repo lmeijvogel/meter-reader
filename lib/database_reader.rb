@@ -45,9 +45,9 @@ class DatabaseReader
   def granularity
     case @granularity
     when :hour
-      "DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
+      "YEAR(#{adjusted_time_stamp}), DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
     when :day
-      "DAYOFYEAR(#{adjusted_time_stamp})"
+      "YEAR(#{adjusted_time_stamp}), DAYOFYEAR(#{adjusted_time_stamp})"
     else
       raise "Unknown granularity for data selection: #{@granularity}"
     end
