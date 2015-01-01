@@ -90,6 +90,8 @@ describe DatabaseWriter do
     let(:diff_stroom_piek) { 15.23.kWh }
     let(:gas) { 12.23 }
 
+    let(:save_interval) { 30 }
+
     let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
     let(:database_connection) { Mysql2::Client.new(host: config["host"],
                                                    database: config["database"],
@@ -110,13 +112,14 @@ describe DatabaseWriter do
       @measurement.gas = gas
 
       database_connection.query("DELETE FROM measurements")
+      writer.save_interval = save_interval
 
       writer.save(@measurement)
       @measurement.time_stamp = new_time_stamp
     end
 
     context "when another measurement already exists" do
-      let(:new_time_stamp) { DateTime.now + 15.0/(24*60) }
+      let(:new_time_stamp) { DateTime.now + (save_interval / 2.0)/(24*60) }
 
       it "is true" do
         expect(writer.send(:exists?, @measurement)).to be_true
@@ -133,7 +136,7 @@ describe DatabaseWriter do
     end
 
     context "when no other measurement exists" do
-      let(:new_time_stamp) { DateTime.now + 31.0/(24*60) }
+      let(:new_time_stamp) { DateTime.now + (save_interval + 1.0)/(24*60) }
 
       it "is false" do
         expect(writer.send(:exists?, @measurement)).to be_false

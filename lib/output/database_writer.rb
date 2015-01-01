@@ -3,7 +3,7 @@ class DatabaseWriter
 
   def initialize(database_connection)
     @database_connection = database_connection
-    save_interval = 0
+    self.save_interval = 0
   end
 
   def save_unless_exists(measurement)
