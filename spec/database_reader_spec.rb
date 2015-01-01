@@ -41,14 +41,6 @@ describe DatabaseReader do
     @usage = reader.read().first
   end
 
-  it "sets the correct stroom_dal" do
-    @usage.stroom_dal.should be_within(0.01).of(stroom_dal_1)
-  end
-
-  it "sets the correct stroom_piek" do
-    @usage.stroom_piek.should be_within(0.01).of(stroom_piek_1)
-  end
-
   it "sets the correct stroom_totaal" do
     @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal_1)
   end
