@@ -104,7 +104,8 @@ class Energie < Sinatra::Base
   def cached(prefix, date)
     cache_file = ROOT_PATH.join("tmp", "cache", "#{prefix}_#{date.year}_#{date.month}_#{date.day}")
 
-    if date < Date.today
+    should_cache = production? && date < Date.today
+    if should_cache
       if File.exist?(cache_file)
         File.read(cache_file)
       else
@@ -177,5 +178,9 @@ class Energie < Sinatra::Base
     webapp_path = ROOT_PATH.join("webapp")
 
     path.enum_for(:ascend).none? {|p| p == webapp_path }
+  end
+
+  def production?
+    ENV["RACK_ENV"] == "production"
   end
 end
