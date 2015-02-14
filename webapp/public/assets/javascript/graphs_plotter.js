@@ -62,10 +62,13 @@ var GraphsPlotter = Class.$extend({
           show: showPointLabels,
           hideZeros: true
 
-        }
+        },
+
+        shadow: false
       },
       grid: {
-        background: 'white'
+        background: 'white',
+        shadow: false
       },
 
       // Show the legend and put it outside the grid, but inside the
