@@ -67,6 +67,7 @@ var GraphsPlotter = Class.$extend({
         shadow: false
       },
       grid: {
+        drawBorder: false,
         background: 'white',
         shadow: false
       },
@@ -78,7 +79,10 @@ var GraphsPlotter = Class.$extend({
       axes: {
         xaxis: {
           ticks: this.ticks(),
-          tickOptions: {formatString: '%d'}
+          tickOptions: {
+            formatString: '%d',
+            showGridline: false
+          },
         },
 
         yaxis: {
@@ -95,7 +99,18 @@ var GraphsPlotter = Class.$extend({
     // Ticks should match up one for each y value (category) in the series.
     var startIndex = this.resultsParser.periodStartIndex();
 
-    return _.range(startIndex - 1, this.resultsParser.singlePeriod(this.measurements)+startIndex+1);
+    var range = _.range(startIndex - 1, this.resultsParser.singlePeriod(this.measurements)+startIndex+1);
+
+    var index = -1;
+
+    return _.map(range, function(e) {
+      index++;
+      if (e > 0 && (e == 1 || e % 5 == 0)) {
+        return [index, String(e)];
+      } else {
+        return [index, ""];
+      }
+    });
   },
 
   daysPerSet: function() {
