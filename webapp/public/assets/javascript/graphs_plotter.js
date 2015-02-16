@@ -42,7 +42,6 @@ var GraphsPlotter = Class.$extend({
   defaultPlotOptions: function() {
     var graphWidth = this.element.innerWidth();
     var barMargin = 9;
-    var showPointLabels = graphWidth > 300;
 
     var maxY = (this.daysPerSet() * this.expectedDailyMax());
 
@@ -59,7 +58,7 @@ var GraphsPlotter = Class.$extend({
           barMargin: barMargin
         },
         pointLabels: {
-          show: showPointLabels,
+          show: false,
           hideZeros: true
 
         },
