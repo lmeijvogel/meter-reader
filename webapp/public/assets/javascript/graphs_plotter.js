@@ -35,7 +35,7 @@ var GraphsPlotter = Class.$extend({
   },
 
   load: function(measurements) {
-    this.measurements = measurements;
+    this.resultsParser.setMeasurements(measurements);
     this.data = this.processData();
   },
 
@@ -77,7 +77,7 @@ var GraphsPlotter = Class.$extend({
       // the legend to overflow the container.
       axes: {
         xaxis: {
-          ticks: this.ticks(),
+          ticks: this.formattedTicks(),
           tickOptions: {
             formatString: '%d',
             showGridline: false
@@ -93,19 +93,14 @@ var GraphsPlotter = Class.$extend({
     };
   },
 
-  ticks: function() {
-    // Can specify a custom tick Array.
-    // Ticks should match up one for each y value (category) in the series.
-    var startIndex = this.resultsParser.periodStartIndex();
-
-    var range = _.range(startIndex - 1, this.resultsParser.singlePeriod(this.measurements)+startIndex+1);
+  formattedTicks: function() {
+    var allTicks = this.resultsParser.ticks();
 
     var index = -1;
-
-    return _.map(range, function(e) {
+    return _.map(allTicks, function(tick) {
       index++;
-      if (e > 0 && (e == 1 || e % 5 == 0)) {
-        return [index, String(e)];
+      if (tick > 0 && (tick == 1 || tick % 5 == 0)) {
+        return [index, String(tick)];
       } else {
         return [index, ""];
       }
@@ -120,7 +115,7 @@ var GraphsPlotter = Class.$extend({
 var StroomPlotter = GraphsPlotter.$extend({
   expectedDailyMax: function() { return 1500; },
   processData: function() {
-    var parsedStroomTotaal = this.resultsParser.parse(this.measurements, "stroom_totaal");
+    var parsedStroomTotaal = this.resultsParser.parse("stroom_totaal");
     var stroomRelative = RelativeConverter().convert(parsedStroomTotaal);
 
     return _.map(stroomRelative, function(kwh) { return kwh*1000; });
@@ -146,7 +141,7 @@ var StroomPlotter = GraphsPlotter.$extend({
 var GasPlotter = GraphsPlotter.$extend({
   expectedDailyMax: function() { return 1200; },
   processData: function() {
-    var gas = this.resultsParser.parse(this.measurements, "gas");
+    var gas = this.resultsParser.parse("gas");
     var gasRelative = RelativeConverter().convert(gas);
 
     return _.map(gasRelative, function(m3) { return m3*1000; });

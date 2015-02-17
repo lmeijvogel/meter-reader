@@ -10,7 +10,7 @@ window.SparseArrayFiller = Class.$extend({
     var result = _.clone(inputArray);
 
     _.each(input, function(element) {
-      var position = self.positionFunction(element, input);
+      var position = self.positionFunction(element);
 
       if (0 <= position && position < result.length) {
         result[position] = self.selectorFunction(element);
