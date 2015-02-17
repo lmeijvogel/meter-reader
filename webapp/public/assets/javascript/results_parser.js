@@ -31,14 +31,7 @@ var ResultsParser = Class.$extend({
   },
 
   ticks: function() {
-    // Can specify a custom tick Array.
-    // Ticks should match up one for each y value (category) in the series.
-    var startIndex = this.periodStartIndex();
-
-    // ResultsParser should also contain the measurements?
-    var range = _.range(startIndex - 1, this.singlePeriod()+startIndex+1);
-
-    return range;
+    throw "NotImplemented: ResultsParser.ticks()";
   }
 });
 
@@ -57,10 +50,14 @@ var DayResultsParser = ResultsParser.$extend({
     return hour;
   },
 
-  periodStartIndex: function() { return 0; },
   singlePeriod: function() {
     return 24;
   },
+
+  ticks: function() {
+    // Make the range a little larger on both sides
+    return _.range(-1, 25);
+  }
 });
 
 var MonthResultsParser = ResultsParser.$extend({
@@ -78,11 +75,16 @@ var MonthResultsParser = ResultsParser.$extend({
     return day;
   },
 
-  periodStartIndex: function() { return 1; },
   singlePeriod: function() {
     var ts = moment(_.head(this.measurements).time_stamp);
 
     var lastOfMonth = new Date(ts.year(), ts.month()+1, 0);
     return moment(lastOfMonth).date();
+  },
+
+  ticks: function() {
+    // Make the range a bit larger to the left and right to
+    // have a bit of room.
+    return _.range(0, this.singlePeriod()+1);
   }
 });
