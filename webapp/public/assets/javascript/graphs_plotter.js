@@ -13,6 +13,11 @@ var GraphsPlotter = Class.$extend({
     var self = this;
     this.element.empty();
 
+    if (_.isEmpty(this.data)) {
+      this.element.text("No data");
+      return;
+    }
+
     var options = DeepObjectDefaults.merge(this.options(), this.defaultPlotOptions());
     this.element.jqplot([this.data], options);
 
