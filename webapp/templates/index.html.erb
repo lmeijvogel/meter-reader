@@ -95,7 +95,7 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="components/totals">
-    <div class="bg-info col-xs-2 col-sm-2 numeric" {{bind-attr title=formattedUsage}}>&euro; {{{cost}}}</div>
+    <div class="bg-info col-xs-2 col-sm-2 numeric" {{bind-attr title=formattedUsage}}>{{formattedCost}}</div>
   </script>
 
   <% libs.each do |lib| %>

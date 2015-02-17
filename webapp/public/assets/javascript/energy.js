@@ -318,27 +318,36 @@ Energy.TotalsComponent = Ember.Component.extend({
 
     cost: function() {
         return this.truncateDigits(this.get("value") * this.get("costPerUnit"), 2);
-    }.property("value", "costPerUnit")
+    }.property("content", "value", "costPerUnit"),
+
+    formattedCost: function() {
+        if (_.isEmpty(this.get("content"))) {
+            return "-";
+        }
+
+        return "€ "+ this.get("cost");
+    }.property("content", "cost"),
+
+    formattedUsage: function() {
+        if (_.isEmpty(this.get("content"))) {
+            return "-";
+        }
+        return this.get("value") +" "+ this.get("unit");
+    }.property("content", "value")
 });
 
 Energy.EnergyTotalsComponent = Energy.TotalsComponent.extend({
     fieldName: "stroom_totaal",
     accuracy: 2,
     costPerUnit: 0.2345,
-
-    formattedUsage: function() {
-        return this.get("value") +" kWh";
-    }.property("value")
+    unit: "kWh"
 });
 
 Energy.GasTotalsComponent = Energy.TotalsComponent.extend({
     fieldName: "gas",
     accuracy: 3,
     costPerUnit: 0.7184,
-
-    formattedUsage: function() {
-      return this.get("value") +" m³";
-    }.property("value")
+    unit: "m³"
 });
 
 Energy.GraphComponent = Ember.Component.extend({
