@@ -99,7 +99,7 @@ var GraphsPlotter = Class.$extend({
     var index = -1;
     return _.map(allTicks, function(tick) {
       index++;
-      if (tick > 0 && (tick == 1 || tick % 5 == 0)) {
+      if (_.isNumber(tick)) {
         return [index, String(tick)];
       } else {
         return [index, ""];

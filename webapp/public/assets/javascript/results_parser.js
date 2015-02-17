@@ -56,7 +56,13 @@ var DayResultsParser = ResultsParser.$extend({
 
   ticks: function() {
     // Make the range a little larger on both sides
-    return _.range(-1, 25);
+    return _.map(_.range(-1, 24+2), function(el) {
+      if ((el % 5 == 0 && el != 25) || el == 24) {
+        return el;
+      } else {
+        return null;
+      }
+    });
   }
 });
 
@@ -85,6 +91,14 @@ var MonthResultsParser = ResultsParser.$extend({
   ticks: function() {
     // Make the range a bit larger to the left and right to
     // have a bit of room.
-    return _.range(0, this.singlePeriod()+1);
+    var singlePeriod = this.singlePeriod();
+    return _.map(_.range(0, singlePeriod+2), function(el) {
+      // if a month contains 31 days, don't print '30' on the x-axis since '31' is already printed.
+      if (el == 1 || el == singlePeriod || (el % 5 == 0 && el != 0 && (singlePeriod -1 != el))) {
+        return el;
+      } else {
+        return null;
+      }
+    });
   }
 });
