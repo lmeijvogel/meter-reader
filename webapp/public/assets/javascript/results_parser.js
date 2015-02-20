@@ -56,8 +56,8 @@ var DayResultsParser = ResultsParser.$extend({
 
   ticks: function() {
     // Make the range a little larger on both sides
-    return _.map(_.range(-1, 24+2), function(el) {
-      if ((el % 5 == 0 && el != 25) || el == 24) {
+    return _.map(_.range(-1, 23+2), function(el) {
+      if (el % 5 == 0 || el == 23) {
         return el;
       } else {
         return null;
