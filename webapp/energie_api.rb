@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'erb'
 
 require 'mysql2'
 require 'json'
@@ -27,7 +26,7 @@ $database = ConnectionPool.new(size: 2) do
   Mysql2::Client.new(DatabaseConfig.for(settings.environment))
 end
 
-class Energie < Sinatra::Base
+class EnergieApi < Sinatra::Base
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
@@ -41,23 +40,56 @@ class Energie < Sinatra::Base
     check_login_or_redirect unless request.path.include?("login")
   end
 
-  get "/assets/*" do
-    requested_path = params[:splat]
+  get "/day/:year/:month/:day" do
+    day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
-    full_path = ROOT_PATH.join("webapp", "public", "assets", *requested_path)
+    cached(:day, day) do
+      $database.with {|database_connection|
+        database_reader = DatabaseReader.new(database_connection)
 
-    if !File.exists?(full_path) || path_outside_webapp(full_path.realpath)
-      halt 404 and return
+        database_reader.day = day
+
+        database_reader.read().to_json
+      }
     end
-
-    cache_control :public, max_age: 3600
-
-    etag Digest::SHA1.file(full_path)
-    send_file full_path
   end
 
-  get "/login.html" do
-    render_template("login.html.erb")
+  get "/month/:year/:month" do
+    $database.with {|database_connection|
+      database_reader = DatabaseReader.new(database_connection)
+
+      database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
+
+      database_reader.read().to_json
+    }
+  end
+
+  get "/energy/current" do
+    result = JSON.parse(Redis.new.get("measurement"))
+
+    @id = result["id"];
+    @current_measurement = result["stroom_current"]
+
+    { id: @id, current: @current_measurement }.to_json
+  end
+
+  def cached(prefix, date)
+    cache_file = ROOT_PATH.join("tmp", "cache", "#{prefix}_#{date.year}_#{date.month}_#{date.day}")
+
+    should_cache = production? && date < Date.today
+    if should_cache
+      if File.exist?(cache_file)
+        File.read(cache_file)
+      else
+        contents = yield
+        File.open(cache_file, "w") do |file|
+          file.write contents
+        end
+        contents
+      end
+    else
+      yield
+    end
   end
 
   post "/login/create" do
@@ -84,33 +116,6 @@ class Energie < Sinatra::Base
     end
   end
 
-  get "/*" do
-    send_file "index.html"
-  end
-
-  get "/" do
-    redirect to("index.html")
-  end
-
-  def cached(prefix, date)
-    cache_file = ROOT_PATH.join("tmp", "cache", "#{prefix}_#{date.year}_#{date.month}_#{date.day}")
-
-    should_cache = production? && date < Date.today
-    if should_cache
-      if File.exist?(cache_file)
-        File.read(cache_file)
-      else
-        contents = yield
-        File.open(cache_file, "w") do |file|
-          file.write contents
-        end
-        contents
-      end
-    else
-      yield
-    end
-  end
-
   def read_password_hash(username)
     raise NoPasswordsFile unless File.exists? "passwords"
 
@@ -130,21 +135,6 @@ class Energie < Sinatra::Base
     else
       pass
     end
-  end
-
-  def render_template(template_name)
-    template = File.read(File.join(templates_path, template_name))
-    ERB.new(template).result(binding)
-  end
-
-  def templates_path
-    @_templates_path ||= File.join(File.dirname(__FILE__), "templates")
-  end
-
-  def path_outside_webapp(path)
-    webapp_path = ROOT_PATH.join("webapp")
-
-    path.enum_for(:ascend).none? {|p| p == webapp_path }
   end
 
   def production?
