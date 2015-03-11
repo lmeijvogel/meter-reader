@@ -111,8 +111,7 @@ class EnergieApi < Sinatra::Base
     rescue UsernameNotFound, BCrypt::Errors::InvalidHash
       invalid_username_or_password!
     rescue NoPasswordsFile
-      status 401
-      "No passwords file"
+      halt 401, "No passwords file"
     end
   end
 
@@ -125,8 +124,7 @@ class EnergieApi < Sinatra::Base
   end
 
   def invalid_username_or_password!
-    status 401
-    "Invalid username or password"
+    halt 401, "Invalid username or password"
   end
 
   def check_login_or_redirect
