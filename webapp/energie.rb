@@ -1,44 +1,15 @@
 require 'sinatra'
-require 'erb'
 
-require 'mysql2'
-require 'json'
 require 'pathname'
-require 'fileutils'
-require 'connection_pool'
-require 'bcrypt'
-require 'redis'
-
 require 'digest/sha1'
-
-require_relative '../lib/database_config.rb'
-require_relative '../lib/database_reader.rb'
-
-NoPasswordsFile = Class.new(StandardError)
-UsernameNotFound = Class.new(StandardError)
 
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 
 set :bind, '0.0.0.0'
 
-FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
-
-$database = ConnectionPool.new(size: 2) do
-  Mysql2::Client.new(DatabaseConfig.for(settings.environment))
-end
-
 class Energie < Sinatra::Base
   configure do
-    # Storing login information in cookies is good enough for our purposes
-    one_year = 60*60*24*365
-    secret = File.read('session_secret.txt')
-    use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
-
     set :static, false
-  end
-
-  before do
-    check_login_or_redirect unless request.path.include?("login")
   end
 
   get "/assets/*" do
@@ -56,98 +27,13 @@ class Energie < Sinatra::Base
     send_file full_path
   end
 
-  get "/login.html" do
-    render_template("login.html.erb")
-  end
-
-  post "/login/create" do
-    username = params["username"]
-    password = params["password"]
-
-    begin
-      stored_password_hash = read_password_hash(username)
-
-      password_valid = BCrypt::Password.new(stored_password_hash) == password
-      if password_valid
-        session.clear
-        session[:username] = username
-
-        redirect(url("/", false))
-      else
-        invalid_username_or_password!
-      end
-    rescue UsernameNotFound, BCrypt::Errors::InvalidHash
-      invalid_username_or_password!
-    rescue NoPasswordsFile
-      status 401
-      "No passwords file"
-    end
-  end
-
   get "/*" do
     send_file "index.html"
-  end
-
-  get "/" do
-    redirect to("index.html")
-  end
-
-  def cached(prefix, date)
-    cache_file = ROOT_PATH.join("tmp", "cache", "#{prefix}_#{date.year}_#{date.month}_#{date.day}")
-
-    should_cache = production? && date < Date.today
-    if should_cache
-      if File.exist?(cache_file)
-        File.read(cache_file)
-      else
-        contents = yield
-        File.open(cache_file, "w") do |file|
-          file.write contents
-        end
-        contents
-      end
-    else
-      yield
-    end
-  end
-
-  def read_password_hash(username)
-    raise NoPasswordsFile unless File.exists? "passwords"
-
-    password_hashes = YAML.load(File.read("passwords"))
-
-    password_hashes.fetch(username) { raise UsernameNotFound }
-  end
-
-  def invalid_username_or_password!
-    status 401
-    "Invalid username or password"
-  end
-
-  def check_login_or_redirect
-    if session[:username].nil?
-      redirect url("login.html", false)
-    else
-      pass
-    end
-  end
-
-  def render_template(template_name)
-    template = File.read(File.join(templates_path, template_name))
-    ERB.new(template).result(binding)
-  end
-
-  def templates_path
-    @_templates_path ||= File.join(File.dirname(__FILE__), "templates")
   end
 
   def path_outside_webapp(path)
     webapp_path = ROOT_PATH.join("webapp")
 
     path.enum_for(:ascend).none? {|p| p == webapp_path }
-  end
-
-  def production?
-    ENV["RACK_ENV"] == "production"
   end
 end

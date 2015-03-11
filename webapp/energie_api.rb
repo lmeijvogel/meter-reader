@@ -37,7 +37,11 @@ class EnergieApi < Sinatra::Base
   end
 
   before do
-    check_login_or_redirect unless request.path.include?("login")
+    assert_logged_in unless request.path.include?("login")
+  end
+
+  get "/" do
+    status 204
   end
 
   get "/day/:year/:month/:day" do
@@ -104,7 +108,8 @@ class EnergieApi < Sinatra::Base
         session.clear
         session[:username] = username
 
-        redirect(url("/", false))
+        status 200
+        "Welcome!"
       else
         invalid_username_or_password!
       end
@@ -127,9 +132,9 @@ class EnergieApi < Sinatra::Base
     halt 401, "Invalid username or password"
   end
 
-  def check_login_or_redirect
+  def assert_logged_in
     if session[:username].nil?
-      redirect url("login.html", false)
+      halt 401, "Not logged in"
     else
       pass
     end
