@@ -7,6 +7,7 @@ require 'fileutils'
 require 'connection_pool'
 require 'bcrypt'
 require 'redis'
+require 'dotenv'
 
 require 'digest/sha1'
 
@@ -17,6 +18,7 @@ NoPasswordsFile = Class.new(StandardError)
 UsernameNotFound = Class.new(StandardError)
 
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
+Dotenv.load
 
 set :bind, '0.0.0.0'
 
@@ -30,7 +32,7 @@ class EnergieApi < Sinatra::Base
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
-    secret = File.read('session_secret.txt')
+    secret = ENV['SESSION_SECRET']
     use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
 
     set :static, false

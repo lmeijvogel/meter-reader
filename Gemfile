@@ -8,6 +8,7 @@ gem "sinatra"
 gem 'thin'
 gem 'connection_pool'
 gem 'redis'
+gem 'dotenv'
 
 group :development do
   gem "guard"
