@@ -5,6 +5,7 @@ require 'dotenv'
 
 require_relative "models/meterstand.rb"
 require_relative "lib/data_parsing/stream_splitter.rb"
+require_relative "lib/data_parsing/fake_stream_splitter.rb"
 require_relative "lib/output/database_writer.rb"
 require_relative "lib/output/redis_writer.rb"
 require_relative "lib/database_config.rb"

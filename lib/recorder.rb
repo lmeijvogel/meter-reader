@@ -7,7 +7,11 @@ class MeterstandenRecorder
     self.redis_writer    = RedisWriter.new
     self.meterstanden_parser = Meterstand.new
 
-    self.stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")
+    if environment == "production"
+      self.stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")
+    else
+      self.stream_splitter = FakeStreamSplitter.new
+    end
   end
 
   def collect_data
