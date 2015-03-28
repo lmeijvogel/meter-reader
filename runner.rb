@@ -9,8 +9,6 @@ require_relative "lib/output/database_writer.rb"
 require_relative "lib/output/redis_writer.rb"
 require_relative "lib/database_config.rb"
 
-require_relative 'daemon.rb'
-
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
 class MeterstandenRecorder
@@ -48,13 +46,7 @@ class MeterstandenRecorder
   end
 end
 
-daemon = Daemon.new(process_name: "meterstanden", pidfile: opts[:pidfile], daemonize: !opts[:no_fork])
-
-
 Dotenv.load
-
 recorder = MeterstandenRecorder.new(ENV['ENVIRONMENT'])
 
-daemon.run do
-  recorder.collect_data
-end
+recorder.collect_data
