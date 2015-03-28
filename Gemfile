@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem "mysql2"
-gem "trollop"
 gem "bcrypt"
 
 gem "sinatra"

@@ -1,7 +1,7 @@
 require 'pathname'
 require 'serialport'
 require 'mysql2'
-require 'trollop'
+require 'dotenv'
 
 require_relative "models/meterstand.rb"
 require_relative "lib/data_parsing/stream_splitter.rb"
@@ -13,15 +13,9 @@ require_relative 'daemon.rb'
 
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
-opts = Trollop::options do
-  opt :env, "Environment", default: "development"
-  opt :pidfile, "PID file", default: "/var/run/runner.pid"
-  opt :no_fork, "Don't daemonize", default: false
-end
-
 class MeterstandenRecorder
-  def initialize(options)
-    database_connection = Mysql2::Client.new(DatabaseConfig.for(options[:environment]))
+  def initialize(environment)
+    database_connection = Mysql2::Client.new(DatabaseConfig.for(environment))
 
     self.database_writer = DatabaseWriter.new(database_connection)
     self.database_writer.save_interval = 15
@@ -56,7 +50,10 @@ end
 
 daemon = Daemon.new(process_name: "meterstanden", pidfile: opts[:pidfile], daemonize: !opts[:no_fork])
 
-recorder = MeterstandenRecorder.new(environment: opts[:env])
+
+Dotenv.load
+
+recorder = MeterstandenRecorder.new(ENV['ENVIRONMENT'])
 
 daemon.run do
   recorder.collect_data
