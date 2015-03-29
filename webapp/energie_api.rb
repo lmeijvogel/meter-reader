@@ -32,7 +32,7 @@ class EnergieApi < Sinatra::Base
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
-    secret = ENV['SESSION_SECRET']
+    secret = ENV.fetch('SESSION_SECRET')
     use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
 
     set :static, false
@@ -143,6 +143,6 @@ class EnergieApi < Sinatra::Base
   end
 
   def production?
-    ENV["RACK_ENV"] == "production"
+    ENV.fetch("RACK_ENV") == "production"
   end
 end

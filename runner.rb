@@ -15,5 +15,5 @@ ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
 Dotenv.load
 
-recorder = MeterstandenRecorder.new(ENV['ENVIRONMENT'])
+recorder = MeterstandenRecorder.new(ENV.fetch('ENVIRONMENT'))
 recorder.collect_data
