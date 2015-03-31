@@ -1,4 +1,3 @@
-require 'redis'
 require 'json'
 
 class LastMeasurementStore
@@ -7,7 +6,7 @@ class LastMeasurementStore
   end
 
   def load
-    redis.get("measurement")
+    File.read(filename)
   end
 
   def save(measurement)
@@ -23,12 +22,12 @@ class LastMeasurementStore
       gas:              measurement.gas.to_f
     }
 
-    redis.set("measurement", hash.to_json)
+    File.write(filename, hash.to_json)
     @counter += 1
   end
 
   private
-  def redis
-    Redis.new
+  def filename
+    "/tmp/meter-reader-last-measurement.json"
   end
 end

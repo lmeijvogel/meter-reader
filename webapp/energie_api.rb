@@ -6,7 +6,6 @@ require 'pathname'
 require 'fileutils'
 require 'connection_pool'
 require 'bcrypt'
-require 'redis'
 require 'dotenv'
 
 require 'digest/sha1'
