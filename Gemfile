@@ -5,7 +5,6 @@ gem "bcrypt"
 
 gem "sinatra"
 gem 'thin'
-gem 'connection_pool'
 gem 'dotenv'
 gem 'serialport'
 

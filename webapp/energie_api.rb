@@ -4,7 +4,6 @@ require 'mysql2'
 require 'json'
 require 'pathname'
 require 'fileutils'
-require 'connection_pool'
 require 'bcrypt'
 require 'dotenv'
 
@@ -24,9 +23,7 @@ set :bind, '0.0.0.0'
 
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
-$database = ConnectionPool.new(size: 2) do
-  Mysql2::Client.new(DatabaseConfig.for(settings.environment))
-end
+$database_connection = Mysql2::Client.new(DatabaseConfig.for(settings.environment))
 
 class EnergieApi < Sinatra::Base
   configure do
@@ -50,24 +47,20 @@ class EnergieApi < Sinatra::Base
     day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
     cached(:day, day) do
-      $database.with {|database_connection|
-        database_reader = DatabaseReader.new(database_connection)
+      database_reader = DatabaseReader.new($database_connection)
 
-        database_reader.day = day
+      database_reader.day = day
 
-        database_reader.read().to_json
-      }
+      database_reader.read().to_json
     end
   end
 
   get "/month/:year/:month" do
-    $database.with {|database_connection|
-      database_reader = DatabaseReader.new(database_connection)
+    database_reader = DatabaseReader.new($database_connection)
 
-      database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
+    database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
 
-      database_reader.read().to_json
-    }
+    database_reader.read().to_json
   end
 
   get "/energy/current" do
