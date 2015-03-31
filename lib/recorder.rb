@@ -4,7 +4,7 @@ class MeterstandenRecorder
 
     self.database_writer = DatabaseWriter.new(database_connection)
     self.database_writer.save_interval = 15
-    self.redis_writer    = RedisWriter.new
+    self.last_measurement_store = LastMeasurementStore.new
     self.meterstanden_parser = Meterstand.new
 
     if environment == "production"
@@ -20,12 +20,12 @@ class MeterstandenRecorder
 
       measurement = meterstanden_parser.parse(message)
       database_writer.save_unless_exists(measurement)
-      redis_writer.save(measurement)
+      last_measurement_store.save(measurement)
     end
   end
 
   protected
-  attr_accessor :database_writer, :redis_writer, :meterstanden_parser, :stream_splitter
+  attr_accessor :database_writer, :last_measurement_store, :meterstanden_parser, :stream_splitter
 
   private
   def serial_port

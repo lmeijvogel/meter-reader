@@ -1,14 +1,16 @@
 require 'redis'
 require 'json'
 
-class RedisWriter
+class LastMeasurementStore
   def initialize
     @counter = 0
   end
 
-  def save(measurement)
-    redis_connection = Redis.new
+  def load
+    redis.get("measurement")
+  end
 
+  def save(measurement)
     hash = {
       id:               @counter,
       time_stamp:       measurement.time_stamp.to_s,
@@ -21,7 +23,12 @@ class RedisWriter
       gas:              measurement.gas.to_f
     }
 
-    redis_connection.set("measurement", hash.to_json)
+    redis.set("measurement", hash.to_json)
     @counter += 1
+  end
+
+  private
+  def redis
+    Redis.new
   end
 end

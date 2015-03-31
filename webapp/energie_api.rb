@@ -13,6 +13,7 @@ require 'digest/sha1'
 
 require_relative '../lib/database_config.rb'
 require_relative '../lib/database_reader.rb'
+require_relative '../lib/output/last_measurement_store.rb'
 
 NoPasswordsFile = Class.new(StandardError)
 UsernameNotFound = Class.new(StandardError)
@@ -71,7 +72,7 @@ class EnergieApi < Sinatra::Base
   end
 
   get "/energy/current" do
-    result = JSON.parse(Redis.new.get("measurement"))
+    result = JSON.parse(LastMeasurementStore.new.load)
 
     @id = result["id"];
     @current_measurement = result["stroom_current"]
