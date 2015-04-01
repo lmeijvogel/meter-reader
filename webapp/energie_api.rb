@@ -63,6 +63,14 @@ class EnergieApi < Sinatra::Base
     database_reader.read().to_json
   end
 
+  get "/year/:year" do
+    database_reader = DatabaseReader.new($database_connection)
+
+    database_reader.year = DateTime.new(params[:year].to_i)
+
+    database_reader.read().to_json
+  end
+
   get "/energy/current" do
     result = JSON.parse(LastMeasurementStore.new.load)
 

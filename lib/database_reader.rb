@@ -42,12 +42,21 @@ class DatabaseReader
     self.granularity = :day
   end
 
+  def year=(date)
+    start_date = sql_date(date)
+    end_date = sql_date(date.next_year + 1.0 / (24 * 4));
+    self.where = "WHERE #{adjusted_time_stamp} > #{start_date} AND #{adjusted_time_stamp} < #{end_date}"
+    self.granularity = :month
+  end
+
   def granularity
     case @granularity
     when :hour
       "YEAR(#{adjusted_time_stamp}), DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
     when :day
       "YEAR(#{adjusted_time_stamp}), DAYOFYEAR(#{adjusted_time_stamp})"
+    when :month
+      "YEAR(#{adjusted_time_stamp}), MONTH(#{adjusted_time_stamp})"
     else
       raise "Unknown granularity for data selection: #{@granularity}"
     end
