@@ -68,16 +68,21 @@ class EnergieApi < Sinatra::Base
 
     database_reader.year = DateTime.new(params[:year].to_i)
 
-    database_reader.read().to_json
+    { measurements: database_reader.read() }.to_json
   end
 
   get "/energy/current" do
-    result = JSON.parse(LastMeasurementStore.new.load)
+    begin
+      result = JSON.parse(LastMeasurementStore.new.load)
 
-    @id = result["id"];
-    @current_measurement = result["stroom_current"]
+      @id = result["id"];
+      @current_measurement = result["stroom_current"]
 
-    { id: @id, current: @current_measurement }.to_json
+      { id: @id, current: @current_measurement }.to_json
+    rescue LastMeasurementStore::NoMeasurementFound
+      status 404
+      "Not found"
+    end
   end
 
   def cached(prefix, date)

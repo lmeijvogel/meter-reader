@@ -1,12 +1,16 @@
 require 'json'
 
 class LastMeasurementStore
+  NoMeasurementFound = Class.new(StandardError)
+
   def initialize
     @counter = 0
   end
 
   def load
     File.read(filename)
+  rescue Errno::ENOENT
+    raise NoMeasurementFound
   end
 
   def save(measurement)
