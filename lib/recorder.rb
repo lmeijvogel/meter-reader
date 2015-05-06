@@ -1,4 +1,4 @@
-class MeterstandenRecorder
+class Recorder
   def initialize(environment)
     database_connection = Mysql2::Client.new(DatabaseConfig.for(environment))
 
