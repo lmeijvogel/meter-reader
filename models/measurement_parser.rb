@@ -8,7 +8,7 @@ require "data_parsing/parse_chain/skip_line_chain"
 
 require "measurement"
 
-class Meterstand
+class MeasurementParser
   def initialize
     super
 

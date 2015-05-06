@@ -5,7 +5,7 @@ class MeterstandenRecorder
     self.database_writer = DatabaseWriter.new(database_connection)
     self.database_writer.save_interval = 15
     self.last_measurement_store = LastMeasurementStore.new
-    self.meterstanden_parser = Meterstand.new
+    self.meterstanden_parser = MeasurementParser.new
 
     if environment == "production"
       self.stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")

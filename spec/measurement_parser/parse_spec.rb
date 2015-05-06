@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'timecop'
 
-require ROOT_PATH.join("models/meterstand.rb")
+require "measurement_parser"
 
 describe "full integration" do
   describe :parse do
@@ -37,7 +37,7 @@ INPUT
       Timecop.return
     end
 
-    subject { Meterstand.new.parse(input) }
+    subject { MeasurementParser.new.parse(input) }
 
     its(:time_stamp)  { should == DateTime.now }
     its(:stroom_dal)  { should == 557.379.kWh }

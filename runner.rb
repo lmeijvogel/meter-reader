@@ -5,7 +5,7 @@ require 'dotenv'
 
 $LOAD_PATH << "lib"
 $LOAD_PATH << "models"
-require "meterstand"
+require "measurement_parser"
 require "data_parsing/stream_splitter"
 require "data_parsing/fake_stream_splitter"
 require "output/database_writer"
