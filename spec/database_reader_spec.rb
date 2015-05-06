@@ -1,10 +1,10 @@
 require "spec_helper"
 require 'mysql2'
 
-require ROOT_PATH.join "models/usage.rb"
-require ROOT_PATH.join "lib/output/database_writer.rb"
-require ROOT_PATH.join "lib/database_reader.rb"
-require ROOT_PATH.join "lib/float_extensions.rb"
+require "usage"
+require "output/database_writer"
+require "database_reader"
+require "float_extensions"
 
 describe DatabaseReader do
   let(:time_stamp_1) { DateTime.now }

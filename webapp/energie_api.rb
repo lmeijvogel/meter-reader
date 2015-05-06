@@ -9,9 +9,9 @@ require 'dotenv'
 
 require 'digest/sha1'
 
-require_relative '../lib/database_config.rb'
-require_relative '../lib/database_reader.rb'
-require_relative '../lib/output/last_measurement_store.rb'
+require 'database_config'
+require 'database_reader'
+require 'output/last_measurement_store'
 
 NoPasswordsFile = Class.new(StandardError)
 UsernameNotFound = Class.new(StandardError)

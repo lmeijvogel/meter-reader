@@ -1,4 +1,4 @@
-require_relative 'chainable'
+require 'data_parsing/parse_chain/chainable'
 
 class GasChain < Chainable
   def can_handle?(line)

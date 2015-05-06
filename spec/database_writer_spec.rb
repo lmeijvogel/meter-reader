@@ -2,9 +2,9 @@ require 'yaml'
 require 'mysql2'
 require 'spec_helper'
 
-require ROOT_PATH.join("lib/float_extensions.rb")
-require ROOT_PATH.join("lib/output/database_writer.rb")
-require ROOT_PATH.join("models/measurement.rb")
+require "float_extensions"
+require "output/database_writer"
+require "measurement"
 
 describe DatabaseWriter do
   describe :save do

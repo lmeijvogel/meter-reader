@@ -3,13 +3,15 @@ require 'serialport'
 require 'mysql2'
 require 'dotenv'
 
-require_relative "models/meterstand.rb"
-require_relative "lib/data_parsing/stream_splitter.rb"
-require_relative "lib/data_parsing/fake_stream_splitter.rb"
-require_relative "lib/output/database_writer.rb"
-require_relative "lib/output/last_measurement_store.rb"
-require_relative "lib/database_config.rb"
-require_relative "lib/recorder.rb"
+$LOAD_PATH << "lib"
+$LOAD_PATH << "models"
+require "meterstand"
+require "data_parsing/stream_splitter"
+require "data_parsing/fake_stream_splitter"
+require "output/database_writer"
+require "output/last_measurement_store"
+require "database_config"
+require "recorder"
 
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 

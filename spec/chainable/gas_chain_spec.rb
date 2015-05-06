@@ -1,6 +1,6 @@
 require 'spec_helper'
-require ROOT_PATH.join('lib/data_parsing/gas_chain.rb')
-require ROOT_PATH.join("models/measurement.rb")
+require 'measurement'
+require 'data_parsing/parse_chain/gas_chain'
 
 describe GasChain do
   describe :can_handle? do

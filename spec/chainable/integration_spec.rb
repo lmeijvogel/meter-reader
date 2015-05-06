@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'ostruct'
 
-require ROOT_PATH.join("lib/data_parsing/chainable.rb")
+require 'data_parsing/parse_chain/chainable'
 
 class TestChainable < Chainable
   def can_handle?(line)

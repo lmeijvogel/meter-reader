@@ -1,6 +1,6 @@
 require 'spec_helper'
-require ROOT_PATH.join("models/measurement.rb")
-require ROOT_PATH.join("lib/data_parsing/stroom_dal_chain.rb")
+require 'measurement'
+require 'data_parsing/parse_chain/stroom_dal_chain.rb'
 
 describe StroomDalChain do
   describe :can_handle? do

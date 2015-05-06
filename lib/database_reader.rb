@@ -1,5 +1,6 @@
 require 'ostruct'
-require_relative '../models/usage.rb'
+
+require 'usage'
 
 class DatabaseReader
   def initialize(client)

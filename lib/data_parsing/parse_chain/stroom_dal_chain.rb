@@ -1,5 +1,5 @@
-require_relative 'chainable'
-require_relative 'kwh_reader'
+require 'data_parsing/parse_chain/chainable'
+require 'data_parsing/kwh_reader'
 
 class StroomDalChain < Chainable
   # This is primarily for testing

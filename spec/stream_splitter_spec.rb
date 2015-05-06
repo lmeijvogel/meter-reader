@@ -1,5 +1,5 @@
 require 'spec_helper'
-require ROOT_PATH.join("lib/data_parsing/stream_splitter.rb")
+require 'data_parsing/stream_splitter'
 
 describe StreamSplitter do
   let(:io) { StringIO.new(example_data) }

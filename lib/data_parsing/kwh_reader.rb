@@ -1,4 +1,4 @@
-require_relative '../float_extensions.rb'
+require 'float_extensions'
 
 module KwhReader
   def read(line)

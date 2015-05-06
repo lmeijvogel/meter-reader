@@ -1,12 +1,12 @@
 require 'date'
 
-require_relative "../lib/data_parsing/gas_chain.rb"
-require_relative "../lib/data_parsing/stroom_dal_chain.rb"
-require_relative "../lib/data_parsing/stroom_current_chain.rb"
-require_relative "../lib/data_parsing/stroom_piek_chain.rb"
-require_relative "../lib/data_parsing/skip_line_chain.rb"
+require "data_parsing/parse_chain/gas_chain"
+require "data_parsing/parse_chain/stroom_dal_chain"
+require "data_parsing/parse_chain/stroom_current_chain"
+require "data_parsing/parse_chain/stroom_piek_chain"
+require "data_parsing/parse_chain/skip_line_chain"
 
-require_relative "measurement.rb"
+require "measurement"
 
 class Meterstand
   def initialize
