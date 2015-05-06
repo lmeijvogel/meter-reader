@@ -1,4 +1,4 @@
-require "measurement_parser"
+require "p1_meter_reader/models/measurement_parser"
 
 class Recorder
   def initialize(measurement_source:)

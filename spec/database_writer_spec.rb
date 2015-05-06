@@ -4,7 +4,7 @@ require 'spec_helper'
 
 require "float_extensions"
 require "output/database_writer"
-require "measurement"
+require "models/measurement"
 
 describe DatabaseWriter do
   describe :save do

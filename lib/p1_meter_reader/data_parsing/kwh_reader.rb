@@ -1,4 +1,4 @@
-require 'float_extensions'
+require 'p1_meter_reader/float_extensions'
 
 module KwhReader
   def read(line)

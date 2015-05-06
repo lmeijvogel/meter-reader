@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'measurement'
+require 'models/measurement'
 require 'data_parsing/parse_chain/stroom_piek_chain.rb'
 
 describe StroomPiekChain do

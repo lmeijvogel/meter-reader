@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'measurement'
+require 'models/measurement'
 require 'data_parsing/parse_chain/gas_chain'
 
 describe GasChain do

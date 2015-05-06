@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'timecop'
 
-require "measurement_parser"
+require "models/measurement_parser"
 
 describe "full integration" do
   describe :parse do

@@ -1,5 +1,5 @@
-require 'data_parsing/parse_chain/chainable'
-require 'data_parsing/kwh_reader'
+require 'p1_meter_reader/data_parsing/parse_chain/chainable'
+require 'p1_meter_reader/data_parsing/kwh_reader'
 
 class StroomCurrentChain < Chainable
   def can_handle?(line)

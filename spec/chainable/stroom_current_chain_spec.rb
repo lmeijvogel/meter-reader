@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'data_parsing/parse_chain/stroom_current_chain'
-require 'measurement'
+require 'models/measurement'
 
 describe StroomCurrentChain do
   describe :can_handle? do

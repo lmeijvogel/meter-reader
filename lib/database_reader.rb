@@ -1,6 +1,6 @@
 require 'ostruct'
 
-require 'usage'
+require 'models/usage'
 
 class DatabaseReader
   def initialize(client)

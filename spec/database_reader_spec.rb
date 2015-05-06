@@ -1,7 +1,7 @@
 require "spec_helper"
 require 'mysql2'
 
-require "usage"
+require "models/usage"
 require "output/database_writer"
 require "database_reader"
 require "float_extensions"

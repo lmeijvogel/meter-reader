@@ -4,13 +4,12 @@ require 'mysql2'
 require 'dotenv'
 
 $LOAD_PATH << "lib"
-$LOAD_PATH << "models"
-require "data_parsing/stream_splitter"
-require "data_parsing/fake_stream_splitter"
+require "p1_meter_reader/data_parsing/stream_splitter"
+require "p1_meter_reader/data_parsing/fake_stream_splitter"
 require "output/database_writer"
 require "output/last_measurement_store"
 require "database_config"
-require "recorder"
+require "p1_meter_reader/recorder"
 
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
