@@ -2,7 +2,8 @@ require 'pathname'
 require 'mysql2'
 require 'dotenv'
 
-$LOAD_PATH << "lib"
+$LOAD_PATH << File.expand_path("../lib", __FILE__)
+
 require "p1_meter_reader"
 require "output/database_writer"
 require "output/last_measurement_store"
