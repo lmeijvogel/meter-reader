@@ -1,6 +1,6 @@
 require 'ostruct'
 
-require 'models/usage'
+require 'p1_meter_reader/models/usage'
 
 class DatabaseReader
   def initialize(client)
@@ -17,7 +17,7 @@ class DatabaseReader
     GROUP BY #{granularity}"
 
     @client.query(query).map do |row|
-      usage = Usage.new
+      usage = P1MeterReader::Models::Usage.new
       usage.stroom_totaal = row["d_totaal"]
       usage.gas = row["d_gas"]
       usage.time_stamp = row["ts"].to_datetime

@@ -2,18 +2,17 @@ require 'yaml'
 require 'mysql2'
 require 'spec_helper'
 
-require "float_extensions"
 require "output/database_writer"
-require "models/measurement"
+require "p1_meter_reader/models/measurement"
 
 describe DatabaseWriter do
   describe :save do
     let(:time_stamp) { DateTime.now }
-    let(:stroom_dal) { 12.23.kWh }
-    let(:stroom_piek) { 23.34.kWh }
+    let(:stroom_dal) { 12.23 }
+    let(:stroom_piek) { 23.34 }
     let(:stroom_current) { 0.23 }
-    let(:diff_stroom_dal) { 14.23.kWh }
-    let(:diff_stroom_piek) { 15.23.kWh }
+    let(:diff_stroom_dal) { 14.23 }
+    let(:diff_stroom_piek) { 15.23 }
     let(:gas) { 12.23 }
 
     let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
@@ -26,7 +25,7 @@ describe DatabaseWriter do
     let(:writer) { DatabaseWriter.new(database_connection) }
 
     before do
-      @measurement = Measurement.new
+      @measurement = P1MeterReader::Models::Measurement.new
       @measurement.time_stamp = time_stamp
       @measurement.stroom_dal = stroom_dal
       @measurement.stroom_piek = stroom_piek
@@ -83,11 +82,11 @@ describe DatabaseWriter do
 
   describe :exists? do
     let(:existing_time_stamp) { DateTime.now }
-    let(:stroom_dal) { 12.23.kWh }
-    let(:stroom_piek) { 23.34.kWh }
+    let(:stroom_dal) { 12.23 }
+    let(:stroom_piek) { 23.34 }
     let(:stroom_current) { 0.23 }
-    let(:diff_stroom_dal) { 14.23.kWh }
-    let(:diff_stroom_piek) { 15.23.kWh }
+    let(:diff_stroom_dal) { 14.23 }
+    let(:diff_stroom_piek) { 15.23 }
     let(:gas) { 12.23 }
 
     let(:save_interval) { 30 }
@@ -102,7 +101,7 @@ describe DatabaseWriter do
     let(:writer) { DatabaseWriter.new(database_connection) }
 
     before do
-      @measurement = Measurement.new
+      @measurement = P1MeterReader::Models::Measurement.new
       @measurement.time_stamp = existing_time_stamp
       @measurement.stroom_dal = stroom_dal
       @measurement.stroom_piek = stroom_piek

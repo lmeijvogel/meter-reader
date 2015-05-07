@@ -1,15 +1,12 @@
 require 'pathname'
-require 'serialport'
 require 'mysql2'
 require 'dotenv'
 
 $LOAD_PATH << "lib"
-require "p1_meter_reader/data_parsing/stream_splitter"
-require "p1_meter_reader/data_parsing/fake_stream_splitter"
+require "p1_meter_reader"
 require "output/database_writer"
 require "output/last_measurement_store"
 require "database_config"
-require "p1_meter_reader/recorder"
 
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
@@ -25,12 +22,12 @@ database_writer.save_interval = 15
 last_measurement_store = LastMeasurementStore.new
 
 if environment == "production"
-  stream_splitter = StreamSplitter.new(serial_port, "/XMX5XMXABCE100129872")
+  stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new("/XMX5XMXABCE100129872")
 else
-  stream_splitter = FakeStreamSplitter.new
+  stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
 end
 
-recorder = Recorder.new(measurement_source: stream_splitter)
+recorder = P1MeterReader::Recorder.new(measurement_source: stream_splitter)
 
 recorder.collect_data do |measurement|
   database_writer.save_unless_exists(measurement)

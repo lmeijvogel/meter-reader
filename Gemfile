@@ -13,8 +13,8 @@ gem 'serialport'
 gem 'foreman'
 gem 'foreman-export-initscript', github: "metaquark/foreman-export-initscript"
 
+gem "p1_meter_reader"
 group :development do
-
   gem "guard"
   gem "guard-rspec"
   gem "timecop"

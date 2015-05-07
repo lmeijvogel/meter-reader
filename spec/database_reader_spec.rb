@@ -1,10 +1,9 @@
 require "spec_helper"
 require 'mysql2'
 
-require "models/usage"
+require "p1_meter_reader/models/usage"
 require "output/database_writer"
 require "database_reader"
-require "float_extensions"
 
 describe DatabaseReader do
   let(:time_stamp_1) { DateTime.now }
