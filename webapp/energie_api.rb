@@ -68,7 +68,7 @@ class EnergieApi < Sinatra::Base
 
     database_reader.year = DateTime.new(params[:year].to_i)
 
-    { measurements: database_reader.read() }.to_json
+    database_reader.read().to_json
   end
 
   get "/energy/current" do
