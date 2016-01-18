@@ -5,19 +5,21 @@ require "p1_meter_reader/models/usage"
 require "output/database_writer"
 require "database_reader"
 
+class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas)
+  def columns_str
+    members.join(", ")
+  end
+
+  def values_str
+    values
+      .map { |m| "'#{m}'" }
+      .join(", ")
+  end
+end
+
 describe DatabaseReader do
-  let(:time_stamp_1) { DateTime.now }
-  let(:stroom_dal_1) { 12.23 }
-  let(:stroom_piek_1) { 23.34 }
-  let(:gas_1) { 12.23 }
-
-  let(:time_stamp_2) { DateTime.now }
-  let(:stroom_dal_2) { 13.23 }
-  let(:stroom_piek_2) { 25.34 }
-  let(:gas_2) { 12.23 }
-
-  let(:stroom_totaal_1) { stroom_dal_1 + stroom_piek_1 }
-  let(:stroom_totaal_2) { stroom_dal_2 + stroom_piek_2 }
+  let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23 ) }
+  let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23 ) }
 
   let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
   let(:database_connection) { Mysql2::Client.new(host: config["host"],
@@ -31,24 +33,27 @@ describe DatabaseReader do
 
   before do
     database_connection.query("DELETE FROM measurements")
-    database_connection.query("INSERT INTO measurements(
-                              time_stamp, stroom_dal, stroom_piek, gas)
-                              VALUES ('#{time_stamp_1}', '#{stroom_dal_1}', '#{stroom_piek_1}', '#{gas_1}'),
-                                     ('#{time_stamp_2}', '#{stroom_dal_2}', '#{stroom_piek_2}', '#{gas_2}')")
+    [measurement_1, measurement_2].each do |measurement|
+      database_connection.query("INSERT INTO measurements(#{measurement.columns_str})
+                                VALUES (#{measurement.values_str})")
+    end
 
     reader.send(:granularity=, :hour)
     @usage = reader.read().first
   end
 
   it "sets the correct stroom_totaal" do
-    @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal_1)
+    stroom_totaal = measurement_1.stroom_dal + measurement_1.stroom_piek
+
+
+    @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal)
   end
 
   it "sets the correct gas" do
-    @usage.gas.should be_within(0.01).of(gas_1)
+    @usage.gas.should be_within(0.01).of(measurement_1.gas)
   end
 
   it "sets the correct time_stamp" do
-    @usage.time_stamp.to_s.should == time_stamp_1.to_s
+    @usage.time_stamp.to_s.should == measurement_1.time_stamp.to_s
   end
 end
