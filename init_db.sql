@@ -1,4 +1,4 @@
-DROP TABLE measurements;
+DROP TABLE IF EXISTS measurements;
 
 CREATE TABLE measurements (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
