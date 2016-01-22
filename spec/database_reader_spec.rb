@@ -1,5 +1,6 @@
 require "spec_helper"
 require 'mysql2'
+require 'yaml'
 
 require "p1_meter_reader/models/usage"
 require "output/database_writer"
@@ -18,9 +19,6 @@ class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas)
 end
 
 describe DatabaseReader do
-  let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23 ) }
-  let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23 ) }
-
   let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
   let(:database_connection) { Mysql2::Client.new(host: config["host"],
                                                  database: config["database"],
@@ -33,27 +31,107 @@ describe DatabaseReader do
 
   before do
     database_connection.query("DELETE FROM measurements")
-    [measurement_1, measurement_2].each do |measurement|
+
+    measurements.each do |measurement|
       database_connection.query("INSERT INTO measurements(#{measurement.columns_str})
                                 VALUES (#{measurement.values_str})")
     end
-
-    reader.send(:granularity=, :hour)
-    @usage = reader.read().first
   end
 
-  it "sets the correct stroom_totaal" do
-    stroom_totaal = measurement_1.stroom_dal + measurement_1.stroom_piek
+  describe "a single value" do
+    let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23 ) }
+    let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23 ) }
 
+    let(:measurements) { [measurement_1, measurement_2 ] }
 
-    @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal)
+    before do
+      now = DateTime.now
+      reader.day = DateTime.civil(now.year, now.month, now.day, 0, 0, 0, "+1")
+
+      @usage = reader.read().first
+    end
+
+    it "sets the correct stroom_totaal" do
+      stroom_totaal = measurement_1.stroom_dal + measurement_1.stroom_piek
+
+      @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal)
+    end
+
+    it "sets the correct gas" do
+      @usage.gas.should be_within(0.01).of(measurement_1.gas)
+    end
+
+    it "sets the correct time_stamp" do
+      @usage.time_stamp.to_s.should == measurement_1.time_stamp.to_s
+    end
   end
 
-  it "sets the correct gas" do
-    @usage.gas.should be_within(0.01).of(measurement_1.gas)
-  end
+  describe "multiple data" do
+    let(:measurement_day) {
+      now = DateTime.now
+      DateTime.civil(now.year, now.month, now.day)
+    }
 
-  it "sets the correct time_stamp" do
-    @usage.time_stamp.to_s.should == measurement_1.time_stamp.to_s
+    let(:base_date) {
+      DateTime.civil(measurement_day.year, measurement_day.month, measurement_day.day, 0, 0, 0, "+1")
+    }
+
+    let(:minute) { 1.0 / (24*60) }
+
+    let(:measurements) { [
+      Measurement.new( base_date, 11.23, 22.34, 11.23 ),
+      Measurement.new( base_date + 10*minute, 12.23, 23.34, 12.23 ),
+      Measurement.new( base_date + 30*minute, 14.23, 25.34, 14.23 ),
+      Measurement.new( base_date + 50*minute, 16.23, 27.34, 16.23 ),
+      Measurement.new( base_date + 60*minute, 15.23, 26.34, 15.23 ),
+      Measurement.new( base_date + 70*minute, 16.23, 27.34, 16.23 )
+    ] }
+
+    before do
+      now = DateTime.now
+      reader.day = DateTime.new(now.year, now.month, now.day)
+      result = reader.read
+
+      @first, @second, @last = result
+    end
+
+    it "returns the first measurement of the first hour" do
+      @first.time_stamp.to_s.should == base_date.to_s
+      @first.gas.should be_within(0.01).of(11.23)
+    end
+
+    it "returns the first measurement of the second hour" do
+      @second.time_stamp.to_s.should == (base_date + 60*minute).to_s
+      @second.gas.should be_within(0.01).of(15.23)
+    end
+
+    context "when the measurement is for today" do
+      it "adds a 'virtual' measurement of the current hour" do
+        now = DateTime.now
+        expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, "+1")
+
+        @last.time_stamp.to_s.should == expected.to_s
+        @last.gas.should be_within(0.01).of(16.23)
+      end
+    end
+
+    context "when the measurement is for a previous day" do
+      let(:measurement_day) {
+        now = DateTime.now - 1
+        DateTime.civil(now.year, now.month, now.day)
+      }
+
+      it "does not add a 'virtual' measurement" do
+        @last.should be_nil
+      end
+    end
+
+    it "also returns the latest measurement" do
+      now = DateTime.now
+      expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, "+1")
+
+      @last.time_stamp.to_s.should == expected.to_s
+      @last.gas.should be_within(0.01).of(16.23)
+    end
   end
 end
