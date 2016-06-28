@@ -6,6 +6,6 @@ $LOAD_PATH << "../models"
 
 require_relative 'energie_api.rb'
 
-map '/energie-api' do
+map '/api' do
   run EnergieApi
 end
