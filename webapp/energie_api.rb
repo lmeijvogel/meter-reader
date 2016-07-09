@@ -75,10 +75,12 @@ class EnergieApi < Sinatra::Base
     begin
       result = JSON.parse(LastMeasurementStore.new.load)
 
-      @id = result["id"];
-      @current_measurement = result["stroom_current"]
-
-      { id: @id, current: @current_measurement }.to_json
+      { id: result["id"],
+        current: result["stroom_current"],
+        stroom_piek: result["stroom_piek"],
+        stroom_dal: result["stroom_dal"],
+        gas: result["gas"]
+      }.to_json
     rescue LastMeasurementStore::NoMeasurementFound
       status 404
       "Not found"
