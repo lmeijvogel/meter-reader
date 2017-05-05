@@ -46,7 +46,9 @@ describe DatabaseReader do
 
     before do
       now = DateTime.now
-      reader.day = DateTime.civil(now.year, now.month, now.day, 0, 0, 0, "+1")
+
+      time_offset = Time.now.dst? ? "+2" : "+1"
+      reader.day = DateTime.civil(now.year, now.month, now.day, 0, 0, 0, time_offset)
 
       @usage = reader.read().first
     end
@@ -73,7 +75,8 @@ describe DatabaseReader do
     }
 
     let(:base_date) {
-      DateTime.civil(measurement_day.year, measurement_day.month, measurement_day.day, 0, 0, 0, "+1")
+      time_offset = Time.now.dst? ? "+2" : "+1"
+      DateTime.civil(measurement_day.year, measurement_day.month, measurement_day.day, 0, 0, 0, time_offset)
     }
 
     let(:minute) { 1.0 / (24*60) }
@@ -108,7 +111,9 @@ describe DatabaseReader do
     context "when the measurement is for today" do
       it "adds a 'virtual' measurement of the current hour" do
         now = DateTime.now
-        expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, "+1")
+        time_offset = Time.now.dst? ? "+2" : "+1"
+
+        expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, time_offset)
 
         @last.time_stamp.to_s.should == expected.to_s
         @last.gas.should be_within(0.01).of(16.23)
@@ -128,7 +133,8 @@ describe DatabaseReader do
 
     it "also returns the latest measurement" do
       now = DateTime.now
-      expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, "+1")
+      time_offset = Time.now.dst? ? "+2" : "+1"
+      expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, time_offset)
 
       @last.time_stamp.to_s.should == expected.to_s
       @last.gas.should be_within(0.01).of(16.23)
