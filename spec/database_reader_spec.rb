@@ -56,15 +56,15 @@ describe DatabaseReader do
     it "sets the correct stroom_totaal" do
       stroom_totaal = measurement_1.stroom_dal + measurement_1.stroom_piek
 
-      @usage.stroom_totaal.should be_within(0.01).of(stroom_totaal)
+      expect(@usage.stroom_totaal).to be_within(0.01).of(stroom_totaal)
     end
 
     it "sets the correct gas" do
-      @usage.gas.should be_within(0.01).of(measurement_1.gas)
+      expect(@usage.gas).to be_within(0.01).of(measurement_1.gas)
     end
 
     it "sets the correct time_stamp" do
-      @usage.time_stamp.to_s.should == measurement_1.time_stamp.to_s
+      expect(@usage.time_stamp.to_s).to eql measurement_1.time_stamp.to_s
     end
   end
 
@@ -99,13 +99,13 @@ describe DatabaseReader do
     end
 
     it "returns the first measurement of the first hour" do
-      @first.time_stamp.to_s.should == base_date.to_s
-      @first.gas.should be_within(0.01).of(11.23)
+      expect(@first.time_stamp.to_s).to eql base_date.to_s
+      expect(@first.gas).to be_within(0.01).of(11.23)
     end
 
     it "returns the first measurement of the second hour" do
-      @second.time_stamp.to_s.should == (base_date + 60*minute).to_s
-      @second.gas.should be_within(0.01).of(15.23)
+      expect(@second.time_stamp.to_s).to eql (base_date + 60*minute).to_s
+      expect(@second.gas).to be_within(0.01).of(15.23)
     end
 
     context "when the measurement is for today" do
@@ -115,8 +115,8 @@ describe DatabaseReader do
 
         expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, time_offset)
 
-        @last.time_stamp.to_s.should == expected.to_s
-        @last.gas.should be_within(0.01).of(16.23)
+        expect(@last.time_stamp.to_s).to eql expected.to_s
+        expect(@last.gas).to be_within(0.01).of(16.23)
       end
     end
 
@@ -127,7 +127,7 @@ describe DatabaseReader do
       }
 
       it "does not add a 'virtual' measurement" do
-        @last.should be_nil
+        expect(@lasti).to be_nil
       end
     end
 
@@ -136,8 +136,8 @@ describe DatabaseReader do
       time_offset = Time.now.dst? ? "+2" : "+1"
       expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, time_offset)
 
-      @last.time_stamp.to_s.should == expected.to_s
-      @last.gas.should be_within(0.01).of(16.23)
+      expect(@last.time_stamp.to_s).to eql expected.to_s
+      expect(@last.gas).to be_within(0.01).of(16.23)
     end
   end
 end

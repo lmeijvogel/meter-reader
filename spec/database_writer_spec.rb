@@ -51,31 +51,31 @@ describe DatabaseWriter do
       end
 
       it "should have the correct stroom_dal" do
-        subject["stroom_dal"].should == stroom_dal.to_f
+        expect(subject["stroom_dal"]).to eql stroom_dal.to_f
       end
 
       it "should have the correct stroom_piek" do
-        subject["stroom_piek"].should == stroom_piek.to_f
+        expect(subject["stroom_piek"]).to eql stroom_piek.to_f
       end
 
       it "should have the correct diff_stroom_dal" do
-        subject["diff_stroom_dal"].should == diff_stroom_dal.to_f
+        expect(subject["diff_stroom_dal"]).to eql diff_stroom_dal.to_f
       end
 
       it "should have the correct diff_stroom_piek" do
-        subject["diff_stroom_piek"].should == diff_stroom_piek.to_f
+        expect(subject["diff_stroom_piek"]).to eql diff_stroom_piek.to_f
       end
 
       it "should have the correct stroom_current" do
-        subject["stroom_current"].should == stroom_current
+        expect(subject["stroom_current"]).to eql stroom_current
       end
 
       it "should have the correct gas" do
-        subject["gas"].should == gas
+        expect(subject["gas"]).to eql gas
       end
 
       it "should have the correct timestamp" do
-        subject["time_stamp"].to_datetime.to_s.should == time_stamp.to_s
+        expect(subject["time_stamp"].to_datetime.to_s).to eql time_stamp.to_s
       end
     end
   end
@@ -121,7 +121,7 @@ describe DatabaseWriter do
       let(:new_time_stamp) { DateTime.now + (save_interval / 2.0)/(24*60) }
 
       it "is true" do
-        expect(writer.send(:exists?, @measurement)).to be_true
+        expect(writer.send(:exists?, @measurement)).to be true
       end
     end
 
@@ -130,7 +130,7 @@ describe DatabaseWriter do
       let(:new_time_stamp)      { DateTime.civil(2014, 11, 20, 20, 0, 50) }
 
       it "is true" do
-        expect(writer.send(:exists?, @measurement)).to be_true
+        expect(writer.send(:exists?, @measurement)).to be true
       end
     end
 
@@ -138,7 +138,7 @@ describe DatabaseWriter do
       let(:new_time_stamp) { DateTime.now + (save_interval + 1.0)/(24*60) }
 
       it "is false" do
-        expect(writer.send(:exists?, @measurement)).to be_false
+        expect(writer.send(:exists?, @measurement)).to be false
       end
     end
   end
