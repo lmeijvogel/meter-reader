@@ -15,6 +15,7 @@ gem 'foreman-export-initscript', git: "git@github.com:metaquark/foreman-export-i
 
 gem "p1_meter_reader"
 group :development do
+  gem "byebug"
   gem "guard"
   gem "guard-rspec"
   gem "timecop"
