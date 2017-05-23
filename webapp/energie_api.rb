@@ -13,6 +13,11 @@ require 'database_config'
 require 'database_reader'
 require 'output/last_measurement_store'
 
+require 'webapp/results_cache'
+require 'webapp/day_cache_descriptor'
+require 'webapp/month_cache_descriptor'
+require 'webapp/year_cache_descriptor'
+
 NoPasswordsFile = Class.new(StandardError)
 UsernameNotFound = Class.new(StandardError)
 
@@ -20,6 +25,8 @@ ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 Dotenv.load
 
 set :bind, '0.0.0.0'
+
+set :port, 8000
 
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
@@ -56,19 +63,27 @@ class EnergieApi < Sinatra::Base
   end
 
   get "/month/:year/:month" do
-    database_reader = DatabaseReader.new($database_connection)
+    month = DateTime.new(params[:year].to_i, params[:month].to_i, 1)
 
-    database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
+    cached(:month, month) do
+      database_reader = DatabaseReader.new($database_connection)
 
-    database_reader.read().to_json
+      database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
+
+      database_reader.read().to_json
+    end
   end
 
   get "/year/:year" do
-    database_reader = DatabaseReader.new($database_connection)
+    year = DateTime.new(params[:year].to_i, 1, 1)
 
-    database_reader.year = DateTime.new(params[:year].to_i)
+    cached(:year, year) do
+      database_reader = DatabaseReader.new($database_connection)
 
-    database_reader.read().to_json
+      database_reader.year = DateTime.new(params[:year].to_i)
+
+      database_reader.read().to_json
+    end
   end
 
   get "/energy/current" do
@@ -88,20 +103,18 @@ class EnergieApi < Sinatra::Base
   end
 
   def cached(prefix, date)
-    cache_file = ROOT_PATH.join("tmp", "cache", "#{prefix}_#{date.year}_#{date.month}_#{date.day}")
+    cache_dir = ROOT_PATH.join("tmp", "cache")
 
-    should_cache = production? && date < Date.today
-    if should_cache
-      if File.exist?(cache_file)
-        File.read(cache_file)
-      else
-        contents = yield
-        File.open(cache_file, "w") do |file|
-          file.write contents
-        end
-        contents
-      end
-    else
+    cache_descriptor = case prefix
+    when :year
+      YearCacheDescriptor.new(date, cache_dir)
+    when :month
+      MonthCacheDescriptor.new(date, cache_dir)
+    when :day
+      DayCacheDescriptor.new(date, cache_dir)
+    end
+
+    ResultsCache.new(date, descriptor: cache_descriptor).cached do
       yield
     end
   end
