@@ -26,6 +26,8 @@ Dotenv.load
 
 set :bind, '0.0.0.0'
 
+set :port, 8000
+
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
 $database_connection = Mysql2::Client.new(DatabaseConfig.for(settings.environment))
