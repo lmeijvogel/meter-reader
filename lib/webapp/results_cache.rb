@@ -14,8 +14,16 @@ class ResultsCache
 
     if cacheable
       if File.exist?(filename)
+        if @cache_descriptor.data_fixed?
+          STDOUT.puts "Reading from cache: #{filename}"
+        elsif @cache_descriptor.temporary_cache_fresh?
+          STDOUT.puts "Reading from temporary cache: #{filename}"
+        end
+
         return File.read(filename)
       else
+        STDOUT.puts "Writing to cache: #{filename}"
+
         data = yield
 
         File.open(filename, "w") do |file|
@@ -25,6 +33,7 @@ class ResultsCache
         return data
       end
     else
+      STDOUT.puts "Deleting stale temporary cache: #{filename}"
       FileUtils.rm_f(filename)
 
       yield
