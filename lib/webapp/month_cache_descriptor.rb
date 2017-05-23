@@ -18,6 +18,6 @@ class MonthCacheDescriptor
   def temporary_cache_fresh?
     yesterday = Time.now - 86400
 
-    File.mtime(filename) > yesterday
+    File.exist?(filename) && (File.mtime(filename) > yesterday)
   end
 end
