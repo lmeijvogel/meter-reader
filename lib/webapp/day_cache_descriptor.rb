@@ -1,7 +1,7 @@
 class DayCacheDescriptor
   def initialize(date, cache_dir)
     @cache_dir = cache_dir
-    @date = date
+    @date = date.to_time
   end
 
   def filename
