@@ -14,17 +14,29 @@ class DatabaseReader
       TRUNCATE(MIN(gas),3) as d_gas
     FROM measurements
     #{where}
-    GROUP BY #{granularity}
-    #{optional_union_with_last}"
+    GROUP BY #{granularity}"
 
-    @client.query(query).map do |row|
-      usage = P1MeterReader::Models::Usage.new
-      usage.stroom_totaal = row["d_totaal"]
-      usage.gas = row["d_gas"]
-      usage.time_stamp = row["ts"].to_datetime
-
-      usage
+    result = @client.query(query).map do |row|
+      to_usage(row)
     end
+
+    if is_last_of_current_period?
+      last_entry_query = "SELECT
+        #{next_timestamp} as ts,
+        TRUNCATE(stroom_piek+stroom_dal,3) as d_totaal,
+        TRUNCATE(gas,3) as d_gas
+      FROM measurements
+      ORDER BY id DESC
+      LIMIT 1"
+
+      last_entry_result = @client.query(last_entry_query).map do |row|
+        to_usage(row)
+      end
+
+      result.concat(last_entry_result)
+    end
+
+    result
   end
 
   def day=(date)
@@ -86,18 +98,6 @@ class DatabaseReader
   attr_accessor :where
   attr_writer :granularity
 
-  def optional_union_with_last
-    if is_last_of_current_period?
-      return <<-QUERY
-        UNION SELECT
-          #{next_timestamp} as ts,
-          TRUNCATE(MAX(stroom_piek+stroom_dal),3) as d_totaal,
-          TRUNCATE(MAX(gas),3) as d_gas
-        FROM measurements
-      QUERY
-    end
-  end
-
   private
   def adjusted_time_stamp
     "time_stamp"
@@ -118,5 +118,14 @@ class DatabaseReader
 
   def sql_date(date)
     %Q|str_to_date('#{date.to_datetime.strftime("%Y-%m-%d %H:%M:%S")}', "%Y-%m-%d %H:%i:%S")|
+  end
+
+  def to_usage(row)
+    usage = P1MeterReader::Models::Usage.new
+    usage.stroom_totaal = row["d_totaal"]
+    usage.gas = row["d_gas"]
+    usage.time_stamp = row["ts"].to_datetime
+
+    usage
   end
 end
