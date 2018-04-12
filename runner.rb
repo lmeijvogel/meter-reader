@@ -13,24 +13,51 @@ ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
 Dotenv.load
 
-environment = ENV.fetch('ENVIRONMENT')
+def main
+  environment = ENV.fetch('ENVIRONMENT')
 
-database_connection = Mysql2::Client.new(DatabaseConfig.for(environment))
+  database_connection = with_retries(log_message_format: "Retrying SQL connection (%d/%d)") do
+    Mysql2::Client.new(DatabaseConfig.for(environment))
+  end
 
-database_writer = DatabaseWriter.new(database_connection)
-database_writer.save_interval = 15
+  database_writer = DatabaseWriter.new(database_connection)
+  database_writer.save_interval = 15
 
-last_measurement_store = LastMeasurementStore.new
+  last_measurement_store = LastMeasurementStore.new
 
-if environment == "production"
-  stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new("/XMX5XMXABCE100129872")
-else
-  stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
+  if environment == "production"
+    stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new("/XMX5XMXABCE100129872")
+  else
+    puts "Fake stream splitter"
+    stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
+  end
+
+  recorder = P1MeterReader::Recorder.new(measurement_source: stream_splitter)
+
+  recorder.collect_data do |measurement|
+    database_writer.save_unless_exists(measurement)
+    last_measurement_store.save(measurement)
+  end
 end
 
-recorder = P1MeterReader::Recorder.new(measurement_source: stream_splitter)
+def with_retries(max_tries: 5, log_message_format: "Retrying (%d/%d)")
+  tries = 0
 
-recorder.collect_data do |measurement|
-  database_writer.save_unless_exists(measurement)
-  last_measurement_store.save(measurement)
+  begin
+    yield
+  rescue Mysql2::Error
+    tries += 1
+
+    if (tries > max_tries)
+      raise
+    end
+
+    puts format(log_message_format, tries, max_tries)
+    sleep 2
+
+    retry
+  end
 end
+
+puts "Starting..."
+main
