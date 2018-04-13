@@ -22,6 +22,6 @@ class DatabaseConfig
   def self.database_config
     erb_content = File.read(ROOT_PATH.join("database.yml"))
 
-    ERB.new(erb_content).result
+    ERB.new(erb_content).result(binding)
   end
 end
