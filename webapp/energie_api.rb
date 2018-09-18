@@ -24,15 +24,40 @@ UsernameNotFound = Class.new(StandardError)
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 Dotenv.load
 
+require 'sinatra/reloader' if development?
+
+File.open('/tmp/logfile', "w") do |logfile|
+  if development?
+    logfile.puts "DEVELOPMENT!"
+  else
+    logfile.puts "NOT DEVELOPMENT"
+  end
+
+  logfile.flush
+end
 set :bind, '0.0.0.0'
 
 set :port, 8000
 
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
 
-$database_connection = Mysql2::Client.new(DatabaseConfig.for(settings.environment))
+class DatabaseConnectionFactory
+  def initialize(database_config)
+    @database_config = database_config
+  end
+
+  def with_connection
+    connection = Mysql2::Client.new(@database_config)
+
+    yield connection
+  ensure
+    connection.close
+  end
+end
 
 class EnergieApi < Sinatra::Base
+  connection_factory = DatabaseConnectionFactory.new(DatabaseConfig.for(settings.environment))
+
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
@@ -54,7 +79,7 @@ class EnergieApi < Sinatra::Base
     day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
     cached(:day, day) do
-      database_reader = DatabaseReader.new($database_connection)
+      database_reader = DatabaseReader.new(connection_factory)
 
       database_reader.day = day
 
@@ -66,7 +91,7 @@ class EnergieApi < Sinatra::Base
     month = DateTime.new(params[:year].to_i, params[:month].to_i, 1)
 
     cached(:month, month) do
-      database_reader = DatabaseReader.new($database_connection)
+      database_reader = DatabaseReader.new(connection_factory)
 
       database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
 
@@ -78,7 +103,7 @@ class EnergieApi < Sinatra::Base
     year = DateTime.new(params[:year].to_i, 1, 1)
 
     cached(:year, year) do
-      database_reader = DatabaseReader.new($database_connection)
+      database_reader = DatabaseReader.new(connection_factory)
 
       database_reader.year = DateTime.new(params[:year].to_i)
 

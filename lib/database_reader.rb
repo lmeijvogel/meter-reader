@@ -3,8 +3,8 @@ require 'ostruct'
 require 'p1_meter_reader/models/usage'
 
 class DatabaseReader
-  def initialize(client)
-    @client = client
+  def initialize(connection_factory)
+    @connection_factory = connection_factory
   end
 
   def read
@@ -16,27 +16,29 @@ class DatabaseReader
     #{where}
     GROUP BY #{granularity}"
 
-    result = @client.query(query).map do |row|
-      to_usage(row)
-    end
-
-    if is_last_of_current_period?
-      last_entry_query = "SELECT
-        #{next_timestamp} as ts,
-        TRUNCATE(stroom_piek+stroom_dal,3) as d_totaal,
-        TRUNCATE(gas,3) as d_gas
-      FROM measurements
-      ORDER BY id DESC
-      LIMIT 1"
-
-      last_entry_result = @client.query(last_entry_query).map do |row|
+    @connection_factory.with_connection do |connection|
+      result = connection.query(query).map do |row|
         to_usage(row)
       end
 
-      result.concat(last_entry_result)
-    end
+      if is_last_of_current_period?
+        last_entry_query = "SELECT
+          #{next_timestamp} as ts,
+          TRUNCATE(stroom_piek+stroom_dal,3) as d_totaal,
+          TRUNCATE(gas,3) as d_gas
+        FROM measurements
+        ORDER BY id DESC
+        LIMIT 1"
 
-    result
+        last_entry_result = connection.query(last_entry_query).map do |row|
+          to_usage(row)
+        end
+
+        result.concat(last_entry_result)
+      end
+
+      result
+    end
   end
 
   def day=(date)
