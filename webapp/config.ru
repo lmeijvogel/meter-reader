@@ -17,7 +17,7 @@ if run_static_site
 
     set :public_folder, REACT_BUILD_PATH
 
-    get '/' do
+    get '/*' do
       File.read(File.join(REACT_BUILD_PATH, "index.html"))
     end
   end
