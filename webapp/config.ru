@@ -1,21 +1,24 @@
 require 'rubygems'
 require 'sinatra'
+require 'logger'
 
 $LOAD_PATH << "../lib"
 $LOAD_PATH << "../models"
 
 require_relative 'energie_api.rb'
 
+set :logger, Logger.new(STDOUT)
+
 run_static_site = ENV.fetch("RACK_ENV") != "production"
 
 if run_static_site
   static_controller = Sinatra.new do
-    ELM_BUILD_PATH = File.dirname(__FILE__) + '/../../elm/out'
+    REACT_BUILD_PATH = File.dirname(__FILE__) + '/../../../meter-reader-react/build'
 
-    set :public_folder, ELM_BUILD_PATH
+    set :public_folder, REACT_BUILD_PATH
 
     get '/' do
-      File.read(File.join(ELM_BUILD_PATH, "index.html"))
+      File.read(File.join(REACT_BUILD_PATH, "index.html"))
     end
   end
 end
