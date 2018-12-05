@@ -37,6 +37,18 @@ describe YearCacheDescriptor do
       end
     end
 
+    # Regression:
+    #
+    # The code used to compare `date < current_month`, but `date` is given
+    # as january 1 in the current year. So in practice, it would always be true.
+    context 'when the data is a few months ago' do
+      it 'returns false' do
+        subject = YearCacheDescriptor.new(Time.new(2017, 1, 1), "/my_tmp_dir")
+
+        expect(subject.data_fixed?).to be false
+      end
+    end
+
     context 'when viewing a previous year' do
       it 'returns true' do
         subject = YearCacheDescriptor.new(Time.new(2016, 4, 1), "/my_tmp_dir")

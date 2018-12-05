@@ -9,14 +9,21 @@ class YearCacheDescriptor
   end
 
   def data_fixed?
-    @date < beginning_of_month
+    !viewing_current_year?
   end
 
   def temporary_cache_fresh?
-    File.mtime(filename) > beginning_of_month
+    beginning_of_month < File.mtime(filename)
   end
 
   private
+
+  def viewing_current_year?
+    now = Time.now
+
+    @date.year == now.year
+  end
+
   def beginning_of_month
     now = Time.now
 
