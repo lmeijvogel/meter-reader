@@ -69,6 +69,18 @@ describe YearCacheDescriptor do
       Timecop.return
     end
 
+    context 'when the cache was created a few months ago' do
+      it 'returns false' do
+        cache_date = Time.new(2017, 2, 18)
+        subject = YearCacheDescriptor.new(Time.new(2017, 2, 18), tmpdir)
+
+        FileUtils.touch(subject.filename)
+        File.utime(cache_date, cache_date, subject.filename)
+
+        expect(subject.temporary_cache_fresh?).to be false
+      end
+    end
+
     context 'when the cache was created in the previous month' do
       it 'returns false' do
         cache_date = Time.new(2017, 4, 18)
