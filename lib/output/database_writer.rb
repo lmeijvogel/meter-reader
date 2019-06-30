@@ -1,17 +1,23 @@
 class DatabaseWriter
   attr_accessor :save_interval
 
-  def initialize(database_connection)
-    @database_connection = database_connection
+  def initialize(database_connection_factory)
+    @database_connection_factory = database_connection_factory
     self.save_interval = 0
   end
 
   def save_unless_exists(measurement)
-    save(measurement) unless exists?(measurement)
+    database_connection = @database_connection_factory.create
+
+    begin
+      save(measurement, database_connection) unless exists?(measurement, database_connection)
+    ensure
+      database_connection.close
+    end
   end
 
-  def save(measurement)
-    c = @database_connection
+  def save(measurement, database_connection)
+    c = database_connection
     query = <<-QUERY
       INSERT INTO measurements(time_stamp, time_stamp_utc, stroom_dal, stroom_piek, stroom_current, diff_stroom_dal, diff_stroom_piek, gas) VALUES(
       '#{c.escape measurement.time_stamp.strftime("%FT%T")}',
@@ -25,11 +31,11 @@ class DatabaseWriter
       )
     QUERY
 
-    @database_connection.query( query )
+    database_connection.query(query)
   end
 
   private
-  def exists?(measurement)
+  def exists?(measurement, database_connection)
     sql_date_format  = "%Y-%m-%d %H:%i:%S"
     ruby_date_format = "%Y-%m-%d %H:%M:%S"
 
@@ -39,7 +45,7 @@ class DatabaseWriter
     formatted_start_time = previous_half_hour.strftime(ruby_date_format)
     formatted_end_time   = measurement.time_stamp.strftime(ruby_date_format)
 
-    c = @database_connection
+    c = database_connection
     escaped_start_time  = c.escape formatted_start_time
     escaped_end_time    = c.escape formatted_end_time
 
@@ -49,6 +55,6 @@ class DatabaseWriter
       AND   time_stamp <=  str_to_date('#{escaped_end_time}',   '#{sql_date_format}')
     QUERY
 
-    @database_connection.query(exists_query).any?
+    database_connection.query(exists_query).any?
   end
 end
