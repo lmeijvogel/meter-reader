@@ -21,8 +21,6 @@ class LastMeasurementStore
       stroom_dal:       measurement.stroom_dal.to_f,
       stroom_piek:      measurement.stroom_piek.to_f,
       stroom_current:   measurement.stroom_current.to_f,
-      diff_stroom_dal:  measurement.diff_stroom_dal.to_f,
-      diff_stroom_piek: measurement.diff_stroom_piek.to_f,
       gas:              measurement.gas.to_f
     }
 
