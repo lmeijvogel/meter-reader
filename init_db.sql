@@ -8,6 +8,7 @@ CREATE TABLE measurements (
   stroom_piek FLOAT,
   stroom_current FLOAT,
   gas FLOAT,
+  water FLOAT,
 
   diff_stroom_dal FLOAT,
   diff_stroom_piek FLOAT,
