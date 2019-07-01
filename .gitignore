@@ -4,3 +4,4 @@ database.yml
 passwords
 webapp/session_secret.txt
 webapp/.env
+docker/mariadb

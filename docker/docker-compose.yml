@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=meterstanden_test
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${PWD}/mariadb:/var/lib/mysql
