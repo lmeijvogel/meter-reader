@@ -5,7 +5,7 @@ gem "dotenv"
 gem "mysql2"
 gem "p1_meter_reader", git: "https://github.com/lmeijvogel/p1_meter_reader_gem", branch: "report_water_usage"
 gem "serialport"
-gem "sinatra"
+gem "sinatra", ">= 2.0.5"
 gem "thin"
 
 group :development do
