@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
-gem "bcrypt"
+# Can't compile bcrypt 3.1.13 on Raspberry Pi?
+gem "bcrypt", "=3.1.12"
 gem "dotenv"
 gem "mysql2"
 gem "p1_meter_reader", git: "https://github.com/lmeijvogel/p1_meter_reader_gem", branch: "report_water_usage"
