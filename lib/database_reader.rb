@@ -11,7 +11,8 @@ class DatabaseReader
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
       TRUNCATE(MIN(stroom_piek+stroom_dal),3) as d_totaal,
-      TRUNCATE(MIN(gas),3) as d_gas
+      TRUNCATE(MIN(gas),3) as d_gas,
+      TRUNCATE(MIN(water), 3) as d_water
     FROM measurements
     #{where}
     GROUP BY #{granularity}"
@@ -25,7 +26,8 @@ class DatabaseReader
         last_entry_query = "SELECT
           #{next_timestamp} as ts,
           TRUNCATE(stroom_piek+stroom_dal,3) as d_totaal,
-          TRUNCATE(gas,3) as d_gas
+          TRUNCATE(gas,3) as d_gas,
+          TRUNCATE(water,3) as d_water
         FROM measurements
         ORDER BY id DESC
         LIMIT 1"
@@ -97,10 +99,12 @@ class DatabaseReader
   end
 
   protected
+
   attr_accessor :where
   attr_writer :granularity
 
   private
+
   def adjusted_time_stamp
     "time_stamp"
   end
@@ -126,6 +130,7 @@ class DatabaseReader
     usage = P1MeterReader::Models::Usage.new
     usage.stroom_totaal = row["d_totaal"]
     usage.gas = row["d_gas"]
+    usage.water = row["d_water"]
     usage.time_stamp = row["ts"].to_datetime
 
     usage
