@@ -13,7 +13,7 @@ run_static_site = ENV.fetch("RACK_ENV") != "production"
 
 if run_static_site
   static_controller = Sinatra.new do
-    REACT_BUILD_PATH = File.dirname(__FILE__) + '/../../../meter-reader-react/build'
+    REACT_BUILD_PATH = File.join(__dir__, "../../meter-reader-react/build")
 
     set :public_folder, REACT_BUILD_PATH
 
