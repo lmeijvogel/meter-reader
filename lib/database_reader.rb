@@ -130,7 +130,18 @@ class DatabaseReader
   def next_timestamp
     case @granularity
     when :hour
-      "DATE_SUB(DATE_SUB(DATE_ADD(NOW(), INTERVAL 1 HOUR), INTERVAL MINUTE(NOW()) MINUTE), INTERVAL SECOND(NOW()) SECOND)"
+      # Add 3 hours because timezones?!
+      <<~HOUR
+      DATE_SUB(
+        DATE_SUB(
+          DATE_ADD(NOW(), INTERVAL 1 HOUR)
+          , INTERVAL MINUTE(
+          NOW()
+          ) MINUTE
+        )
+        , INTERVAL SECOND(NOW()) SECOND
+      )
+      HOUR
     when :day
       "DATE_ADD(CURDATE(), INTERVAL 1 DAY)"
     when :month
