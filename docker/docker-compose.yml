@@ -2,10 +2,11 @@ version: '2'
 
 services:
   db:
-    image: mariadb:latest
+    build: .
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
       - MYSQL_DATABASE=meterstanden_test
+      - TZ=Europe/Amsterdam
     ports:
       - "3306:3306"
     volumes:
