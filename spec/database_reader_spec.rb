@@ -3,16 +3,16 @@ require 'mysql2'
 require 'yaml'
 
 require "p1_meter_reader/models/usage"
-require "output/database_writer"
 require "database_reader"
 
-class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas)
+class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :water)
   def columns_str
     members.join(", ")
   end
 
   def values_str
-    values
+    time_stamp = values[0].strftime("%d-%m-%y %H:%M")
+    ([time_stamp] + values[1..-1])
       .map { |m| "'#{m}'" }
       .join(", ")
   end
