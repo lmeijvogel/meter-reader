@@ -18,9 +18,14 @@ class DatabaseConnectionFactory
     @environment = environment
   end
 
-  def create
+  def with_connection
     with_retries(log_message_format: "Retrying SQL connection (%d/%d)") do
-      Mysql2::Client.new(DatabaseConfig.for(@environment))
+      connection = Mysql2::Client.new(DatabaseConfig.for(@environment))
+      begin
+        yield connection
+      ensure
+        connection.close
+      end
     end
   end
 
@@ -32,7 +37,8 @@ class DatabaseConnectionFactory
 
     begin
       yield
-    rescue Mysql2::Error
+    rescue Mysql2::Error => e
+      puts "Error: #{e.message}"
       tries += 1
 
       if tries > max_tries
