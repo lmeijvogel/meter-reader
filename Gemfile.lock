@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/lmeijvogel/p1_meter_reader_gem
-  revision: 76f0acf2e312464f0b1ad0184a6a6ebf50ebaea3
+  revision: bebccefa878d011db003c103ec3b247116f1cc2c
   branch: report_water_usage
   specs:
     p1_meter_reader (0.2.0)

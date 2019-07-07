@@ -98,6 +98,24 @@ class DatabaseReader
     return @start_date.strftime(comparison_format) == DateTime.now.strftime(comparison_format)
   end
 
+  def last_measurement
+    query = <<~QUERY
+      SELECT
+        #{adjusted_time_stamp} AS ts,
+        stroom_piek+stroom_dal AS d_totaal,
+        gas AS d_gas,
+        water AS d_water
+      FROM measurements
+      WHERE id = (SELECT MAX(id) FROM measurements)
+    QUERY
+
+    @connection_factory.with_connection do |connection|
+      row = connection.query(query).first
+
+      return to_usage(row)
+    end
+  end
+
   protected
 
   attr_accessor :where
