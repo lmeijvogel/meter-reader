@@ -119,7 +119,8 @@ class EnergieApi < Sinatra::Base
         current: result["stroom_current"],
         stroom_piek: result["stroom_piek"],
         stroom_dal: result["stroom_dal"],
-        gas: result["gas"]
+        gas: result["gas"],
+        water: result["water"]
       }.to_json
     rescue LastMeasurementStore::NoMeasurementFound
       status 404
