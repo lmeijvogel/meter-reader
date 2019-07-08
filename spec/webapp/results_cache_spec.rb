@@ -13,13 +13,16 @@ describe ResultsCache do
 
   subject(:results_cache) { ResultsCache.new(date, descriptor: descriptor) }
   let(:cache_filename) { File.join(tmpdir, "#{SecureRandom.hex}.txt") }
-  let(:descriptor) { instance_double("DayCacheDescriptor", filename: cache_filename) }
+  let(:descriptor) { instance_double("DayCacheDescriptor", filename: cache_filename, should_delete_cache?: should_delete_cache ) }
+  let(:should_delete_cache) { true }
+  let(:one_day) { 60*60*24 }
 
   context "when the data won't change anymore" do
-    let(:date) { Date.today }
+    let(:date) { Date.today - one_day }
 
     before do
       allow(descriptor).to receive(:data_fixed?).and_return(true)
+      allow(descriptor).to receive(:should_delete_cache?).and_return(false)
     end
 
     context "and it is cached" do

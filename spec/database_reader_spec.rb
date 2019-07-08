@@ -3,6 +3,7 @@ require 'mysql2'
 require 'yaml'
 
 require "p1_meter_reader/models/usage"
+require "database_connection_factory"
 require "database_reader"
 
 class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :water)
@@ -11,7 +12,7 @@ class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :wa
   end
 
   def values_str
-    time_stamp = values[0].strftime("%d-%m-%y %H:%M")
+    time_stamp = values[0].strftime("%Y-%m-%d %H:%M:%S")
     ([time_stamp] + values[1..-1])
       .map { |m| "'#{m}'" }
       .join(", ")
@@ -19,28 +20,27 @@ class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :wa
 end
 
 describe DatabaseReader do
-  let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
-  let(:database_connection) { Mysql2::Client.new(host: config["host"],
-                                                 database: config["database"],
-                                                 username: config["username"],
-                                                 password: config["password"])
-  }
+  let(:environment) { "test" }
+  let(:database_connection_factory) { DatabaseConnectionFactory.new(environment) }
 
-  let(:writer) { DatabaseWriter.new(database_connection) }
-  let(:reader) { DatabaseReader.new(database_connection) }
+  let(:reader) { DatabaseReader.new(database_connection_factory) }
 
   before do
-    database_connection.query("DELETE FROM measurements")
+    database_connection_factory.with_connection do |connection|
+      connection.query("DELETE FROM measurements")
 
-    measurements.each do |measurement|
-      database_connection.query("INSERT INTO measurements(#{measurement.columns_str})
-                                VALUES (#{measurement.values_str})")
+      measurements.each do |measurement|
+        query = "INSERT INTO measurements(#{measurement.columns_str})
+                                          VALUES (#{measurement.values_str})"
+
+        connection.query(query)
+      end
     end
   end
 
   describe "a single value" do
-    let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23 ) }
-    let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23 ) }
+    let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23, 34 ) }
+    let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23, 34 ) }
 
     let(:measurements) { [measurement_1, measurement_2 ] }
 
@@ -50,7 +50,8 @@ describe DatabaseReader do
       time_offset = Time.now.dst? ? "+2" : "+1"
       reader.day = DateTime.civil(now.year, now.month, now.day, 0, 0, 0, time_offset)
 
-      @usage = reader.read().first
+      all_records = reader.read
+      @usage = all_records.first
     end
 
     it "sets the correct stroom_totaal" do
@@ -61,6 +62,10 @@ describe DatabaseReader do
 
     it "sets the correct gas" do
       expect(@usage.gas).to be_within(0.01).of(measurement_1.gas)
+    end
+
+    it "sets the correct water" do
+      expect(@usage.water).to be_within(0.001).of(measurement_1.water)
     end
 
     it "sets the correct time_stamp" do
@@ -76,18 +81,18 @@ describe DatabaseReader do
 
     let(:base_date) {
       time_offset = Time.now.dst? ? "+2" : "+1"
-      DateTime.civil(measurement_day.year, measurement_day.month, measurement_day.day, 0, 0, 0, time_offset)
+      DateTime.civil(measurement_day.year, measurement_day.month, measurement_day.day, 1, 0, 0, time_offset)
     }
 
     let(:minute) { 1.0 / (24*60) }
 
     let(:measurements) { [
-      Measurement.new( base_date, 11.23, 22.34, 11.23 ),
-      Measurement.new( base_date + 10*minute, 12.23, 23.34, 12.23 ),
-      Measurement.new( base_date + 30*minute, 14.23, 25.34, 14.23 ),
-      Measurement.new( base_date + 50*minute, 16.23, 27.34, 16.23 ),
-      Measurement.new( base_date + 60*minute, 15.23, 26.34, 15.23 ),
-      Measurement.new( base_date + 70*minute, 16.23, 27.34, 16.23 )
+      Measurement.new( base_date, 11.23, 22.34, 11.23, 14 ),
+      Measurement.new( base_date + 10*minute, 12.23, 23.34, 12.23, 14 ),
+      Measurement.new( base_date + 30*minute, 14.23, 25.34, 14.23, 14 ),
+      Measurement.new( base_date + 50*minute, 16.23, 27.34, 16.23, 14 ),
+      Measurement.new( base_date + 60*minute, 15.23, 26.34, 15.23, 14 ),
+      Measurement.new( base_date + 70*minute, 16.23, 27.34, 16.23, 14 )
     ] }
 
     before do
@@ -111,7 +116,7 @@ describe DatabaseReader do
     context "when the measurement is for today" do
       it "adds a 'virtual' measurement of the current hour" do
         now = DateTime.now
-        time_offset = Time.now.dst? ? "+2" : "+1"
+        time_offset = Time.now.dst? ? "+02:00" : "+01:00"
 
         expected = DateTime.new(now.year, now.month, now.day, now.hour + 1, 0, 0, time_offset)
 
@@ -127,7 +132,7 @@ describe DatabaseReader do
       }
 
       it "does not add a 'virtual' measurement" do
-        expect(@lasti).to be_nil
+        expect(@last).to be_nil
       end
     end
 

@@ -1,4 +1,5 @@
 require 'mysql2'
+require 'database_config'
 
 class DatabaseConnectionFactory
   def initialize(environment)
