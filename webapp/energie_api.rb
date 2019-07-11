@@ -46,7 +46,8 @@ class DatabaseConnectionFactory
 end
 
 class EnergieApi < Sinatra::Base
-  connection_factory = DatabaseConnectionFactory.new(DatabaseConfig.for(settings.environment))
+  database_config = DatabaseConfig.for(settings.environment)
+  connection_factory = DatabaseConnectionFactory.new(database_config)
 
   configure do
     # Storing login information in cookies is good enough for our purposes
