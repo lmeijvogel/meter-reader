@@ -9,10 +9,6 @@ CREATE TABLE measurements (
   stroom_current FLOAT,
   gas FLOAT,
   water FLOAT,
-
-  diff_stroom_dal FLOAT,
-  diff_stroom_piek FLOAT,
-  diff_gas FLOAT
 );
 
 CREATE INDEX measurement_time_index ON measurements(time_stamp);
