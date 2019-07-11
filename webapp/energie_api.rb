@@ -26,17 +26,7 @@ Dotenv.load
 
 require 'sinatra/reloader' if development?
 
-File.open('/tmp/logfile', "w") do |logfile|
-  if development?
-    logfile.puts "DEVELOPMENT!"
-  else
-    logfile.puts "NOT DEVELOPMENT"
-  end
-
-  logfile.flush
-end
 set :bind, '0.0.0.0'
-
 set :port, 8000
 
 FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
