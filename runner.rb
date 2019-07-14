@@ -11,6 +11,8 @@ require "output/database_writer"
 require "output/last_measurement_store"
 require "database_config"
 
+require "temporary_measurement_store"
+
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
 Dotenv.load
@@ -24,10 +26,16 @@ end
 def main
   environment = ENV.fetch('ENVIRONMENT')
 
+  measurement_counter = 0
+
   database_writer = DatabaseWriter.new(DatabaseConnectionFactory.new(environment))
   database_writer.save_interval = 15
 
   last_measurement_store = LastMeasurementStore.new
+  temporary_measurement_store = TemporaryMeasurementStore.new(
+    number_of_entries: 6 * 60 * 4, # 4 hours at 6 measurements per hour
+    redis_list_name: ENV.fetch("REDIS_LIST_NAME")
+  )
 
   last_water_measurement = 0
 
@@ -51,9 +59,27 @@ def main
   )
 
   recorder.collect_data do |measurement|
+    json = measurement_to_json(measurement, measurement_counter)
+
     database_writer.save_unless_exists(measurement)
-    last_measurement_store.save(measurement)
+    last_measurement_store.save(json)
+    temporary_measurement_store.add(json)
+
+    measurement_counter += 1
   end
+end
+
+def measurement_to_json(measurement, measurement_counter)
+  {
+    id:               measurement_counter,
+    time_stamp:       measurement.time_stamp.to_s,
+    time_stamp_utc:   measurement.time_stamp_utc.to_s,
+    stroom_dal:       measurement.stroom_dal.to_f,
+    stroom_piek:      measurement.stroom_piek.to_f,
+    stroom_current:   measurement.stroom_current.to_f,
+    gas:              measurement.gas.to_f,
+    water:            measurement.water.to_f
+  }.to_json
 end
 
 puts "Starting..."

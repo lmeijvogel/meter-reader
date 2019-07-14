@@ -55,6 +55,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    redis (3.3.5)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -102,6 +103,7 @@ DEPENDENCIES
   guard-rspec
   mysql2
   p1_meter_reader!
+  redis
   rspec
   serialport
   sinatra (>= 2.0.5)

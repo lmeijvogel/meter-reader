@@ -8,6 +8,7 @@ gem "p1_meter_reader", git: "https://github.com/lmeijvogel/p1_meter_reader_gem",
 gem "serialport"
 gem "sinatra", ">= 2.0.5"
 gem "thin"
+gem "redis"
 
 group :development do
   gem "byebug"
