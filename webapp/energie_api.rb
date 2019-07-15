@@ -12,6 +12,7 @@ require 'digest/sha1'
 require 'database_config'
 require 'database_reader'
 require 'output/last_measurement_store'
+require 'recent_measurement_store'
 
 require 'webapp/results_cache'
 require 'webapp/day_cache_descriptor'
@@ -48,6 +49,10 @@ end
 class EnergieApi < Sinatra::Base
   database_config = DatabaseConfig.for(settings.environment)
   connection_factory = DatabaseConnectionFactory.new(database_config)
+  recent_measurement_store = RecentMeasurementStore.new(
+    number_of_entries: 6 * 60 * 4,
+    redis_list_name: ENV.fetch("REDIS_LIST_NAME")
+  )
 
   configure do
     # Storing login information in cookies is good enough for our purposes
@@ -117,6 +122,12 @@ class EnergieApi < Sinatra::Base
       status 404
       "Not found"
     end
+  end
+
+  get "/energy/recent" do
+    "[" +
+      recent_measurement_store.measurements.join(", ") +
+      "]"
   end
 
   def cached(prefix, date)
