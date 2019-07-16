@@ -6,14 +6,21 @@ class RecentMeasurementStore
     @redis_list_name = redis_list_name
 
     @wait_until_error_output = 0
+    @wait_until_add = 0
 
     @redis = Redis.new
   end
 
   def add(measurement)
-    @redis.multi do
-      @redis.lpush @redis_list_name, measurement
-      @redis.ltrim @redis_list_name, 0, @number_of_entries
+    if @wait_until_add == 0
+      @redis.multi do
+        @redis.lpush @redis_list_name, measurement
+        @redis.ltrim @redis_list_name, 0, @number_of_entries
+      end
+
+      @wait_until_add = 6
+    else
+      @wait_until_add -= 1
     end
 
     # No Exceptions happened, so reset the timer

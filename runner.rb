@@ -33,7 +33,7 @@ def main
 
   last_measurement_store = LastMeasurementStore.new
   recent_measurement_store = RecentMeasurementStore.new(
-    number_of_entries: 6 * 60 * 4, # 4 hours at 6 measurements per hour
+    number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
 
