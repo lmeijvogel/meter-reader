@@ -7,15 +7,15 @@ class RecentMeasurementStore
 
     @wait_until_error_output = 0
     @wait_until_add = 0
-
-    @redis = Redis.new
   end
 
   def add(measurement)
     if @wait_until_add == 0
-      @redis.multi do
-        @redis.lpush @redis_list_name, measurement
-        @redis.ltrim @redis_list_name, 0, @number_of_entries
+      with_redis do |redis|
+        redis.multi do
+          redis.lpush @redis_list_name, measurement
+          redis.ltrim @redis_list_name, 0, @number_of_entries
+        end
       end
 
       @wait_until_add = 6
@@ -38,8 +38,16 @@ class RecentMeasurementStore
   alias_method :<<, :add
 
   def measurements
-    @redis = Redis.new
+    with_redis do |redis|
+      redis.lrange @redis_list_name, 0, @number_of_entries
+    end
+  end
 
-    @redis.lrange @redis_list_name, 0, @number_of_entries
+  def with_redis
+    redis = Redis.new
+
+    yield redis
+  ensure
+    redis.close
   end
 end
