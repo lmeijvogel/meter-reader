@@ -10,7 +10,7 @@ class RecentMeasurementStore
   end
 
   def add(measurement)
-    if @wait_until_add == 0
+    once_every_n_times(6) do
       with_redis do |redis|
         redis.multi do
           redis.lpush @redis_list_name, measurement
@@ -18,13 +18,9 @@ class RecentMeasurementStore
         end
       end
 
-      @wait_until_add = 6
-    else
-      @wait_until_add -= 1
+      # No Exceptions happened, so reset the timer
+      @wait_until_error_output = 0
     end
-
-    # No Exceptions happened, so reset the timer
-    @wait_until_error_output = 0
   rescue RuntimeError => e
     # Recent measurements are less important than long term data,
     # so ignore errors here.
@@ -43,11 +39,23 @@ class RecentMeasurementStore
     end
   end
 
+  private
+
   def with_redis
     redis = Redis.new
 
     yield redis
   ensure
     redis.close
+  end
+
+  def once_every_n_times(n)
+    if @wait_until_add == 0
+      yield
+
+      @wait_until_add = n
+    else
+      @wait_until_add -= 1
+    end
   end
 end
