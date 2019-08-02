@@ -1,20 +1,27 @@
-require 'json'
+require 'redis'
 
 class LastMeasurementStore
   NoMeasurementFound = Class.new(StandardError)
 
   def load
-    File.read(filename)
-  rescue Errno::ENOENT
-    raise NoMeasurementFound
+    with_redis do |redis|
+      redis.get("last_measurement") or raise NoMeasurementFound
+    end
   end
 
   def save(measurement)
-    File.write(filename, measurement)
+    with_redis do |redis|
+      redis.set("last_measurement", measurement)
+    end
   end
 
   private
-  def filename
-    "/tmp/meter-reader-last-measurement.json"
+
+  def with_redis
+    redis = Redis.new
+
+    yield redis
+  ensure
+    redis.close
   end
 end

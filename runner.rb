@@ -1,6 +1,7 @@
 require 'pathname'
 require 'mysql2'
 require 'dotenv'
+require 'json'
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 
