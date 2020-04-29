@@ -5,3 +5,6 @@ passwords
 webapp/session_secret.txt
 webapp/.env
 docker/mariadb
+.env
+.bundle
+vendor
