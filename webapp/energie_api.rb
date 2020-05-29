@@ -11,7 +11,6 @@ require 'digest/sha1'
 
 require 'database_config'
 require 'database_reader'
-require 'output/last_measurement_store'
 require 'recent_measurement_store'
 
 require 'webapp/results_cache'
@@ -108,20 +107,23 @@ class EnergieApi < Sinatra::Base
   end
 
   get "/energy/current" do
-    begin
-      result = JSON.parse(LastMeasurementStore.new.load)
+    recent_measurements = recent_measurement_store.measurements
 
-      { id: result["id"],
-        current: result["stroom_current"],
-        stroom_piek: result["stroom_piek"],
-        stroom_dal: result["stroom_dal"],
-        gas: result["gas"],
-        water: result["water"]
-      }.to_json
-    rescue LastMeasurementStore::NoMeasurementFound
+    if recent_measurements.none?
       status 404
       "Not found"
+      break
     end
+
+    result = JSON.parse(recent_measurements.last)
+
+    { id: result["id"],
+      current: result["stroom_current"],
+      stroom_piek: result["stroom_piek"],
+      stroom_dal: result["stroom_dal"],
+      gas: result["gas"],
+      water: result["water"]
+    }.to_json
   end
 
   get "/energy/recent" do
