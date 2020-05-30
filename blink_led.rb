@@ -36,7 +36,7 @@ def test_and_blink
     blink(:fast)
   end
 rescue StandardError => e
-  blink(:fast)
+  blink(:really_fast)
 end
 
 def latest_measurements
@@ -49,10 +49,10 @@ def latest_measurements
 end
 
 def blink(speed)
-  if speed == :slow
-    delay = 1
-  else
-    delay = 0.2
+  delay = case speed
+          when :slow then 1.5
+          when :fast then 0.3
+          when :really_fast then 0.1
   end
 
   on
