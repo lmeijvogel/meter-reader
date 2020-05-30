@@ -1,11 +1,14 @@
 require 'date'
+require 'dotenv'
 require 'json'
 require 'redis'
 
-LED_BRIGHTNESS_PATH = "/sys/class/leds/led0/brightness"
-LED_TRIGGER_PATH = "/sys/class/leds/led0/trigger"
+Dotenv.load
 
-LATEST_MEASUREMENTS_KEY = "latest_measurements"
+LED_BRIGHTNESS_PATH = ENV.fetch("LED_BRIGHTNESS_PATH")
+LED_TRIGGER_PATH = ENV.fetch("LED_TRIGGER_PATH")
+LATEST_MEASUREMENTS_KEY = ENV.fetch("REDIS_LIST_NAME")
+
 ALERT_TIMEOUT_IN_SECONDS = 600
 
 def production?
