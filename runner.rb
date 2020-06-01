@@ -9,7 +9,6 @@ require "p1_meter_reader"
 require "database_connection_factory"
 require "database_reader"
 require "output/database_writer"
-require "output/last_measurement_store"
 require "database_config"
 
 require "recent_measurement_store"
@@ -32,7 +31,6 @@ def main
   database_writer = DatabaseWriter.new(DatabaseConnectionFactory.new(environment))
   database_writer.save_interval = 15
 
-  last_measurement_store = LastMeasurementStore.new
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
@@ -63,7 +61,6 @@ def main
     json = measurement_to_json(measurement, measurement_counter)
 
     database_writer.save_unless_exists(measurement)
-    last_measurement_store.save(json)
     recent_measurement_store.add(json)
 
     measurement_counter += 1
