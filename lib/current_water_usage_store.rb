@@ -1,0 +1,70 @@
+require 'json'
+require 'redis'
+
+class CurrentWaterUsageStore
+  def initialize(period_in_seconds:, redis_list_name: "current_water_usage")
+    @period_in_days = period_in_seconds * (1.0 / 24 / 60 / 60)
+
+    @usage = 0
+    @redis_list_name = redis_list_name
+  end
+
+  def usage
+    with_redis do |redis|
+      remove_outdated_items(redis)
+
+      first_entry = redis.lrange(@redis_list_name, 0, 0)
+      last_entry = redis.lrange(@redis_list_name, -1, -1)
+
+      return 0 if first_entry.empty?
+
+      JSON.parse(last_entry[0])["water"] - JSON.parse(first_entry[0])["water"]
+    end
+  end
+
+  def add(measurement)
+    with_redis do |redis|
+      remove_outdated_items(redis)
+
+      redis_data = {
+        water: measurement.water,
+        time_stamp_utc: measurement.time_stamp_utc
+      }
+
+      redis.rpush(@redis_list_name, redis_data.to_json)
+      last_entry = redis.lrange(@redis_list_name, 0, 0)[0]
+    end
+  end
+
+  private def remove_outdated_items(redis)
+    cutoff_time = DateTime.now - @period_in_days
+
+    loop do
+      entry_json = redis.lrange(@redis_list_name, 0, 0)[0]
+
+      break if entry_json.nil?
+
+      entry = JSON.parse(entry_json)
+
+      time_stamp_string = entry["time_stamp_utc"]
+      time_stamp_utc = DateTime.parse(time_stamp_string)
+
+      # $stdout.write "Checking #{cutoff_time} < #{time_stamp_utc}: #{entry["water"]}... "
+
+      # Items are time-ordered: If the current item is after the cutoff time,
+      # any following items will also be after the cutoff time
+      break if cutoff_time < time_stamp_utc
+
+      # $stdout.puts "Removing"
+      redis.lpop @redis_list_name
+    end
+  end
+
+  private def with_redis
+    redis = Redis.new
+
+    yield redis
+  ensure
+    redis.close
+  end
+end

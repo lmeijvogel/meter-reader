@@ -11,6 +11,7 @@ require "database_reader"
 require "output/database_writer"
 require "database_config"
 
+require "current_water_usage_store"
 require "recent_measurement_store"
 
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
@@ -35,6 +36,8 @@ def main
     number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
+
+  current_water_usage_store = CurrentWaterUsageStore.new(period_in_seconds: 120)
 
   last_water_measurement = 0
 
@@ -62,6 +65,7 @@ def main
 
     database_writer.save_unless_exists(measurement)
     recent_measurement_store.add(json)
+    current_water_usage_store.add(measurement)
 
     measurement_counter += 1
   end
