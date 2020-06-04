@@ -40,23 +40,25 @@ class CurrentWaterUsageStore
     cutoff_time = DateTime.now - @period_in_days
 
     loop do
-      entry_json = redis.lrange(@redis_list_name, 0, 0)[0]
+      begin
+        entry_json = redis.lrange(@redis_list_name, 0, 0)[0]
 
-      break if entry_json.nil?
+        break if entry_json.nil?
 
-      entry = JSON.parse(entry_json)
+        entry = JSON.parse(entry_json)
 
-      time_stamp_string = entry["time_stamp_utc"]
-      time_stamp_utc = DateTime.parse(time_stamp_string)
+        time_stamp_string = entry["time_stamp_utc"]
+        time_stamp_utc = DateTime.parse(time_stamp_string)
 
-      # $stdout.write "Checking #{cutoff_time} < #{time_stamp_utc}: #{entry["water"]}... "
+        # Items are time-ordered: If the current item is after the cutoff time,
+        # any following items will also be after the cutoff time
+        break if cutoff_time < time_stamp_utc
 
-      # Items are time-ordered: If the current item is after the cutoff time,
-      # any following items will also be after the cutoff time
-      break if cutoff_time < time_stamp_utc
-
-      # $stdout.puts "Removing"
-      redis.lpop @redis_list_name
+        redis.lpop @redis_list_name
+      rescue StandardError => e
+        # Delete any unreadable entries
+        redis.lpop @redis_list_name
+      end
     end
   end
 
