@@ -1,12 +1,16 @@
 require 'json'
 require 'redis'
 
-class CurrentWaterUsageStore
-  def initialize(period_in_seconds:, redis_list_name: "current_water_usage")
-    @period_in_days = period_in_seconds * (1.0 / 24 / 60 / 60)
+WATER_USAGE_PERIOD_IN_SECONDS = 120
 
+class CurrentWaterUsageStore
+  def initialize(redis_list_name: "current_water_usage")
     @usage = 0
     @redis_list_name = redis_list_name
+  end
+
+  def period_in_seconds
+    WATER_USAGE_PERIOD_IN_SECONDS
   end
 
   def usage
@@ -37,7 +41,7 @@ class CurrentWaterUsageStore
   end
 
   private def remove_outdated_items(redis)
-    cutoff_time = DateTime.now - @period_in_days
+    cutoff_time = DateTime.now - period_in_days
 
     loop do
       begin
@@ -68,5 +72,9 @@ class CurrentWaterUsageStore
     yield redis
   ensure
     redis.close
+  end
+
+  private def period_in_days
+    period_in_seconds * (1.0 / 24 / 60 / 60)
   end
 end

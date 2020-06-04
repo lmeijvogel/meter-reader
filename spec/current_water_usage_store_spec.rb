@@ -10,7 +10,7 @@ end
 describe CurrentWaterUsageStore do
   let(:test_redis_key) { "test_redis_key" }
 
-  let(:store) { CurrentWaterUsageStore.new(period_in_seconds: 300, redis_list_name: test_redis_key) }
+  let(:store) { CurrentWaterUsageStore.new(redis_list_name: test_redis_key) }
 
   before do
     redis = Redis.new
@@ -23,7 +23,7 @@ describe CurrentWaterUsageStore do
   end
 
   it "returns 1 if one liter was used in the last minute" do
-    at_start = minutes_ago(2)
+    at_start = minutes_ago(1.5)
 
     store.add(Measurement.new(0, at_start))
 
@@ -51,8 +51,8 @@ describe CurrentWaterUsageStore do
 
     store.add(Measurement.new(0, minutes_ago(10)))
     store.add(Measurement.new(25, minutes_ago(9)))
-    store.add(Measurement.new(50, minutes_ago(4)))
-    store.add(Measurement.new(100, minutes_ago(3)))
+    store.add(Measurement.new(50, minutes_ago(1.5)))
+    store.add(Measurement.new(100, minutes_ago(1.2)))
     store.add(Measurement.new(150, minutes_ago(1)))
 
     expect(store.usage).to eq 100

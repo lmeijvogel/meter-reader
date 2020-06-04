@@ -37,7 +37,7 @@ def main
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
 
-  current_water_usage_store = CurrentWaterUsageStore.new(period_in_seconds: 120)
+  current_water_usage_store = CurrentWaterUsageStore.new
 
   last_water_measurement = 0
 
