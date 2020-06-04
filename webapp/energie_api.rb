@@ -12,6 +12,7 @@ require 'digest/sha1'
 require 'database_config'
 require 'database_reader'
 require 'recent_measurement_store'
+require 'current_water_usage_store'
 
 require 'webapp/results_cache'
 require 'webapp/day_cache_descriptor'
@@ -52,6 +53,8 @@ class EnergieApi < Sinatra::Base
     number_of_entries: 6 * 60 * 4,
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
+
+  current_water_usage_store = CurrentWaterUsageStore.new
 
   configure do
     # Storing login information in cookies is good enough for our purposes
@@ -117,12 +120,16 @@ class EnergieApi < Sinatra::Base
 
     result = JSON.parse(recent_measurements.last)
 
+    water_current = current_water_usage_store.usage
+
     { id: result["id"],
       current: result["stroom_current"],
       stroom_piek: result["stroom_piek"],
       stroom_dal: result["stroom_dal"],
       gas: result["gas"],
-      water: result["water"]
+      water: result["water"],
+      water_current: water_current,
+      water_current_period_in_seconds: current_water_usage_store.period_in_seconds
     }.to_json
   end
 
