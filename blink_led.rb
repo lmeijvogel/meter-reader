@@ -50,7 +50,7 @@ end
 
 def blink(speed)
   delay = case speed
-          when :slow then 1.5
+          when :slow then 1.0
           when :fast then 0.3
           when :really_fast then 0.1
   end
