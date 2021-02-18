@@ -2,6 +2,7 @@ require 'pathname'
 require 'mysql2'
 require 'dotenv'
 require 'json'
+require 'serialport'
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 
@@ -44,7 +45,7 @@ def main
   if environment == "production"
     last_water_measurement = get_last_water_measurement(environment)
 
-    stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new("/XMX5XMXABCE100129872")
+    stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new(ENV.fetch("P1_CONVERTER_MESSAGE_START"), input: serial_port)
     water_data_source = P1MeterReader::DataParsing::WaterMeasurementListener.new
   else
     puts "Fake stream splitter"
@@ -82,6 +83,19 @@ def measurement_to_json(measurement, measurement_counter)
     gas:              measurement.gas.to_f,
     water:            measurement.water.to_f
   }.to_json
+end
+
+
+def serial_port
+  device = ENV.fetch("P1_CONVERTER_DEVICE")
+  baud_rate = Integer(ENV.fetch("P1_CONVERTER_BAUD_RATE"))
+
+  serial_port = SerialPort.new(device, baud_rate)
+  serial_port.data_bits = 7
+  serial_port.stop_bits = 1
+  serial_port.parity = SerialPort::EVEN
+
+  serial_port
 end
 
 puts "Starting..."
