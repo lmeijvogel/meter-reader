@@ -10,7 +10,7 @@ class DatabaseReader
   def read
     query = "SELECT
       MIN(#{adjusted_time_stamp}) as ts,
-      TRUNCATE(MIN(stroom_piek+stroom_dal),3) as d_totaal,
+      TRUNCATE(MIN(stroom),3) as d_stroom,
       TRUNCATE(MIN(gas),3) as d_gas,
       TRUNCATE(MIN(water), 3) as d_water
     FROM measurements
@@ -25,7 +25,7 @@ class DatabaseReader
       if is_last_of_current_period?
         last_entry_query = "SELECT
           #{next_timestamp} as ts,
-          TRUNCATE(stroom_piek+stroom_dal,3) as d_totaal,
+          TRUNCATE(stroom,3) as d_stroom,
           TRUNCATE(gas,3) as d_gas,
           TRUNCATE(water,3) as d_water
         FROM measurements
@@ -102,7 +102,7 @@ class DatabaseReader
     query = <<~QUERY
       SELECT
         #{adjusted_time_stamp} AS ts,
-        stroom_piek+stroom_dal AS d_totaal,
+        stroom AS d_stroom,
         gas AS d_gas,
         water AS d_water
       FROM measurements
@@ -157,7 +157,7 @@ class DatabaseReader
 
   def to_usage(row)
     usage = P1MeterReader::Models::Usage.new
-    usage.stroom_totaal = row["d_totaal"]
+    usage.stroom_totaal = row["d_stroom"]
     usage.gas = row["d_gas"]
     usage.water = row["d_water"]
     usage.time_stamp = row["ts"].to_datetime

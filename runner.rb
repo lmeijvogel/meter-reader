@@ -73,13 +73,13 @@ def main
 end
 
 def measurement_to_json(measurement, measurement_counter)
+  stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+
   {
     id:               measurement_counter,
     time_stamp:       measurement.time_stamp.to_s,
     time_stamp_utc:   measurement.time_stamp_utc.to_s,
-    stroom_dal:       measurement.stroom_dal.to_f,
-    stroom_piek:      measurement.stroom_piek.to_f,
-    stroom_current:   measurement.stroom_current.to_f,
+    stroom:           stroom,
     gas:              measurement.gas.to_f,
     water:            measurement.water.to_f
   }.to_json

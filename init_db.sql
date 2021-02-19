@@ -4,9 +4,7 @@ CREATE TABLE measurements (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   time_stamp DATETIME,
   time_stamp_utc DATETIME,
-  stroom_dal FLOAT,
-  stroom_piek FLOAT,
-  stroom_current FLOAT,
+  stroom FLOAT,
   gas FLOAT,
   water FLOAT,
 );
