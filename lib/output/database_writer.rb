@@ -13,12 +13,14 @@ class DatabaseWriter
   end
 
   def save(measurement, database_connection)
+    stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+
     c = database_connection
     query = <<~QUERY
       INSERT INTO measurements(time_stamp, time_stamp_utc, stroom, gas, water) VALUES(
         '#{c.escape measurement.time_stamp.strftime('%FT%T')}',
         '#{c.escape measurement.time_stamp_utc.strftime('%FT%T')}',
-        '#{c.escape measurement.stroom.to_f.to_s}',
+        '#{c.escape stroom.to_s}',
         '#{c.escape measurement.gas.to_f.to_s}',
         '#{c.escape measurement.water.to_f.to_s}'
       )
