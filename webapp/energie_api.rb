@@ -122,8 +122,9 @@ class EnergieApi < Sinatra::Base
 
     water_current = current_water_usage_store.usage
 
+
     { id: result["id"],
-      stroom: result["stroom"],
+      current: result["stroom_current"],
       gas: result["gas"],
       water: result["water"],
       water_current: water_current,
