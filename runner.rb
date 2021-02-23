@@ -31,7 +31,7 @@ def main
   measurement_counter = 0
 
   database_writer = DatabaseWriter.new(DatabaseConnectionFactory.new(environment))
-  database_writer.save_interval = 15
+  database_writer.save_interval = 5
 
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
