@@ -80,7 +80,7 @@ def measurement_to_json(measurement, measurement_counter)
     time_stamp:       measurement.time_stamp.to_s,
     time_stamp_utc:   measurement.time_stamp_utc.to_s,
     stroom:           stroom,
-    stroom_current:   measurement.stroom_current.to_f
+    stroom_current:   measurement.stroom_current.to_f,
     gas:              measurement.gas.to_f,
     water:            measurement.water.to_f
   }.to_json
