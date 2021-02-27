@@ -41,6 +41,7 @@ def main
   current_water_usage_store = CurrentWaterUsageStore.new
 
   last_water_measurement = 0
+  last_measurement = :no_last_measurement
 
   if environment == "production"
     last_water_measurement = get_last_water_measurement(environment)
@@ -62,13 +63,17 @@ def main
   )
 
   recorder.collect_data do |measurement|
-    json = measurement_to_json(measurement, measurement_counter)
+    if valid?(measurement, last_measurement)
+      json = measurement_to_json(measurement, measurement_counter)
 
-    database_writer.save_unless_exists(measurement)
-    recent_measurement_store.add(json)
-    current_water_usage_store.add(measurement)
+      database_writer.save_unless_exists(measurement)
+      recent_measurement_store.add(json)
+      current_water_usage_store.add(measurement)
 
-    measurement_counter += 1
+      measurement_counter += 1
+
+      last_measurement = measurement
+    end
   end
 end
 
@@ -86,6 +91,29 @@ def measurement_to_json(measurement, measurement_counter)
   }.to_json
 end
 
+def valid?(measurement, last_measurement)
+  if last_measurement == :no_last_measurement
+    measurement_not_zero?(measurement)
+  else
+    # The new meter is a bit less trustworthy and will sometimes report
+    # invalid energy measurements, e.g. 0 or less than it should
+    return false if measurement.stroom_dal.to_f < last_measurement.stroom_dal.to_f
+    return false if measurement.stroom_piek.to_f < last_measurement.stroom_piek.to_f
+    return false if measurement.gas < last_measurement.gas
+    return false if measurement.water < last_measurement.water
+
+    true
+  end
+end
+
+def measurement_not_zero?(measurement)
+  return false if measurement.stroom_dal.to_f.abs < 0.01
+  return false if measurement.stroom_piek.to_f.abs < 0.01
+  return false if measurement.gas.abs < 0.01
+  return false if measurement.water.abs < 0.01
+
+  true
+end
 
 def serial_port
   device = ENV.fetch("P1_CONVERTER_DEVICE")
