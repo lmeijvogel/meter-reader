@@ -56,6 +56,10 @@ def main
 
   water_measurement_parser = P1MeterReader::Models::WaterMeasurementParser.new(last_water_measurement)
 
+  water_measurement_parser.on_tick = ->() {
+    current_water_usage_store.last_tick = DateTime.now
+  }
+
   recorder = P1MeterReader::Recorder.new(
     p1_data_source: stream_splitter,
     water_data_source: water_data_source,

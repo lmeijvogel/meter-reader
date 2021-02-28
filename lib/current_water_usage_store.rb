@@ -1,12 +1,14 @@
 require 'json'
 require 'redis'
 
+# Less than 1/2 liter per minute is negligible
 WATER_USAGE_PERIOD_IN_SECONDS = 120
 
 class CurrentWaterUsageStore
-  def initialize(redis_list_name: "current_water_usage")
+  def initialize(redis_list_name: "current_water_usage", last_tick_var_name: "last_water_usage_tick")
     @usage = 0
     @redis_list_name = redis_list_name
+    @last_tick_var_name = last_tick_var_name
   end
 
   def period_in_seconds
@@ -37,6 +39,12 @@ class CurrentWaterUsageStore
 
       redis.rpush(@redis_list_name, redis_data.to_json)
       last_entry = redis.lrange(@redis_list_name, 0, 0)[0]
+    end
+  end
+
+  def last_tick=(timestamp)
+    with_redis do |redis|
+      redis.set(@last_tick_var_name, timestamp)
     end
   end
 

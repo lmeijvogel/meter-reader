@@ -120,6 +120,9 @@ class EnergieApi < Sinatra::Base
 
     result = JSON.parse(recent_measurements.last)
 
+    last_water_tick_redis = Redis.new.get("last_water_usage_tick")
+    last_water_tick = last_water_tick_redis.nil? ? nil : DateTime.parse(last_water_tick_redis)
+
     water_current = current_water_usage_store.usage
 
 
@@ -128,7 +131,8 @@ class EnergieApi < Sinatra::Base
       gas: result["gas"],
       water: result["water"],
       water_current: water_current,
-      water_current_period_in_seconds: current_water_usage_store.period_in_seconds
+      water_current_period_in_seconds: current_water_usage_store.period_in_seconds,
+      last_water_tick: last_water_tick
     }.to_json
   end
 
