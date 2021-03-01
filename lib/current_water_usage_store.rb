@@ -5,10 +5,10 @@ require 'redis'
 WATER_USAGE_PERIOD_IN_SECONDS = 120
 
 class CurrentWaterUsageStore
-  def initialize(redis_list_name: "current_water_usage", last_tick_var_name: "last_water_usage_tick")
+  def initialize(redis_list_name: "current_water_usage", last_ticks_var_name: "last_water_usage_ticks")
     @usage = 0
     @redis_list_name = redis_list_name
-    @last_tick_var_name = last_tick_var_name
+    @last_ticks_var_name = last_ticks_var_name
   end
 
   def period_in_seconds
@@ -42,9 +42,13 @@ class CurrentWaterUsageStore
     end
   end
 
-  def last_tick=(timestamp)
+  def add_tick(timestamp)
     with_redis do |redis|
-      redis.set(@last_tick_var_name, timestamp)
+      redis.multi do
+        redis.lpush(@last_ticks_var_name, timestamp)
+
+        redis.ltrim @last_ticks_var_name, 0, 1
+      end
     end
   end
 
