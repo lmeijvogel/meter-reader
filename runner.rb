@@ -6,7 +6,13 @@ require 'serialport'
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 
-require "p1_meter_reader"
+require "p1_meter_reader/data_parsing/stream_splitter"
+require "p1_meter_reader/data_parsing/fake_stream_splitter"
+require "p1_meter_reader/data_parsing/water_measurement_listener"
+require "p1_meter_reader/data_parsing/fake_water_measurement_listener"
+require "p1_meter_reader/models/water_measurement_parser"
+require "p1_meter_reader/recorder"
+
 require "database_connection_factory"
 require "database_reader"
 require "output/database_writer"
