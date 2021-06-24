@@ -8,9 +8,9 @@ $LOAD_PATH << File.expand_path("../lib", __FILE__)
 
 require "p1_meter_reader/data_parsing/stream_splitter"
 require "p1_meter_reader/data_parsing/fake_stream_splitter"
-require "p1_meter_reader/data_parsing/water_measurement_listener"
-require "p1_meter_reader/data_parsing/fake_water_measurement_listener"
-require "p1_meter_reader/models/water_measurement_parser"
+require "water_reader/water_measurement_listener"
+require "water_reader/fake_water_measurement_listener"
+require "water_reader/water_measurement_parser"
 require "p1_meter_reader/recorder"
 
 require "database_connection_factory"
@@ -53,14 +53,14 @@ def main
     last_water_measurement = get_last_water_measurement(environment)
 
     stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new(ENV.fetch("P1_CONVERTER_MESSAGE_START"), input: serial_port)
-    water_data_source = P1MeterReader::DataParsing::WaterMeasurementListener.new
+    water_data_source = WaterReader::WaterMeasurementListener.new
   else
     puts "Fake stream splitter"
     stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
-    water_data_source = P1MeterReader::DataParsing::FakeWaterMeasurementListener.new
+    water_data_source = WaterReader::FakeWaterMeasurementListener.new
   end
 
-  water_measurement_parser = P1MeterReader::Models::WaterMeasurementParser.new(last_water_measurement)
+  water_measurement_parser = WaterReader::WaterMeasurementParser.new(last_water_measurement)
 
   water_measurement_parser.on_tick = ->() {
     current_water_usage_store.add_tick DateTime.now

@@ -1,8 +1,9 @@
 require 'redis'
 
 class RecentMeasurementStore
-  def initialize(number_of_entries:, redis_list_name: "latest_measurements")
+  def initialize(number_of_entries:, redis_host: "127.0.0.1", redis_list_name: "latest_measurements")
     @number_of_entries = number_of_entries
+    @redis_host = redis_host
     @redis_list_name = redis_list_name
 
     @wait_until_error_output = 0
@@ -42,7 +43,7 @@ class RecentMeasurementStore
   private
 
   def with_redis
-    redis = Redis.new
+    redis = Redis.new(host: @redis_host)
 
     yield redis
   ensure

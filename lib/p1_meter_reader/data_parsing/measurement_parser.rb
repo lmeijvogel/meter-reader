@@ -6,7 +6,7 @@ require "p1_meter_reader/data_parsing/parse_chain/stroom_current_chain"
 require "p1_meter_reader/data_parsing/parse_chain/stroom_piek_chain"
 require "p1_meter_reader/data_parsing/parse_chain/skip_line_chain"
 
-require "p1_meter_reader/models/measurement"
+require "models/measurement"
 
 module P1MeterReader
   module Models

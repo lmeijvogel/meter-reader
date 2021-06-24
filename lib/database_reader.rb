@@ -1,10 +1,21 @@
 require 'ostruct'
 
-require 'p1_meter_reader/models/usage'
+require 'models/usage'
+
+# Split this up into something like
+# - start of period
+# - internal elements of period
+# - end of period
 
 class DatabaseReader
   def initialize(connection_factory)
     @connection_factory = connection_factory
+  end
+
+  def read_day
+    query = "SELECT TRUNCATE(MIN(stroom), 3) as stroom
+    FROM measurements
+    GROUP BY YEAR(#{adjusted_time_stamp}), DAYOFYEAR(#{adjusted_time_stamp}), HOUR(#{adjusted_time_stamp})"
   end
 
   def read
@@ -16,8 +27,10 @@ class DatabaseReader
     FROM measurements
     #{where}
     GROUP BY #{granularity}"
+    puts "Database reader"
 
     @connection_factory.with_connection do |connection|
+      puts connection.inspect
       result = connection.query(query).map do |row|
         to_usage(row)
       end

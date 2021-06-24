@@ -10,6 +10,7 @@ class DatabaseConnectionFactory
     with_retries(log_message_format: "Retrying SQL connection (%d/%d)") do
       connection = Mysql2::Client.new(DatabaseConfig.for(@environment))
       begin
+        puts connection.inspect
         yield connection
       ensure
         connection.close

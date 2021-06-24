@@ -1,5 +1,4 @@
-require "p1_meter_reader/models/measurement_parser"
-require "p1_meter_reader/models/water_measurement_parser"
+require "p1_meter_reader/data_parsing/measurement_parser"
 
 module P1MeterReader
   class Recorder

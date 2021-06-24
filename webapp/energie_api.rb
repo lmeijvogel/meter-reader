@@ -1,4 +1,5 @@
-require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/reloader'
 
 require 'mysql2'
 require 'json'
@@ -8,6 +9,9 @@ require 'bcrypt'
 require 'dotenv'
 
 require 'digest/sha1'
+
+$LOAD_PATH << "../lib"
+$LOAD_PATH << "../models"
 
 require 'database_config'
 require 'database_reader'
@@ -25,13 +29,6 @@ UsernameNotFound = Class.new(StandardError)
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 Dotenv.load
 
-require 'sinatra/reloader' if development?
-
-set :bind, '0.0.0.0'
-set :port, 8000
-
-FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
-
 class DatabaseConnectionFactory
   def initialize(database_config)
     @database_config = database_config
@@ -41,6 +38,9 @@ class DatabaseConnectionFactory
     connection = Mysql2::Client.new(@database_config)
 
     yield connection
+  rescue Exception => e
+    puts "Exception while opening database:"
+    puts e.inspect
   ensure
     connection.close
   end
@@ -51,11 +51,15 @@ class EnergieApi < Sinatra::Base
   connection_factory = DatabaseConnectionFactory.new(database_config)
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 6 * 60 * 4,
+    redis_host: ENV.fetch("REDIS_HOST"),
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
 
   current_water_usage_store = CurrentWaterUsageStore.new
 
+  configure :development do
+    register Sinatra::Reloader
+  end
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
@@ -63,17 +67,22 @@ class EnergieApi < Sinatra::Base
     use Rack::Session::Cookie, :expire_after => one_year, :secret => secret
 
     set :static, false
+
+    set :bind, '0.0.0.0'
+    set :port, 9292
+
+    FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
   end
 
   before do
     assert_logged_in unless request.path.include?("login")
   end
 
-  get "/" do
+  get "/api/" do
     status 204
   end
 
-  get "/day/:year/:month/:day" do
+  get "/api/day/:year/:month/:day" do
     day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
 
     cached(:day, day) do
@@ -97,7 +106,7 @@ class EnergieApi < Sinatra::Base
     end
   end
 
-  get "/year/:year" do
+  get "/api/year/:year" do
     year = DateTime.new(params[:year].to_i, 1, 1)
 
     cached(:year, year) do
@@ -109,7 +118,7 @@ class EnergieApi < Sinatra::Base
     end
   end
 
-  get "/energy/current" do
+  get "/api/energy/current" do
     recent_measurements = recent_measurement_store.measurements
 
     if recent_measurements.none?
@@ -120,7 +129,7 @@ class EnergieApi < Sinatra::Base
 
     result = JSON.parse(recent_measurements.last)
 
-    last_water_ticks_redis = Redis.new.lrange("last_water_usage_ticks", 0, -1)
+    last_water_ticks_redis = Redis.new(host: ENV.fetch("REDIS_HOST")).lrange("last_water_usage_ticks", 0, -1)
     last_water_ticks = last_water_ticks_redis.map { |str| DateTime.parse(str) }
 
     water_current = current_water_usage_store.usage
@@ -135,7 +144,7 @@ class EnergieApi < Sinatra::Base
     }.to_json
   end
 
-  get "/energy/recent" do
+  get "/api/energy/recent" do
     "[" +
       recent_measurement_store.measurements.join(", ") +
       "]"
@@ -158,7 +167,7 @@ class EnergieApi < Sinatra::Base
     end
   end
 
-  post "/login/create" do
+  post "/api/login/create" do
     username = params["username"]
     password = params["password"]
 
@@ -205,4 +214,6 @@ class EnergieApi < Sinatra::Base
   def production?
     ENV.fetch("RACK_ENV") == "production"
   end
+
+  run! if app_file == $0
 end
