@@ -61,6 +61,7 @@ class EnergieApi < Sinatra::Base
 
   configure :development do
     register Sinatra::Reloader
+    also_reload File.expand_path("../lib/*")
 
     $enable_cache = false
   end
