@@ -83,26 +83,22 @@ class EnergieApi < Sinatra::Base
   end
 
   get "/api/day/:year/:month/:day" do
-    day = DateTime.new(params[:year].to_i, params[:month].to_i, params[:day].to_i)
+    day = DateTime.new(Integer(params[:year]), Integer(params[:month]), params[:day].to_i)
 
     cached(:day, day) do
       database_reader = DatabaseReader.new(connection_factory)
 
-      database_reader.day = day
-
-      database_reader.read().to_json
+      database_reader.read_for_day(day).to_json
     end
   end
 
-  get "/month/:year/:month" do
+  get "/api/month/:year/:month" do
     month = DateTime.new(params[:year].to_i, params[:month].to_i, 1)
 
     cached(:month, month) do
       database_reader = DatabaseReader.new(connection_factory)
 
-      database_reader.month = DateTime.new(params[:year].to_i, params[:month].to_i)
-
-      database_reader.read().to_json
+      database_reader.read_for_month(month).to_json
     end
   end
 
@@ -112,9 +108,7 @@ class EnergieApi < Sinatra::Base
     cached(:year, year) do
       database_reader = DatabaseReader.new(connection_factory)
 
-      database_reader.year = DateTime.new(params[:year].to_i)
-
-      database_reader.read().to_json
+      database_reader.read_for_year(year).to_json
     end
   end
 
