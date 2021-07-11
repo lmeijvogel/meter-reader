@@ -29,6 +29,8 @@ UsernameNotFound = Class.new(StandardError)
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
 Dotenv.load
 
+$enable_cache = true
+
 class DatabaseConnectionFactory
   def initialize(database_config)
     @database_config = database_config
@@ -59,7 +61,10 @@ class EnergieApi < Sinatra::Base
 
   configure :development do
     register Sinatra::Reloader
+
+    $enable_cache = false
   end
+
   configure do
     # Storing login information in cookies is good enough for our purposes
     one_year = 60*60*24*365
@@ -145,6 +150,10 @@ class EnergieApi < Sinatra::Base
   end
 
   def cached(prefix, date)
+    if !$enable_cache
+      return yield
+    end
+
     cache_dir = ROOT_PATH.join("tmp", "cache")
 
     cache_descriptor = case prefix
