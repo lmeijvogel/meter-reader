@@ -80,10 +80,6 @@ class EnergieApi < Sinatra::Base
     FileUtils.mkdir_p(ROOT_PATH.join("tmp/cache"))
   end
 
-  before do
-    assert_logged_in unless request.path.include?("login")
-  end
-
   get "/api/" do
     status 204
   end
@@ -168,50 +164,6 @@ class EnergieApi < Sinatra::Base
 
     ResultsCache.new(date, descriptor: cache_descriptor).cached do
       yield
-    end
-  end
-
-  post "/api/login/create" do
-    username = params["username"]
-    password = params["password"]
-
-    begin
-      stored_password_hash = read_password_hash(username)
-
-      password_valid = BCrypt::Password.new(stored_password_hash) == password
-      if password_valid
-        session.clear
-        session[:username] = username
-
-        status 200
-        "Welcome!"
-      else
-        invalid_username_or_password!
-      end
-    rescue UsernameNotFound, BCrypt::Errors::InvalidHash
-      invalid_username_or_password!
-    rescue NoPasswordsFile
-      halt 401, "No passwords file"
-    end
-  end
-
-  def read_password_hash(username)
-    raise NoPasswordsFile unless File.exists? "passwords"
-
-    password_hashes = YAML.load(File.read("passwords"))
-
-    password_hashes.fetch(username) { raise UsernameNotFound }
-  end
-
-  def invalid_username_or_password!
-    halt 401, "Invalid username or password"
-  end
-
-  def assert_logged_in
-    if session[:username].nil?
-      halt 401, "Not logged in"
-    else
-      pass
     end
   end
 
