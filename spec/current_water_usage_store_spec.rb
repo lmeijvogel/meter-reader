@@ -4,7 +4,7 @@ require "spec_helper"
 
 require 'current_water_usage_store';
 
-class Measurement < Struct.new(:water, :time_stamp_utc)
+class WaterMeasurement < Struct.new(:water, :time_stamp_utc)
 end
 
 describe CurrentWaterUsageStore do
@@ -25,11 +25,11 @@ describe CurrentWaterUsageStore do
   it "returns 1 if one liter was used in the last minute" do
     at_start = minutes_ago(1.5)
 
-    store.add(Measurement.new(0, at_start))
+    store.add(WaterMeasurement.new(0, at_start))
 
     just_now = minutes_ago(1)
 
-    store.add(Measurement.new(1, just_now))
+    store.add(WaterMeasurement.new(1, just_now))
 
     expect(store.usage).to eq 1
   end
@@ -37,11 +37,11 @@ describe CurrentWaterUsageStore do
   it "returns 0 if one liter was used 10 minutes ago" do
     long_ago = minutes_ago(10)
 
-    store.add(Measurement.new(0, long_ago))
+    store.add(WaterMeasurement.new(0, long_ago))
 
     just_now = minutes_ago(1)
 
-    store.add(Measurement.new(1, just_now))
+    store.add(WaterMeasurement.new(1, just_now))
 
     expect(store.usage).to eq 0
   end
@@ -49,11 +49,11 @@ describe CurrentWaterUsageStore do
   it "returns 100 in a more complex case" do
     long_ago = minutes_ago(10)
 
-    store.add(Measurement.new(0, minutes_ago(10)))
-    store.add(Measurement.new(25, minutes_ago(9)))
-    store.add(Measurement.new(50, minutes_ago(1.5)))
-    store.add(Measurement.new(100, minutes_ago(1.2)))
-    store.add(Measurement.new(150, minutes_ago(1)))
+    store.add(WaterMeasurement.new(0, minutes_ago(10)))
+    store.add(WaterMeasurement.new(25, minutes_ago(9)))
+    store.add(WaterMeasurement.new(50, minutes_ago(1.5)))
+    store.add(WaterMeasurement.new(100, minutes_ago(1.2)))
+    store.add(WaterMeasurement.new(150, minutes_ago(1)))
 
     expect(store.usage).to eq 100
   end
