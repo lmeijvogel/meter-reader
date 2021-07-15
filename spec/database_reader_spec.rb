@@ -2,18 +2,20 @@ require "spec_helper"
 require 'mysql2'
 require 'yaml'
 
-require "p1_meter_reader/models/usage"
+require "models/usage"
 require "database_connection_factory"
 require "database_reader"
 
-class Measurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :water)
+class MyMeasurement < Struct.new(:time_stamp, :stroom_dal, :stroom_piek, :gas, :water)
   def columns_str
-    members.join(", ")
+    %w[time_stamp stroom gas water].join(", ")
   end
 
   def values_str
     time_stamp = values[0].strftime("%Y-%m-%d %H:%M:%S")
-    ([time_stamp] + values[1..-1])
+    stroom = self.stroom_dal + self.stroom_piek
+
+    [time_stamp, stroom, gas, water]
       .map { |m| "'#{m}'" }
       .join(", ")
   end
@@ -39,8 +41,8 @@ describe DatabaseReader do
   end
 
   describe "a single value" do
-    let(:measurement_1) { Measurement.new( DateTime.now, 12.23, 23.34, 12.23, 34 ) }
-    let(:measurement_2) { Measurement.new( DateTime.now, 13.23, 25.34, 12.23, 34 ) }
+    let(:measurement_1) { MyMeasurement.new( DateTime.now, 12.23, 23.34, 12.23, 34 ) }
+    let(:measurement_2) { MyMeasurement.new( DateTime.now, 13.23, 25.34, 12.23, 34 ) }
 
     let(:measurements) { [measurement_1, measurement_2 ] }
 
@@ -48,9 +50,8 @@ describe DatabaseReader do
       now = DateTime.now
 
       time_offset = Time.now.dst? ? "+2" : "+1"
-      reader.day = DateTime.civil(now.year, now.month, now.day, 0, 0, 0, time_offset)
 
-      all_records = reader.read
+      all_records = reader.read_for_day(DateTime.civil(now.year, now.month, now.day, 0, 0, 0, time_offset))
       @usage = all_records.first
     end
 
@@ -87,18 +88,17 @@ describe DatabaseReader do
     let(:minute) { 1.0 / (24*60) }
 
     let(:measurements) { [
-      Measurement.new( base_date, 11.23, 22.34, 11.23, 14 ),
-      Measurement.new( base_date + 10*minute, 12.23, 23.34, 12.23, 14 ),
-      Measurement.new( base_date + 30*minute, 14.23, 25.34, 14.23, 14 ),
-      Measurement.new( base_date + 50*minute, 16.23, 27.34, 16.23, 14 ),
-      Measurement.new( base_date + 60*minute, 15.23, 26.34, 15.23, 14 ),
-      Measurement.new( base_date + 70*minute, 16.23, 27.34, 16.23, 14 )
+      MyMeasurement.new( base_date, 11.23, 22.34, 11.23, 14 ),
+      MyMeasurement.new( base_date + 10*minute, 12.23, 23.34, 12.23, 14 ),
+      MyMeasurement.new( base_date + 30*minute, 14.23, 25.34, 14.23, 14 ),
+      MyMeasurement.new( base_date + 50*minute, 16.23, 27.34, 16.23, 14 ),
+      MyMeasurement.new( base_date + 60*minute, 15.23, 26.34, 15.23, 14 ),
+      MyMeasurement.new( base_date + 70*minute, 16.23, 27.34, 16.23, 14 )
     ] }
 
     before do
       now = DateTime.now
-      reader.day = DateTime.new(now.year, now.month, now.day)
-      result = reader.read
+      result = reader.read_for_day(DateTime.new(now.year, now.month, now.day))
 
       @first, @second, @last = result
     end

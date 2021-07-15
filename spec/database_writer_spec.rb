@@ -3,7 +3,7 @@ require 'mysql2'
 require 'spec_helper'
 
 require "output/database_writer"
-require "p1_meter_reader/models/measurement"
+require "models/measurement"
 
 describe DatabaseWriter do
   let(:config) { YAML.load(File.read(File.join(ROOT_PATH.join("database.yml"))))["test"] }
@@ -30,19 +30,11 @@ describe DatabaseWriter do
     let(:time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23 }
     let(:stroom_piek) { 23.34 }
-    let(:stroom_current) { 0.23 }
     let(:gas) { 12.23 }
     let(:water) { 33 }
 
     before do
-      @measurement = P1MeterReader::Models::Measurement.new
-      @measurement.time_stamp = time_stamp
-      @measurement.time_stamp_utc = time_stamp
-      @measurement.stroom_dal = stroom_dal
-      @measurement.stroom_piek = stroom_piek
-      @measurement.stroom_current = stroom_current
-      @measurement.gas = gas
-      @measurement.water = water
+      @measurement = P1MeterReader::Models::Measurement.new(time_stamp, time_stamp, stroom_dal, stroom_piek, gas, water)
 
       database_connection.query("DELETE FROM measurements")
     end
@@ -60,16 +52,9 @@ describe DatabaseWriter do
         writer.save(@measurement, database_connection)
       end
 
-      it "should have the correct stroom_dal" do
-        expect(subject["stroom_dal"]).to eql stroom_dal.to_f
-      end
-
-      it "should have the correct stroom_piek" do
-        expect(subject["stroom_piek"]).to eql stroom_piek.to_f
-      end
-
-      it "should have the correct stroom_current" do
-        expect(subject["stroom_current"]).to eql stroom_current
+      it "should have the correct stroom" do
+        stroom = stroom_dal + stroom_piek;
+        expect(subject["stroom"]).to eql stroom.to_f
       end
 
       it "should have the correct gas" do
@@ -90,21 +75,13 @@ describe DatabaseWriter do
     let(:existing_time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23 }
     let(:stroom_piek) { 23.34 }
-    let(:stroom_current) { 0.23 }
     let(:gas) { 12.23 }
     let(:water) { 33 }
 
     let(:save_interval) { 30 }
 
     before do
-      @measurement = P1MeterReader::Models::Measurement.new
-      @measurement.time_stamp = existing_time_stamp
-      @measurement.time_stamp_utc = existing_time_stamp
-      @measurement.stroom_dal = stroom_dal
-      @measurement.stroom_piek = stroom_piek
-      @measurement.stroom_current = stroom_current
-      @measurement.gas = gas
-      @measurement.water = water
+      @measurement = P1MeterReader::Models::Measurement.new(existing_time_stamp, existing_time_stamp, stroom_dal, stroom_piek, gas, water)
 
       database_connection.query("DELETE FROM measurements")
       writer.save_interval = save_interval
