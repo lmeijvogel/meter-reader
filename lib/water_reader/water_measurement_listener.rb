@@ -3,6 +3,7 @@ require 'serialport'
 module WaterReader
   class WaterMeasurementListener
     def initialize(input: serial_port)
+      @input = input
       @stream = input.each_line
     end
 
@@ -10,6 +11,10 @@ module WaterReader
       line = @stream.next
 
       line.strip
+    end
+
+    def ready?
+      @input.ready?
     end
 
     private

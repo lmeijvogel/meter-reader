@@ -1,7 +1,7 @@
 module P1MeterReader
   module Models
     class Measurement
-      attr_accessor :time_stamp, :time_stamp_utc, :stroom_dal, :stroom_piek, :stroom_current, :gas, :water
+      attr_accessor :time_stamp, :time_stamp_utc, :stroom_dal, :stroom_piek, :gas, :water
 
       def time_stamp_current_minute
         self.time_stamp.strftime("%d-%m-%y %H:%M")
@@ -15,7 +15,7 @@ module P1MeterReader
       def to_s
         date = self.time_stamp.strftime("%d-%m-%y %H:%M:%S")
 
-        "#{date}: #{stroom_dal} - #{stroom_piek} - #{stroom_current} - #{gas}"
+        "#{date}: #{stroom_dal} - #{stroom_piek} - #{gas}"
       end
     end
   end
