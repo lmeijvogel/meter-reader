@@ -17,7 +17,7 @@ describe DatabaseWriter do
   let(:database_connection_factory) do
     factory = Object.new
 
-    def factory.with_connection
+    def factory.with_connection(retries: 0)
       yield database_connection
     end
 

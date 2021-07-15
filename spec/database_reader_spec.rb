@@ -26,7 +26,7 @@ describe DatabaseReader do
   let(:reader) { DatabaseReader.new(database_connection_factory) }
 
   before do
-    database_connection_factory.with_connection do |connection|
+    database_connection_factory.with_connection(retries: 0) do |connection|
       connection.query("DELETE FROM measurements")
 
       measurements.each do |measurement|
