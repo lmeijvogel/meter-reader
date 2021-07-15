@@ -13,7 +13,7 @@ describe CurrentWaterUsageStore do
   let(:store) { CurrentWaterUsageStore.new(redis_list_name: test_redis_key) }
 
   before do
-    redis = Redis.new
+    redis = Redis.new(host: ENV.fetch("REDIS_HOST"))
     redis.del test_redis_key
     redis.close
   end

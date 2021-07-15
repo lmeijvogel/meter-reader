@@ -79,7 +79,7 @@ class CurrentWaterUsageStore
   end
 
   private def with_redis
-    redis = Redis.new
+    redis = Redis.new(host: ENV.fetch("REDIS_HOST"))
 
     yield redis
   ensure
