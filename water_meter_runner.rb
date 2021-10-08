@@ -34,7 +34,7 @@ def main
 
     water_data_source = WaterReader::WaterMeasurementListener.new
   else
-    puts "Fake water measurement reader"
+    log "Fake water measurement reader"
 
     last_water_measurement = 0
 
@@ -47,6 +47,8 @@ def main
     water_measurement_store.set(water_measurement_parser.last_measurement)
 
     current_water_usage_store.add_tick DateTime.now
+
+    log "Got tick: #{water_measurement_parser.last_measurement}"
   }
 
   loop do
@@ -54,7 +56,6 @@ def main
       reading = water_data_source.read
 
       water_measurement_parser.parse(reading)
-      puts water_measurement_parser.last_measurement
     end
   end
 end
@@ -65,5 +66,10 @@ def get_last_water_measurement(environment)
   database_reader.last_measurement.water
 end
 
-puts "Starting..."
+def log(message)
+  $stdout.puts message
+  $stdout.flush
+end
+
+log "Starting..."
 main
