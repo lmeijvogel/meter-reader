@@ -90,10 +90,6 @@ def measurement_to_json(measurement, measurement_counter)
 end
 
 def valid?(measurement, last_measurement)
-  if measurement == :waiting
-    return false
-  end
-
   if last_measurement == :no_last_measurement
     measurement_not_zero?(measurement)
   else
