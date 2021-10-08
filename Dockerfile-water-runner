@@ -1,0 +1,22 @@
+FROM ruby:3.0.1-buster
+
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update && \
+    apt-get install tini && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY Gemfile* /app/
+
+RUN bundle config set --local path '/bundle'
+RUN bundle install
+
+COPY * /app/
+
+WORKDIR /app
+
+ENTRYPOINT ["tini", "--"]
+CMD ["bundle", "exec", "ruby", "water_meter_runner.rb"]

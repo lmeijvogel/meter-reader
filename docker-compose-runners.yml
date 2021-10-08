@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile-runner
+    environment:
+      - RACK_ENV=development
+      - REDIS_HOST=redis
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+  runner-water:
+    build:
+      context: .
+      dockerfile: Dockerfile-water-runner
+    environment:
+      - RACK_ENV=development
+      - REDIS_HOST=redis
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+  db:
+    build: ../mariadb
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=meterstanden_test
+      - TZ=Europe/Amsterdam
+    ports:
+      - "3306:3306"
+    volumes:
+      - store:/var/lib/mysql
+      - .:/app
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+volumes:
+  store:
