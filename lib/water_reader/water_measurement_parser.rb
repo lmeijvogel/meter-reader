@@ -3,6 +3,7 @@ require 'yaml'
 module WaterReader
   class WaterMeasurementParser
     attr_accessor :on_tick
+    attr_accessor :last_measurement
 
     def initialize(last_measurement)
       @last_measurement = last_measurement
@@ -22,9 +23,5 @@ module WaterReader
       # The water usage is the same as before.
       self.last_measurement
     end
-
-    protected
-
-    attr_accessor :last_measurement
   end
 end

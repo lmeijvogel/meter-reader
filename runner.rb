@@ -8,28 +8,19 @@ $LOAD_PATH << File.expand_path("../lib", __FILE__)
 
 require "p1_meter_reader/data_parsing/stream_splitter"
 require "p1_meter_reader/data_parsing/fake_stream_splitter"
-require "water_reader/water_measurement_listener"
-require "water_reader/fake_water_measurement_listener"
-require "water_reader/water_measurement_parser"
+require "water_measurement_store"
 require "p1_meter_reader/recorder"
 
 require "database_connection_factory"
 require "database_reader"
 require "output/database_writer"
-require "database_config"
 
-require "current_water_usage_store"
 require "recent_measurement_store"
 
+# Used by DatabaseConfig
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
 
 Dotenv.load
-
-def get_last_water_measurement(environment)
-  database_reader = DatabaseReader.new(DatabaseConnectionFactory.new(environment))
-
-  database_reader.last_measurement.water
-end
 
 def main
   environment = ENV.fetch('ENVIRONMENT')
@@ -41,48 +32,45 @@ def main
 
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
+    redis_host: ENV.fetch("REDIS_HOST"),
     redis_list_name: ENV.fetch("REDIS_LIST_NAME")
   )
 
-  current_water_usage_store = CurrentWaterUsageStore.new
-
-  last_water_measurement = 0
   last_measurement = :no_last_measurement
 
-  if environment == "production"
-    last_water_measurement = get_last_water_measurement(environment)
+  water_measurement_store = WaterMeasurementStore.new(
+    redis_host: ENV.fetch("REDIS_HOST"),
+    redis_key: ENV.fetch("REDIS_WATER_COUNTER_NAME")
+  )
 
+  if environment == "production"
     stream_splitter = P1MeterReader::DataParsing::StreamSplitter.new(ENV.fetch("P1_CONVERTER_MESSAGE_START"), input: serial_port)
-    water_data_source = WaterReader::WaterMeasurementListener.new
+
+    current_measurement_echoer = ->(measurement) { }
   else
-    puts "Fake stream splitter"
+    log "Fake stream splitter"
     stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
-    water_data_source = WaterReader::FakeWaterMeasurementListener.new
+    current_measurement_echoer = ->(measurement) { log measurement.to_s }
   end
 
-  water_measurement_parser = WaterReader::WaterMeasurementParser.new(last_water_measurement)
-
-  water_measurement_parser.on_tick = ->() {
-    current_water_usage_store.add_tick DateTime.now
-  }
-
   recorder = P1MeterReader::Recorder.new(
-    p1_data_source: stream_splitter,
-    water_data_source: water_data_source,
-    water_measurement_parser: water_measurement_parser
+    p1_data_source: stream_splitter
   )
 
   recorder.collect_data do |measurement|
     if valid?(measurement, last_measurement)
-      json = measurement_to_json(measurement, measurement_counter)
+      measurement.water = water_measurement_store.get
 
       database_writer.save_unless_exists(measurement)
+
+      json = measurement_to_json(measurement, measurement_counter)
       recent_measurement_store.add(json)
-      current_water_usage_store.add(measurement)
 
       measurement_counter += 1
 
       last_measurement = measurement
+
+      current_measurement_echoer.(measurement)
     end
   end
 end
@@ -102,25 +90,27 @@ def measurement_to_json(measurement, measurement_counter)
 end
 
 def valid?(measurement, last_measurement)
+  if measurement == :waiting
+    return false
+  end
+
   if last_measurement == :no_last_measurement
     measurement_not_zero?(measurement)
   else
     # The new meter is a bit less trustworthy and will sometimes report
     # invalid energy measurements, e.g. 0 or less than it should
-    return false if measurement.stroom_dal.to_f < last_measurement.stroom_dal.to_f
-    return false if measurement.stroom_piek.to_f < last_measurement.stroom_piek.to_f
-    return false if measurement.gas < last_measurement.gas
-    return false if measurement.water < last_measurement.water
+    return false if measurement.stroom_dal.nil? || measurement.stroom_dal.to_f < last_measurement.stroom_dal.to_f
+    return false if measurement.stroom_piek.nil? || measurement.stroom_piek.to_f < last_measurement.stroom_piek.to_f
+    return false if measurement.gas.nil? || measurement.gas.to_f < last_measurement.gas.to_f
 
     true
   end
 end
 
 def measurement_not_zero?(measurement)
-  return false if measurement.stroom_dal.to_f.abs < 0.01
-  return false if measurement.stroom_piek.to_f.abs < 0.01
-  return false if measurement.gas.abs < 0.01
-  return false if measurement.water.abs < 0.01
+  return false if measurement.stroom_dal.nil? || measurement.stroom_dal.to_f.to_i.abs < 0.01
+  return false if measurement.stroom_piek.nil? || measurement.stroom_piek.to_f.to_i.abs < 0.01
+  return false if measurement.gas.nil? || measurement.gas.to_i.abs < 0.01
 
   true
 end
@@ -135,6 +125,11 @@ def serial_port
   serial_port.parity = SerialPort::EVEN
 
   serial_port
+end
+
+def log(message)
+  $stdout.puts message
+  $stdout.flush
 end
 
 puts "Starting..."

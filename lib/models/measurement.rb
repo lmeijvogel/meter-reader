@@ -1,17 +1,7 @@
 module P1MeterReader
   module Models
     class Measurement
-      attr_accessor :time_stamp, :time_stamp_utc, :stroom_dal, :stroom_piek, :gas, :water
-
-      # At the moment, this initializer is only used for tests
-      def initialize(time_stamp, time_stamp_utc, stroom_dal, stroom_piek, gas, water)
-        self.time_stamp = time_stamp
-        self.time_stamp_utc = time_stamp_utc
-        self.stroom_dal = stroom_dal
-        self.stroom_piek = stroom_piek
-        self.gas = gas
-        self.water = water
-      end
+      attr_accessor :time_stamp, :time_stamp_utc, :stroom_dal, :stroom_piek, :stroom_current, :gas, :water
 
       def time_stamp_current_minute
         self.time_stamp.strftime("%d-%m-%y %H:%M")
@@ -25,7 +15,7 @@ module P1MeterReader
       def to_s
         date = self.time_stamp.strftime("%d-%m-%y %H:%M:%S")
 
-        "#{date}: #{stroom_dal} - #{stroom_piek} - #{gas}"
+        "#{date}: dal: #{stroom_dal} - piek: #{stroom_piek} - gas: #{gas} - water: #{water}"
       end
     end
   end
