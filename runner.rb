@@ -40,7 +40,7 @@ def main
 
   water_measurement_store = WaterMeasurementStore.new(
     redis_host: ENV.fetch("REDIS_HOST"),
-    redis_key: ENV.fetch("REDIS_WATER_COUNTER_NAME")
+    redis_key: ENV.fetch("REDIS_WATER_COUNT_NAME")
   )
 
   if environment == "production"

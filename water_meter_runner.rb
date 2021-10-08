@@ -12,6 +12,9 @@ require "database_reader"
 require "current_water_usage_store"
 require "water_measurement_store"
 
+# Used by DatabaseConfig
+ROOT_PATH = Pathname.new File.dirname(__FILE__)
+
 Dotenv.load
 
 def main
@@ -20,11 +23,14 @@ def main
   current_water_usage_store = CurrentWaterUsageStore.new
   water_measurement_store = WaterMeasurementStore.new(
     redis_host: ENV.fetch("REDIS_HOST"),
-    redis_key: ENV.fetch("REDIS_WATER_COUNTER_NAME")
+    redis_key: ENV.fetch("REDIS_WATER_COUNT_NAME")
   )
 
   if environment == "production"
     last_water_measurement = get_last_water_measurement(environment)
+
+    # The last measurement should be set just to make sure that the main runner picks it up
+    water_measurement_store.set(last_water_measurement)
 
     water_data_source = WaterReader::WaterMeasurementListener.new
   else
