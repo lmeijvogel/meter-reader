@@ -23,10 +23,8 @@ require 'webapp/day_cache_descriptor'
 require 'webapp/month_cache_descriptor'
 require 'webapp/year_cache_descriptor'
 
-NoPasswordsFile = Class.new(StandardError)
-UsernameNotFound = Class.new(StandardError)
-
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), "..")).realpath
+
 Dotenv.load
 
 $enable_cache = true
@@ -85,7 +83,7 @@ class EnergieApi < Sinatra::Base
   end
 
   get "/api/day/:year/:month/:day" do
-    day = DateTime.new(Integer(params[:year]), Integer(params[:month]), params[:day].to_i)
+    day = DateTime.new(Integer(params[:year], 10), Integer(params[:month], 10), Integer(params[:day], 10))
 
     cached(:day, day) do
       database_reader = DatabaseReader.new(connection_factory)
