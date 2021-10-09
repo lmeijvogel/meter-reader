@@ -1,2 +1,0 @@
-web: ~/.rvm/bin/bootup_thin --port $PORT start
-recorder: ~/.rvm/bin/bootup_ruby ../runner.rb
