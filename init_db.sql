@@ -6,7 +6,7 @@ CREATE TABLE measurements (
   time_stamp_utc DATETIME,
   stroom FLOAT,
   gas FLOAT,
-  water FLOAT,
+  water FLOAT
 );
 
 CREATE INDEX measurement_time_index ON measurements(time_stamp);
