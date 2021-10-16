@@ -13,7 +13,7 @@ class DatabaseReader
     end_date = sql_date(DateTime.civil(next_day.year, next_day.month, next_day.day, 1))
 
     query = "SELECT
-      #{self.fields}
+      #{fields}
     FROM measurements
     WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
     GROUP BY YEAR(time_stamp), DAYOFYEAR(time_stamp), HOUR(time_stamp)"
@@ -37,7 +37,7 @@ class DatabaseReader
     end_date = sql_date(date.next_month + 1.0 / (24 * 4));
 
     query = "SELECT
-      #{self.fields}
+      #{fields}
     FROM measurements
     WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
     GROUP BY YEAR(time_stamp), DAYOFYEAR(time_stamp)"
@@ -75,7 +75,7 @@ class DatabaseReader
     end_date = sql_date(date.next_year + 1.0 / (24 * 4));
 
     query = "SELECT
-      #{self.fields}
+      #{fields}
     FROM measurements
     WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
     GROUP BY YEAR(time_stamp), MONTH(time_stamp)"
