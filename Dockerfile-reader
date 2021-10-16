@@ -19,4 +19,4 @@ COPY * /app/
 WORKDIR /app
 
 ENTRYPOINT ["tini", "--"]
-CMD ["bundle", "exec", "ruby", "water_meter_runner.rb"]
+CMD ["bundle", "exec", "ruby", "meter_reader.rb"]
