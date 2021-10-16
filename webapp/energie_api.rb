@@ -52,7 +52,7 @@ class EnergieApi < Sinatra::Base
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 6 * 60 * 4,
     redis_host: ENV.fetch("REDIS_HOST"),
-    redis_list_name: ENV.fetch("REDIS_LIST_NAME")
+    redis_list_name: ENV.fetch("REDIS_MEASUREMENTS_LIST_NAME")
   )
 
   current_water_usage_store = CurrentWaterUsageStore.new

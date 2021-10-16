@@ -33,14 +33,14 @@ def main
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 8 * 60, # 8 hours at 1 measurement per minute
     redis_host: ENV.fetch("REDIS_HOST"),
-    redis_list_name: ENV.fetch("REDIS_LIST_NAME")
+    redis_list_name: ENV.fetch("REDIS_MEASUREMENTS_LIST_NAME")
   )
 
   last_measurement = :no_last_measurement
 
   water_measurement_store = WaterMeasurementStore.new(
     redis_host: ENV.fetch("REDIS_HOST"),
-    redis_key: ENV.fetch("REDIS_WATER_COUNT_NAME")
+    measurements_redis_key: ENV.fetch("REDIS_WATER_COUNT_NAME")
   )
 
   if environment == "production"
