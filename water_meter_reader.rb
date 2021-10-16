@@ -56,6 +56,8 @@ def main
       reading = water_data_source.read
 
       water_measurement_parser.parse(reading)
+    else
+      sleep 1
     end
   end
 end
