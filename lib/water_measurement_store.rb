@@ -2,9 +2,10 @@ require 'date'
 require 'redis'
 
 class WaterMeasurementStore
-  def initialize(redis_host:, measurements_redis_key: "water_meter_water_count")
+  def initialize(redis_host:, measurements_redis_key: "water_meter_water_count", last_ticks_redis_key: "water_meter_last_ticks")
     @redis_host = redis_host
     @measurements_redis_key = measurements_redis_key
+    @last_ticks_redis_key = last_ticks_redis_key
   end
 
   def get
@@ -19,6 +20,20 @@ class WaterMeasurementStore
     end
   end
 
+  def tick
+    with_redis do |redis|
+        redis.multi do
+          redis.lpush @last_ticks_redis_key, DateTime.now
+          redis.ltrim @last_ticks_redis_key, 0, 1 # Only keep last two ticks
+        end
+    end
+  end
+
+  def ticks
+    with_redis do |redis|
+      redis.lrange @last_ticks_redis_key, 0, 1
+    end
+  end
   private
 
   def with_redis

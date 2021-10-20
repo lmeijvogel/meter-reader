@@ -15,6 +15,8 @@ $LOAD_PATH << "../models"
 require 'database_config'
 require 'database_reader'
 require 'recent_measurement_store'
+require 'water_measurement_store'
+require 'current_water_usage_calculator'
 
 require 'webapp/results_cache'
 require 'webapp/day_cache_descriptor'
@@ -51,6 +53,10 @@ class EnergieApi < Sinatra::Base
     number_of_entries: 6 * 60 * 4,
     redis_host: ENV.fetch("REDIS_HOST"),
     redis_list_name: ENV.fetch("REDIS_MEASUREMENTS_LIST_NAME")
+  )
+
+  water_measurement_store = WaterMeasurementStore.new(
+    redis_host: ENV.fetch("REDIS_HOST")
   )
 
 
@@ -121,7 +127,10 @@ class EnergieApi < Sinatra::Base
 
     result = JSON.parse(recent_measurements.last)
 
-    water_current = 0
+    last_water_ticks_redis = water_measurement_store.ticks
+    last_water_ticks = last_water_ticks_redis.map { |str| DateTime.parse(str) }
+
+    water_current = CurrentWaterUsageCalculator.calculate(last_water_ticks)
 
     { id: result["id"],
       current: result["stroom_current"],

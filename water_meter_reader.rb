@@ -43,6 +43,8 @@ def main
   water_measurement_parser.on_tick = ->() {
     water_measurement_store.set(water_measurement_parser.last_measurement)
 
+    water_measurement_store.tick
+
     log "Got tick: #{water_measurement_parser.last_measurement}"
   }
 
