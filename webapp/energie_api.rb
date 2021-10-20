@@ -1,5 +1,4 @@
 require 'sinatra/base'
-# require 'sinatra/reloader'
 
 require 'mysql2'
 require 'json'
@@ -56,6 +55,7 @@ class EnergieApi < Sinatra::Base
 
 
   configure :development do
+    require 'sinatra/reloader'
     register Sinatra::Reloader
     also_reload File.expand_path("../lib/*")
 
