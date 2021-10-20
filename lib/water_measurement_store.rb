@@ -9,7 +9,7 @@ class WaterMeasurementStore
 
   def get
     with_redis do |redis|
-      Integer(redis.get(@measurements_redis_key))
+      redis.get(@measurements_redis_key).to_i
     end
   end
 
