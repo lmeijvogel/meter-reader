@@ -2,7 +2,7 @@ require 'date'
 require 'redis'
 
 class WaterMeasurementStore
-  def initialize(redis_host:, measurements_redis_key:)
+  def initialize(redis_host:, measurements_redis_key: "water_meter_water_count")
     @redis_host = redis_host
     @measurements_redis_key = measurements_redis_key
   end
