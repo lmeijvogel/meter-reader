@@ -18,8 +18,6 @@ RUN bundle install
 
 USER api
 
-WORKDIR /app
-
 COPY * /app/
 
 WORKDIR /app/webapp
