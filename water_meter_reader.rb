@@ -9,7 +9,6 @@ require "water_reader/water_measurement_parser"
 require "database_connection_factory"
 require "database_reader"
 
-require "current_water_usage_store"
 require "water_measurement_store"
 
 # Used by DatabaseConfig
@@ -20,7 +19,6 @@ Dotenv.load
 def main
   environment = ENV.fetch('ENVIRONMENT')
 
-  current_water_usage_store = CurrentWaterUsageStore.new
   water_measurement_store = WaterMeasurementStore.new(
     redis_host: ENV.fetch("REDIS_HOST")
   )
@@ -44,8 +42,6 @@ def main
 
   water_measurement_parser.on_tick = ->() {
     water_measurement_store.set(water_measurement_parser.last_measurement)
-
-    current_water_usage_store.add_tick DateTime.now
 
     log "Got tick: #{water_measurement_parser.last_measurement}"
   }
