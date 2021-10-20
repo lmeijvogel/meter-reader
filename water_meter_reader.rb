@@ -37,7 +37,7 @@ def main
 
     last_water_measurement = 0
 
-    water_data_source = WaterReader::FakeWaterMeasurementListener.new
+    water_data_source = WaterReader::FakeWaterMeasurementListener.new(0.4)
   end
 
   water_measurement_parser = WaterReader::WaterMeasurementParser.new(last_water_measurement)

@@ -1,5 +1,9 @@
 module WaterReader
   class FakeWaterMeasurementListener
+    def initialize(odds_of_tick)
+      @odds_of_tick = odds_of_tick
+    end
+
     def read
       sleep 1
 
@@ -11,7 +15,8 @@ module WaterReader
     end
 
     def random_event
-      if rand(10) < 2
+
+      if rand < @odds_of_tick
         "USAGE"
       else
         "TICK"
