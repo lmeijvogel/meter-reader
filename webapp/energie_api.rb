@@ -51,8 +51,7 @@ class EnergieApi < Sinatra::Base
   connection_factory = DatabaseConnectionFactory.new(database_config)
   recent_measurement_store = RecentMeasurementStore.new(
     number_of_entries: 6 * 60 * 4,
-    redis_host: ENV.fetch("REDIS_HOST"),
-    redis_list_name: ENV.fetch("REDIS_MEASUREMENTS_LIST_NAME")
+    redis_host: ENV.fetch("REDIS_HOST")
   )
 
   water_measurement_store = WaterMeasurementStore.new(
