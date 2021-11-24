@@ -4,6 +4,7 @@ module P1MeterReader
       def initialize
         @stroom_dal = 2018.0
         @stroom_piek = 2293.0
+        @current = 0
         @gas = 2246.0
       end
 
@@ -17,7 +18,7 @@ module P1MeterReader
           1-0:2.8.1(00000.000*kWh)
           1-0:2.8.2(00000.000*kWh)
           0-0:96.14.0(0002)
-          1-0:1.7.0(0000.50*kW)
+          1-0:1.7.0(#{pretty_print @current }*kW)
           1-0:2.7.0(0000.00*kW)
           0-0:17.0.0(999*A)
           0-0:96.3.10(1)
@@ -48,6 +49,9 @@ module P1MeterReader
         if Random.rand < 0.05
           @gas += (2 * Random.rand)
         end
+
+        @current = Random.rand * 3;
+
         return record
       end
 
