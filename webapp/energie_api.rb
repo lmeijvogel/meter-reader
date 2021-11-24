@@ -124,7 +124,7 @@ class EnergieApi < Sinatra::Base
       break
     end
 
-    result = JSON.parse(recent_measurements.last)
+    result = JSON.parse(recent_measurements.first)
 
     last_water_ticks_redis = water_measurement_store.ticks
     last_water_ticks = last_water_ticks_redis.map { |str| DateTime.parse(str) }
