@@ -165,10 +165,11 @@ class DatabaseReader
 
   def to_usage(row)
     usage = P1MeterReader::Models::Usage.new
-    usage.stroom_totaal = row["d_stroom"]
+    usage.stroom = row["d_stroom"]
     usage.gas = row["d_gas"]
     usage.water = row["d_water"]
     usage.time_stamp = row["ts"].to_datetime
+    usage.label = row["label"]
 
     usage
   end

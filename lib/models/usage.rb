@@ -6,7 +6,8 @@ module P1MeterReader
       def to_json(j)
         {
           time_stamp: time_stamp,
-          stroom_totaal: stroom_totaal,
+          label: label,
+          stroom: stroom,
           gas: gas,
           water: water
         }.to_json(j)

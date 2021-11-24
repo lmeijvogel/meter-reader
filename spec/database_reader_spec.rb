@@ -55,10 +55,10 @@ describe DatabaseReader do
       @usage = all_records.first
     end
 
-    it "sets the correct stroom_totaal" do
-      stroom_totaal = measurement_1.stroom_dal + measurement_1.stroom_piek
+    it "sets the correct stroom" do
+      stroom= measurement_1.stroom_dal + measurement_1.stroom_piek
 
-      expect(@usage.stroom_totaal).to be_within(0.01).of(stroom_totaal)
+      expect(@usage.stroom).to be_within(0.01).of(stroom)
     end
 
     it "sets the correct gas" do
