@@ -7,16 +7,16 @@ class DatabaseReader
 
   def read_for_day(date)
     start_date = sql_date(date)
-    next_day = date.next_day
 
-    # Include one measurement at the end of the day (the first one in the new day)
-    end_date = sql_date(DateTime.civil(next_day.year, next_day.month, next_day.day, 1))
+    next_day = date.next_day
+    end_date = sql_date(DateTime.civil(next_day.year, next_day.month, next_day.day, 0))
 
     query = "SELECT
+      MIN(HOUR(time_stamp)) as label,
       #{fields}
     FROM measurements
-    WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
-    GROUP BY YEAR(time_stamp), DAYOFYEAR(time_stamp), HOUR(time_stamp)"
+    WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}
+    GROUP BY HOUR(time_stamp)"
 
     result = []
     @connection_factory.with_connection do |connection|
@@ -24,9 +24,17 @@ class DatabaseReader
         to_usage(row)
       end
 
-      if last_of_current_period?(date, "%Y-%m-%d")
-        result.concat(last_recorded_entry(connection))
+      last_entry_query = "SELECT
+        (MAX(HOUR(time_stamp)) + 1) as label,
+        #{fields_max}
+      FROM measurements
+      WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}"
+
+      last_entry_result = connection.query(last_entry_query).map do |row|
+        to_usage(row)
       end
+
+      result.concat(last_entry_result)
     end
 
     result
@@ -37,34 +45,28 @@ class DatabaseReader
     end_date = sql_date(date.next_month + 1.0 / (24 * 4));
 
     query = "SELECT
-      #{fields}
-    FROM measurements
-    WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
-    GROUP BY YEAR(time_stamp), DAYOFYEAR(time_stamp)"
+        MIN(DAYOFMONTH(time_stamp)) as label,
+        #{fields}
+      FROM measurements
+      WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}
+      GROUP BY DAYOFMONTH(time_stamp)"
 
     @connection_factory.with_connection do |connection|
       result = connection.query(query).map do |row|
         to_usage(row)
       end
 
-      next_timestamp = "DATE_ADD(CURDATE(), INTERVAL 1 DAY)"
-
-      if last_of_current_period?(date, "%Y-%m")
-        last_entry_query = "SELECT
-          #{next_timestamp} as ts,
-          TRUNCATE(stroom,3) as d_stroom,
-          TRUNCATE(gas,3) as d_gas,
-          TRUNCATE(water,3) as d_water
+      last_entry_query = "SELECT
+          (MAX(DAYOFMONTH(time_stamp)) + 1) as label,
+          #{fields_max}
         FROM measurements
-        ORDER BY id DESC
-        LIMIT 1"
+        WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}"
 
-        last_entry_result = connection.query(last_entry_query).map do |row|
-          to_usage(row)
-        end
-
-        result.concat(last_entry_result)
+      last_entry_result = connection.query(last_entry_query).map do |row|
+        to_usage(row)
       end
+
+      result.concat(last_entry_result)
 
       result
     end
@@ -75,34 +77,28 @@ class DatabaseReader
     end_date = sql_date(date.next_year + 1.0 / (24 * 4));
 
     query = "SELECT
-      #{fields}
-    FROM measurements
-    WHERE time_stamp >= #{start_date} AND time_stamp <= #{end_date}
-    GROUP BY YEAR(time_stamp), MONTH(time_stamp)"
+        MIN(MONTH(time_stamp)) as label,
+        #{fields}
+      FROM measurements
+      WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}
+      GROUP BY MONTH(time_stamp)"
 
     @connection_factory.with_connection do |connection|
       result = connection.query(query).map do |row|
         to_usage(row)
       end
 
-      if last_of_current_period?(date, "%Y")
-        next_timestamp = "DATE_ADD(CURDATE(), INTERVAL 1 MONTH)"
-
-        last_entry_query = "SELECT
-          #{next_timestamp} as ts,
-          TRUNCATE(stroom,3) as d_stroom,
-          TRUNCATE(gas,3) as d_gas,
-          TRUNCATE(water,3) as d_water
+      last_entry_query = "SELECT
+          (MAX(MONTH(time_stamp)) + 1) as label,
+          #{fields_max}
         FROM measurements
-        ORDER BY id DESC
-        LIMIT 1"
+        WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}"
 
-        last_entry_result = connection.query(last_entry_query).map do |row|
-          to_usage(row)
-        end
-
-        result.concat(last_entry_result)
+      last_entry_result = connection.query(last_entry_query).map do |row|
+        to_usage(row)
       end
+
+      result.concat(last_entry_result)
 
       result
     end
@@ -180,6 +176,15 @@ class DatabaseReader
       TRUNCATE(MIN(stroom),3) as d_stroom,
       TRUNCATE(MIN(gas),3) as d_gas,
       TRUNCATE(MIN(water), 3) as d_water
+    FIELDS
+  end
+
+  def fields_max
+    <<~FIELDS
+      MAX(time_stamp) as ts,
+      TRUNCATE(MAX(stroom),3) as d_stroom,
+      TRUNCATE(MAX(gas),3) as d_gas,
+      TRUNCATE(MAX(water), 3) as d_water
     FIELDS
   end
 end
