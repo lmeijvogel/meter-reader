@@ -76,6 +76,21 @@ class DatabaseReader
     start_date = sql_date(date)
     end_date = sql_date(date.next_year + 1.0 / (24 * 4));
 
+    now = DateTime.now
+
+    # Due to moving house in 2021, the meter readouts are no longer strictly
+    # increasing, so just picking max(value) for the whole year will give errors:
+    # The absolute readouts in the previous house were higher.
+    #
+    # To circumvent this, if it's the current year, start from the current month since
+    # we're not strictly sure that e.g. december is filled in.
+    # If it's from a previous year, we do know that december is filled in, so we pick that.
+    start_of_last_month = if date.year == DateTime.now.year
+                            sql_date(DateTime.new(now.year, now.month, 1))
+                          else
+                            sql_date(DateTime.new(date.year, 12, 1))
+                          end
+
     query = "SELECT
         MIN(MONTH(time_stamp)) as label,
         #{fields}
@@ -92,7 +107,7 @@ class DatabaseReader
           (MAX(MONTH(time_stamp)) + 1) as label,
           #{fields_max}
         FROM measurements
-        WHERE time_stamp >= #{start_date} AND time_stamp < #{end_date}"
+        WHERE time_stamp >= #{start_of_last_month} AND time_stamp < #{end_date}"
 
       last_entry_result = connection.query(last_entry_query).map do |row|
         to_usage(row)
