@@ -41,6 +41,7 @@ class DatabaseConnectionFactory
   rescue Exception => e
     puts "Exception while opening database:"
     puts e.inspect
+    puts e.backtrace
   ensure
     connection.close
   end

@@ -10,6 +10,7 @@ require "database_connection_factory"
 require "database_reader"
 
 require "water_measurement_store"
+require "output/influxdb_client"
 
 # Used by DatabaseConfig
 ROOT_PATH = Pathname.new File.dirname(__FILE__)
@@ -35,8 +36,10 @@ def main
 
     last_water_measurement = 0
 
-    water_data_source = WaterReader::FakeWaterMeasurementListener.new(0.4)
+    water_data_source = WaterReader::FakeWaterMeasurementListener.new(0.2)
   end
+
+  influx = InfluxDBClient.new(hostname: ENV.fetch("INFLUXDB_HOST"), org: ENV.fetch("INFLUXDB_ORG"), bucket: ENV.fetch("INFLUXDB_BUCKET"), token: ENV.fetch("INFLUXDB_TOKEN"))
 
   water_measurement_parser = WaterReader::WaterMeasurementParser.new(last_water_measurement)
 
@@ -44,6 +47,12 @@ def main
     water_measurement_store.set(water_measurement_parser.last_measurement)
 
     water_measurement_store.tick
+
+    begin
+      influx.send_water_tick
+    rescue StandardError => e
+      $stdout.puts "ERROR sending to InfluxDB: #{e.message}"
+    end
 
     log "Got tick: #{water_measurement_parser.last_measurement}"
   }

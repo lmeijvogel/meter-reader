@@ -14,6 +14,7 @@ require "p1_meter_reader/recorder"
 require "database_connection_factory"
 require "database_reader"
 require "output/database_writer"
+require "output/influxdb_client"
 
 require "recent_measurement_store"
 
@@ -56,6 +57,8 @@ def main
     p1_data_source: stream_splitter
   )
 
+  influx = InfluxDBClient.new(hostname: ENV.fetch("INFLUXDB_HOST"), org: ENV.fetch("INFLUXDB_ORG"), bucket: ENV.fetch("INFLUXDB_BUCKET"), token: ENV.fetch("INFLUXDB_TOKEN"))
+
   recorder.collect_data do |measurement|
     if valid?(measurement, last_measurement)
       measurement.water = water_measurement_store.get
@@ -67,9 +70,24 @@ def main
 
       measurement_counter += 1
 
+      begin
+        if last_measurement != :no_last_measurement
+          influx.send_gas_reading(measurement.gas) if measurement.gas > last_measurement.gas
+
+          stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+          last_stroom = last_measurement.stroom_dal.to_f + last_measurement.stroom_piek.to_f
+
+          influx.send_stroom_reading(stroom) if stroom > last_stroom
+
+          # Water is sent separately in the water runner
+        end
+      rescue StandardError => e
+        $stdout.puts "ERROR sending to InfluxDB: #{e.message}"
+      end
+
       last_measurement = measurement
 
-      current_measurement_echoer.(measurement)
+      # current_measurement_echoer.(measurement)
     end
   end
 end
