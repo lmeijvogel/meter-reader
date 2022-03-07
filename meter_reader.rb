@@ -79,6 +79,8 @@ def main
 
           influx.send_stroom_reading(stroom) if stroom > last_stroom
 
+          influx.send_current_reading(measurement.stroom_current) # Always send current
+
           # Water is sent separately in the water runner
         end
       rescue StandardError => e

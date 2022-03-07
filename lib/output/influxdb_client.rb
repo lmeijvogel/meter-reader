@@ -32,6 +32,13 @@ class InfluxDBClient
     })
   end
 
+  def send_current_reading(reading)
+    write_api.write(data: {
+      name: 'current',
+      fields: { current: reading.to_f }, time: Time.now
+    })
+  end
+
   def send_gas_reading(reading)
     write_api.write(data: {
       name: 'gas',

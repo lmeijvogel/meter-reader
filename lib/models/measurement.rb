@@ -15,7 +15,7 @@ module P1MeterReader
       def to_s
         date = self.time_stamp.strftime("%d-%m-%y %H:%M:%S")
 
-        "#{date}: dal: #{stroom_dal} - piek: #{stroom_piek} - gas: #{gas} - water: #{water}"
+        "#{date}: dal: #{stroom_dal} - piek: #{stroom_piek} - gas: #{gas} - water: #{water} - current: #{stroom_current}"
       end
     end
   end
