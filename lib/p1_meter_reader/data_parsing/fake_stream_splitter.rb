@@ -43,17 +43,24 @@ module P1MeterReader
       def read
         sleep 1
 
-        if Random.rand < 0.05
+        if Random.rand < 0.1
           @stroom_piek += (2 * Random.rand)
         end
-        if Random.rand < 0.05
+        if Random.rand < 0.1
           @stroom_dal += (2 * Random.rand)
         end
-        if Random.rand < 0.05
+        if Random.rand < 0.1
+          @levering_piek += (2 * Random.rand)
+        end
+        if Random.rand < 0.1
+          @levering_dal += (2 * Random.rand)
+        end
+        if Random.rand < 0.1
           @gas += (2 * Random.rand)
         end
 
         @current = Random.rand * 3;
+        @levering_current = Random.rand * 3;
 
         return record
       end
