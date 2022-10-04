@@ -83,8 +83,9 @@ def main
           last_levering = last_reading.levering_dal.to_f + last_reading.levering_piek.to_f
 
           influx.send_stroom_reading(stroom) if stroom > last_stroom
+          influx.send_levering_reading(levering) if levering > last_levering
 
-          influx.send_current_reading(reading.stroom_current) # Always send current
+          influx.send_current_reading(reading.stroom_current, reading.levering_current) # Always send current
 
           # Water is sent separately in the water runner
         end

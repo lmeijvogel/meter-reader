@@ -32,10 +32,17 @@ class InfluxDBClient
     })
   end
 
-  def send_current_reading(reading)
+  def send_levering_reading(reading)
+    write_api.write(data: {
+      name: 'levering',
+      fields: { levering: reading.to_f }, time: Time.now
+    })
+  end
+
+  def send_current_reading(current, generation)
     write_api.write(data: {
       name: 'current',
-      fields: { current: reading.to_f }, time: Time.now
+      fields: { current: current.to_f, generation: generation.to_f }, time: Time.now
     })
   end
 
