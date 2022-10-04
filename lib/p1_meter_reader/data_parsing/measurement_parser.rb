@@ -2,8 +2,10 @@ require 'date'
 
 require "p1_meter_reader/data_parsing/parse_chain/gas_chain"
 require "p1_meter_reader/data_parsing/parse_chain/stroom_dal_chain"
-require "p1_meter_reader/data_parsing/parse_chain/stroom_current_chain"
 require "p1_meter_reader/data_parsing/parse_chain/stroom_piek_chain"
+require "p1_meter_reader/data_parsing/parse_chain/levering_dal_chain"
+require "p1_meter_reader/data_parsing/parse_chain/levering_piek_chain"
+require "p1_meter_reader/data_parsing/parse_chain/stroom_current_chain"
 require "p1_meter_reader/data_parsing/parse_chain/skip_line_chain"
 
 require "models/measurement"
@@ -16,9 +18,11 @@ module P1MeterReader
 
         @chain = P1MeterReader::DataParsing::ParseChain::StroomDalChain.new(
           P1MeterReader::DataParsing::ParseChain::StroomPiekChain.new(
-            P1MeterReader::DataParsing::ParseChain::StroomCurrentChain.new(
-              P1MeterReader::DataParsing::ParseChain::GasChain.new(
-                P1MeterReader::DataParsing::ParseChain::SkipLineChain.new))))
+            P1MeterReader::DataParsing::ParseChain::LeveringDalChain.new(
+              P1MeterReader::DataParsing::ParseChain::LeveringPiekChain.new(
+                P1MeterReader::DataParsing::ParseChain::StroomCurrentChain.new(
+                  P1MeterReader::DataParsing::ParseChain::GasChain.new(
+                    P1MeterReader::DataParsing::ParseChain::SkipLineChain.new))))))
       end
 
       def parse(input)

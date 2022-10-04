@@ -6,6 +6,9 @@ module P1MeterReader
         @stroom_piek = 2293.0
         @current = 0
         @gas = 2246.0
+
+        @levering_piek = 102.2
+        @levering_dal = 1.3
       end
 
       def record
@@ -15,11 +18,11 @@ module P1MeterReader
           0-0:96.1.1(4B414145303031343535343236383133)
           1-0:1.8.1(#{pretty_print @stroom_dal }*kWh)
           1-0:1.8.2(#{pretty_print @stroom_piek }*kWh)
-          1-0:2.8.1(00000.000*kWh)
-          1-0:2.8.2(00000.000*kWh)
+          1-0:2.8.1(#{pretty_print @levering_dal }*kWh)
+          1-0:2.8.2(#{pretty_print @levering_piek }*kWh)
           0-0:96.14.0(0002)
           1-0:1.7.0(#{pretty_print @current }*kW)
-          1-0:2.7.0(0000.00*kW)
+          1-0:2.7.0(#{pretty_print @levering_current }*kW)
           0-0:17.0.0(999*A)
           0-0:96.3.10(1)
           0-0:96.13.1()

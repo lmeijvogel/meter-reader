@@ -14,22 +14,31 @@ class DatabaseWriter
 
   def save(measurement, database_connection)
     stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+    levering = measurement.levering_dal.to_f + measurement.levering_piek.to_f
 
-    c = database_connection
-    query = <<~QUERY
-      INSERT INTO measurements(time_stamp, time_stamp_utc, stroom, gas, water) VALUES(
-        '#{c.escape measurement.time_stamp.strftime('%FT%T')}',
-        '#{c.escape measurement.time_stamp_utc.strftime('%FT%T')}',
-        '#{c.escape stroom.to_s}',
-        '#{c.escape measurement.gas.to_f.to_s}',
-        '#{c.escape measurement.water.to_f.to_s}'
-      )
-    QUERY
+    statement = database_connection.prepare <<~QUERY
+      INSERT INTO measurements(time_stamp, time_stamp_utc, stroom, levering, gas, water) VALUES(
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?)
+      QUERY
 
-    database_connection.query(query)
+    statement.execute(
+      measurement.time_stamp.strftime('%FT%T'),
+      measurement.time_stamp_utc.strftime('%FT%T'),
+      stroom,
+      levering,
+      measurement.gas.to_f,
+      measurement.water.to_f
+    )
+
   end
 
   private
+
   def exists?(measurement, database_connection)
     sql_date_format  = "%Y-%m-%d %H:%i:%S"
     ruby_date_format = "%Y-%m-%d %H:%M:%S"

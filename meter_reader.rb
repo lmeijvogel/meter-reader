@@ -28,7 +28,8 @@ def main
 
   measurement_counter = 0
 
-  database_writer = DatabaseWriter.new(DatabaseConnectionFactory.new(environment))
+  database_connection_factory = DatabaseConnectionFactory.new(environment)
+  database_writer = DatabaseWriter.new(database_connection_factory)
   database_writer.save_interval = 5
 
   recent_measurement_store = RecentMeasurementStore.new(
@@ -50,7 +51,9 @@ def main
   else
     log "Fake stream splitter"
     stream_splitter = P1MeterReader::DataParsing::FakeStreamSplitter.new
-    current_measurement_echoer = ->(measurement) { log measurement.to_s }
+    current_measurement_echoer = ->(measurement) { log "Received measurement: #{measurement}"}
+
+    # Timecop.scale(360)
   end
 
   recorder = P1MeterReader::Recorder.new(
@@ -75,7 +78,9 @@ def main
           influx.send_gas_reading(measurement.gas) if measurement.gas > last_measurement.gas
 
           stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+          levering = measurement.levering_dal.to_f + measurement.levering_piek.to_f
           last_stroom = last_measurement.stroom_dal.to_f + last_measurement.stroom_piek.to_f
+          last_levering = last_measurement.levering_dal.to_f + last_measurement.levering_piek.to_f
 
           influx.send_stroom_reading(stroom) if stroom > last_stroom
 
@@ -96,12 +101,14 @@ end
 
 def measurement_to_json(measurement, measurement_counter)
   stroom = measurement.stroom_dal.to_f + measurement.stroom_piek.to_f
+  levering = measurement.levering_dal.to_f + measurement.levering_piek.to_f
 
   {
     id:               measurement_counter,
     time_stamp:       measurement.time_stamp.to_s,
     time_stamp_utc:   measurement.time_stamp_utc.to_s,
     stroom:           stroom,
+    levering:         levering,
     stroom_current:   measurement.stroom_current.to_f,
     gas:              measurement.gas.to_f,
     water:            measurement.water.to_f
@@ -116,6 +123,9 @@ def valid?(measurement, last_measurement)
     # invalid energy measurements, e.g. 0 or less than it should
     return false if measurement.stroom_dal.nil? || measurement.stroom_dal.to_f < last_measurement.stroom_dal.to_f
     return false if measurement.stroom_piek.nil? || measurement.stroom_piek.to_f < last_measurement.stroom_piek.to_f
+    # Do not enable these yet since there is no levering yet :D
+    # return false if measurement.levering_dal.nil? || measurement.levering_dal.to_f < last_measurement.levering_dal.to_f
+    # return false if measurement.levering_piek.nil? || measurement.levering_piek.to_f < last_measurement.levering_piek.to_f
     return false if measurement.gas.nil? || measurement.gas.to_f < last_measurement.gas.to_f
 
     true
@@ -125,6 +135,9 @@ end
 def measurement_not_zero?(measurement)
   return false if measurement.stroom_dal.nil? || measurement.stroom_dal.to_f.to_i.abs < 0.01
   return false if measurement.stroom_piek.nil? || measurement.stroom_piek.to_f.to_i.abs < 0.01
+  # Do not enable yet
+  # return false if measurement.levering_dal.nil? || measurement.levering_dal.to_f.to_i.abs < 0.01
+  # return false if measurement.levering_piek.nil? || measurement.levering_piek.to_f.to_i.abs < 0.01
   return false if measurement.gas.nil? || measurement.gas.to_i.abs < 0.01
 
   true
