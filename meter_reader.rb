@@ -12,7 +12,6 @@ require "water_measurement_store"
 require "p1_meter_reader/recorder"
 
 require "database_connection_factory"
-require "database_reader"
 require "output/database_writer"
 require "output/influxdb_client"
 
