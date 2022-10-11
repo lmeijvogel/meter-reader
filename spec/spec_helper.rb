@@ -1,3 +1,5 @@
+require 'pathname'
+
 ROOT_PATH = Pathname.new(File.join(File.dirname(__FILE__), ".."))
 
 $LOAD_PATH.unshift File.expand_path("../../lib/p1_meter_reader", __FILE__)

@@ -30,12 +30,17 @@ describe DatabaseWriter do
     let(:time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23 }
     let(:stroom_piek) { 23.34 }
+    let(:levering_dal) { 2.23 }
+    let(:levering_piek) { 34 }
+    let(:stroom_current) { 500 }
+    let(:levering_current) { 230 }
     let(:gas) { 12.23 }
     let(:water) { 33 }
 
     before do
-      @measurement = P1MeterReader::Models::Measurement.new(time_stamp, time_stamp, stroom_dal, stroom_piek, gas, water)
+      @measurement = P1MeterReader::Models::Measurement.new(time_stamp, time_stamp, stroom_dal, stroom_piek, levering_dal, levering_piek, stroom_current, levering_current, gas, water)
 
+      writer.save_interval = 15
       database_connection.query("DELETE FROM measurements")
     end
 
