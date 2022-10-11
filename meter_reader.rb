@@ -60,6 +60,7 @@ def main
   )
 
   influx = InfluxDBClient.new(hostname: ENV.fetch("INFLUXDB_HOST"), org: ENV.fetch("INFLUXDB_ORG"), bucket: ENV.fetch("INFLUXDB_BUCKET"), token: ENV.fetch("INFLUXDB_TOKEN"))
+  influx_temporary = InfluxDBClient.new(hostname: ENV.fetch("INFLUXDB_HOST"), org: ENV.fetch("INFLUXDB_ORG"), bucket: ENV.fetch("INFLUXDB_BUCKET_TEMPORARY"), token: ENV.fetch("INFLUXDB_TOKEN"))
 
   recorder.collect_data do |reading|
     if valid?(reading, last_reading)
@@ -84,7 +85,7 @@ def main
           influx.send_stroom_reading(stroom) if stroom > last_stroom
           influx.send_levering_reading(levering) if levering > last_levering
 
-          influx.send_current_reading(reading.stroom_current, reading.levering_current) # Always send current
+          influx_temporary.send_current_reading(reading.stroom_current, reading.levering_current) # Always send current
 
           # Water is sent separately in the water runner
         end
