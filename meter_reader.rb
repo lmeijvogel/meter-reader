@@ -29,7 +29,7 @@ def main
 
   database_connection_factory = DatabaseConnectionFactory.new(environment)
   database_writer = DatabaseWriter.new(database_connection_factory)
-  database_writer.save_interval = 5
+  database_writer.save_interval = 15
 
   recent_reading_store = RecentMeasurementStore.new(
     number_of_entries: 8 * 60, # 8 hours at 1 reading per minute

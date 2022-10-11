@@ -71,14 +71,14 @@ describe DatabaseWriter do
     end
   end
 
-  describe :exists? do
+  describe :should_save? do
     let(:existing_time_stamp) { DateTime.now }
     let(:stroom_dal) { 12.23 }
     let(:stroom_piek) { 23.34 }
     let(:gas) { 12.23 }
     let(:water) { 33 }
 
-    let(:save_interval) { 30 }
+    let(:save_interval) { 15 }
 
     before do
       @measurement = P1MeterReader::Models::Measurement.new(existing_time_stamp, existing_time_stamp, stroom_dal, stroom_piek, gas, water)
@@ -91,27 +91,78 @@ describe DatabaseWriter do
     end
 
     context "when another measurement already exists" do
-      let(:new_time_stamp) { DateTime.now + (save_interval / 2.0)/(24*60) }
+      let(:new_time_stamp) { DateTime.now + (7.5)/(24*60) }
 
-      it "is true" do
-        expect(writer.send(:exists?, @measurement, database_connection)).to be true
+      it "is false" do
+        expect(writer.send(:should_save?, @measurement, database_connection)).to be false
+      end
+    end
+
+    describe "save intervals" do
+      describe "previous measurement on time" do
+        let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 15, 0) }
+
+        describe "and it is time for new entry" do
+          let(:new_time_stamp) { DateTime.civil(2014, 11, 20, 20, 30, 0) }
+
+          it "is true" do
+            expect(writer.send(:should_save?, @measurement, database_connection)).to be true
+          end
+        end
+
+        describe "but it is not yet time for new entry" do
+          let(:new_time_stamp) { DateTime.civil(2014, 11, 20, 20, 29, 0) }
+
+          it "is false" do
+            expect(writer.send(:should_save?, @measurement, database_connection)).to be false
+          end
+        end
+      end
+
+      describe "previous measurement missed" do
+        let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 3, 0) }
+
+        describe "but it is not yet time for new entry" do
+          let(:new_time_stamp) { DateTime.civil(2014, 11, 20, 20, 24, 0) }
+
+          it "is false" do
+            expect(writer.send(:should_save?, @measurement, database_connection)).to be false
+          end
+        end
+
+        describe "and it is time for new entry" do
+          let(:new_time_stamp) { DateTime.civil(2014, 11, 20, 20, 30, 0) }
+
+          it "is true" do
+            expect(writer.send(:should_save?, @measurement, database_connection)).to be true
+          end
+        end
+      end
+
+      describe "at day's end" do
+        let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 23, 45, 1) }
+        let(:new_time_stamp) { DateTime.civil(2014, 11, 21, 0, 0, 1) }
+
+        it "is true" do
+          expect(writer.send(:should_save?, @measurement, database_connection)).to be true
+        end
       end
     end
 
     context "when another measurement close to this one exists (regression)" do
-      let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 0, 40) }
-      let(:new_time_stamp)      { DateTime.civil(2014, 11, 20, 20, 0, 50) }
+      let(:existing_time_stamp) { DateTime.civil(2014, 11, 20, 20, 3, 0) }
+      let(:new_time_stamp)      { DateTime.civil(2014, 11, 20, 20, 15, 0) }
 
-      it "is true" do
-        expect(writer.send(:exists?, @measurement, database_connection)).to be true
+      it "is false" do
+        expect(writer.send(:should_save?, @measurement, database_connection)).to be false
       end
     end
 
     context "when no other measurement exists" do
-      let(:new_time_stamp) { DateTime.now + (save_interval + 1.0)/(24*60) }
+      let(:new_time_stamp) { now = DateTime.now ; DateTime.new(now.year, now.month, now.day, now.hour + 1, 15, 0) }
 
-      it "is false" do
-        expect(writer.send(:exists?, @measurement, database_connection)).to be false
+      it "is true" do
+        expect(writer.send(:should_save?, @measurement, database_connection)).to be true
       end
     end
   end

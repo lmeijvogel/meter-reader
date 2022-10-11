@@ -8,7 +8,7 @@ class DatabaseWriter
 
   def save_unless_exists(measurement)
     @database_connection_factory.with_connection do |connection|
-      save(measurement, connection) unless exists?(measurement, connection)
+      save(measurement, connection) if should_save?(measurement, connection)
     end
   end
 
@@ -39,15 +39,17 @@ class DatabaseWriter
 
   private
 
-  def exists?(measurement, database_connection)
+  def should_save?(measurement, database_connection)
     sql_date_format  = "%Y-%m-%d %H:%i:%S"
     ruby_date_format = "%Y-%m-%d %H:%M:%S"
 
-    save_interval_in_days = Float(save_interval)/(24*60)
-    previous_half_hour   = measurement.time_stamp - save_interval_in_days
+    return false if !divisible_by_interval?(measurement.time_stamp, save_interval)
 
-    formatted_start_time = previous_half_hour.strftime(ruby_date_format)
-    formatted_end_time   = measurement.time_stamp.strftime(ruby_date_format)
+    save_interval_in_days = Float(save_interval)/(24*60)
+    last_allowed_time = measurement.time_stamp - save_interval_in_days
+
+    formatted_start_time = last_allowed_time.strftime(ruby_date_format)
+    formatted_end_time = measurement.time_stamp.strftime(ruby_date_format)
 
     c = database_connection
     escaped_start_time  = c.escape formatted_start_time
@@ -59,6 +61,10 @@ class DatabaseWriter
       AND   time_stamp <=  str_to_date('#{escaped_end_time}',   '#{sql_date_format}')
     QUERY
 
-    database_connection.query(exists_query).any?
+    database_connection.query(exists_query).none?
+  end
+
+  def divisible_by_interval?(time_stamp, save_interval)
+    return (time_stamp.minute % save_interval) == 0
   end
 end
