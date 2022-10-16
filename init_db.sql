@@ -5,8 +5,10 @@ CREATE TABLE measurements (
   time_stamp DATETIME,
   time_stamp_utc DATETIME,
   stroom FLOAT,
+  levering FLOAT,
+  opwekking FLOAT,
   gas FLOAT,
-  water FLOAT
+  water INT
 );
 
 CREATE INDEX measurement_time_index ON measurements(time_stamp);
