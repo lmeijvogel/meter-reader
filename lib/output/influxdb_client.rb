@@ -53,6 +53,13 @@ class InfluxDBClient
     })
   end
 
+  def send_opwekking_reading(reading, time)
+    write_api.write(data: {
+      name: 'opwekking',
+      fields: { opwekking: reading.to_i }, time: time
+    })
+  end
+
   def write_api
     @write_api ||= client.create_write_api
   end

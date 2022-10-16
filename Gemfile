@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "dotenv"
+gem "httparty"
 gem "mysql2"
 gem "influxdb-client"
 gem "serialport"
