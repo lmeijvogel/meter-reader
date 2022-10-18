@@ -31,8 +31,6 @@ def main
   # Replace dates with parsed dates
   production = production_raw.map {|entry| entry.merge({"date" => Time.strptime(entry["date"], "%Y-%m-%d %H:%M:%S") } ) }
 
-  puts "Received #{production_raw.size} from SolarEdge"
-
   production.each do |entry|
     influx.send_opwekking_reading(entry["value"], entry["date"])
   end
