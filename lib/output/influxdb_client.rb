@@ -21,7 +21,7 @@ class InfluxDBClient
   def send_water_tick
     write_api.write(data: {
       name: 'water',
-      fields: { water: 1 }, time: Time.now
+      fields: { water: 0.5 }, time: Time.now
     })
   end
 
